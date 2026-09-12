@@ -1,0 +1,6 @@
+{
+  "name": "Renal Medicity",
+  "description": "Renal Medicity - Advanced Kidney Care & Dialysis Center. Caring For Kidney Health with hemodialysis, peritoneal dialysis, home dialysis, and hospital network network care.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

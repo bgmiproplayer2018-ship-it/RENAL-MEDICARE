@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 190" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="favKidneyL" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="50%" stop-color="#005BBD" />
+      <stop offset="100%" stop-color="#00357A" />
+    </linearGradient>
+    <linearGradient id="favKidneyR" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="50%" stop-color="#005BBD" />
+      <stop offset="100%" stop-color="#003272" />
+    </linearGradient>
+    <linearGradient id="favHand" x1="0%" y1="20%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#22C55E" />
+      <stop offset="50%" stop-color="#16A34A" />
+      <stop offset="100%" stop-color="#15803D" />
+    </linearGradient>
+    <linearGradient id="favArch" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#DC2626" />
+      <stop offset="100%" stop-color="#E11D48" />
+    </linearGradient>
+    <filter id="fShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2.5" flood-color="#001840" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <rect width="190" height="190" rx="36" fill="#FFFFFF" />
+
+  <g transform="translate(4, 16)">
+    <!-- Red Arch -->
+    <path d="M 32 94 A 62 62 0 0 1 150 94" stroke="url(#favArch)" stroke-width="8" stroke-linecap="round" fill="none" />
+
+    <!-- Kidneys with shadow -->
+    <g filter="url(#fShadow)">
+      <!-- Left Kidney -->
+      <path d="M 68 56 C 50 56 38 72 38 92 C 38 112 50 130 68 130 C 78 130 84 122 84 110 C 84 100 78 96 78 92 C 78 88 84 84 84 74 C 84 62 78 56 68 56 Z" 
+            fill="url(#favKidneyL)" />
+      <path d="M 54 70 C 47 79 47 98 54 112" stroke="#93C5FD" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
+      
+      <!-- Right Kidney -->
+      <path d="M 114 56 C 132 56 144 72 144 92 C 144 112 132 130 114 130 C 104 130 98 122 98 110 C 98 100 104 96 104 92 C 104 88 98 84 98 74 C 98 62 104 56 114 56 Z" 
+            fill="url(#favKidneyR)" />
+      <path d="M 128 70 C 135 79 135 98 128 112" stroke="#93C5FD" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
+    </g>
+
+    <!-- Hand -->
+    <g filter="url(#fShadow)">
+      <path d="M 24 122 C 36 128 52 140 76 144 C 104 148 132 144 154 128 C 160 124 165 120 167 118 C 167 121 160 132 150 140 C 132 154 100 159 68 153 C 48 149 34 139 24 131 Z" 
+            fill="url(#favHand)" />
+      <path d="M 42 126 C 50 130 60 132 72 134" stroke="#86EFAC" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+    </g>
+  </g>
+</svg>

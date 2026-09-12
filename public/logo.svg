@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 180" width="100%" height="100%" fill="none">
+  <defs>
+    <!-- Kidney Gradients -->
+    <linearGradient id="kidneyLeftGrad" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="40%" stop-color="#005BBD" />
+      <stop offset="100%" stop-color="#00357A" />
+    </linearGradient>
+    <linearGradient id="kidneyRightGrad" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="45%" stop-color="#005BBD" />
+      <stop offset="100%" stop-color="#003272" />
+    </linearGradient>
+    <!-- Highlight Reflection -->
+    <linearGradient id="highlightGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#93C5FD" stop-opacity="0.8" />
+      <stop offset="60%" stop-color="#60A5FA" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#005BBD" stop-opacity="0" />
+    </linearGradient>
+    <!-- Hand Gradient -->
+    <linearGradient id="handGrad" x1="0%" y1="20%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#22C55E" />
+      <stop offset="45%" stop-color="#16A34A" />
+      <stop offset="100%" stop-color="#15803D" />
+    </linearGradient>
+    <!-- Red Arch Gradient -->
+    <linearGradient id="archGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#DC2626" />
+      <stop offset="50%" stop-color="#EF4444" />
+      <stop offset="100%" stop-color="#E11D48" />
+    </linearGradient>
+    <!-- Soft shadow filter -->
+    <filter id="subtleShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#002050" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <g transform="translate(10, 8)">
+    <!-- Protective Upper Red Arc -->
+    <path d="M 28 85 A 64 64 0 0 1 154 85" stroke="url(#archGrad)" stroke-width="7" stroke-linecap="round" fill="none" />
+
+    <!-- Left Kidney -->
+    <g filter="url(#subtleShadow)">
+      <path d="M 68 52 C 50 52 38 68 38 88 C 38 108 50 126 68 126 C 78 126 84 118 84 106 C 84 96 78 92 78 88 C 78 84 84 80 84 70 C 84 58 78 52 68 52 Z" 
+            fill="url(#kidneyLeftGrad)" />
+      <!-- Left Kidney Inner Highlight / Hilum -->
+      <path d="M 52 64 C 44 74 44 96 52 110 C 47 98 47 78 52 64 Z" fill="url(#highlightGrad)" opacity="0.85" />
+      <path d="M 74 80 C 71 85 71 93 74 98" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.75" />
+      <path d="M 70 89 L 84 89" stroke="#E2E8F0" stroke-width="1.8" stroke-linecap="round" opacity="0.6" />
+    </g>
+
+    <!-- Right Kidney -->
+    <g filter="url(#subtleShadow)">
+      <path d="M 114 52 C 132 52 144 68 144 88 C 144 108 132 126 114 126 C 104 126 98 118 98 106 C 98 96 104 92 104 88 C 104 84 98 80 98 70 C 98 58 104 52 114 52 Z" 
+            fill="url(#kidneyRightGrad)" />
+      <!-- Right Kidney Inner Highlight / Hilum -->
+      <path d="M 130 64 C 138 74 138 96 130 110 C 135 98 135 78 130 64 Z" fill="url(#highlightGrad)" opacity="0.85" />
+      <path d="M 108 80 C 111 85 111 93 108 98" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.75" />
+      <path d="M 98 89 L 112 89" stroke="#E2E8F0" stroke-width="1.8" stroke-linecap="round" opacity="0.6" />
+    </g>
+
+    <!-- Caring Protective Green Hand Underneath -->
+    <g filter="url(#subtleShadow)">
+      <!-- Palm and wrist sweeping up from left to right -->
+      <path d="M 24 116 C 36 122 52 134 76 138 C 102 142 130 138 152 122 C 158 118 163 114 165 112 C 165 115 158 126 148 134 C 130 148 98 153 66 147 C 46 143 32 133 22 125 C 20 123 21 118 24 116 Z" 
+            fill="url(#handGrad)" />
+      <!-- Cupping fingers contour -->
+      <path d="M 165 112 C 155 118 142 123 128 125 C 114 127 96 126 84 123 C 98 128 116 129 135 127 C 147 125 158 120 165 112 Z" 
+            fill="#86EFAC" opacity="0.6" />
+      <!-- Thumb accent curve -->
+      <path d="M 40 120 C 48 124 58 126 70 128" stroke="#86EFAC" stroke-width="2.5" stroke-linecap="round" opacity="0.8" />
+    </g>
+  </g>
+
+  <!-- Brand Typography -->
+  <!-- "RENAL" in #005BBD -->
+  <text x="195" y="78" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="46" fill="#005BBD" letter-spacing="2">RENAL</text>
+  
+  <!-- "MEDICITY" in #16A34A -->
+  <text x="195" y="125" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="44" fill="#16A34A" letter-spacing="2">MEDICITY</text>
+  
+  <!-- "KIDNEY CARE & DIALYSIS CENTER" Subtitle -->
+  <text x="197" y="148" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="12.5" fill="#00357A" letter-spacing="2.8">KIDNEY CARE &amp; DIALYSIS CENTER</text>
+</svg>

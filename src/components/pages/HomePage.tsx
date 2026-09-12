@@ -105,57 +105,57 @@ export const HomePage: React.FC<HomePageProps> = ({
               </div>
 
               {/* Exact Requested Headline */}
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15]">
-                Advanced <span className="text-[#005BBD]">Dialysis</span> &amp; <br />
+              <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.2]">
+                Advanced <span className="text-[#005BBD]">Dialysis</span> &amp;{' '}
                 <span className="text-[#16A34A]">Kidney Care</span> Services
               </h1>
 
               {/* Exact Requested Subheadline */}
-              <p className="text-base sm:text-xl text-slate-600 font-normal leading-relaxed max-w-2xl">
+              <p className="text-sm sm:text-xl text-slate-600 font-normal leading-relaxed max-w-2xl">
                 Providing quality dialysis treatment across multiple hospitals and at-home dialysis services.
               </p>
 
               {/* Hero Features (Exact from prompt: Patient Focused, Quality Care, Compassion & Trust, Better Health Better Life) */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 pt-1">
                 {[
                   { title: 'Patient Focused', desc: 'Customized dialysis prescriptions & dietary care' },
                   { title: 'Quality Care', desc: 'AAMI ultrapure water & high-flux filtration' },
                   { title: 'Compassion & Trust', desc: 'Dedicated senior nephrologists & trained nurses' },
                   { title: 'Better Health Better Life', desc: 'Infection-free home & hospital suites' },
                 ].map((feat, i) => (
-                  <div key={i} className="flex items-start gap-2.5 p-2 rounded-xl bg-white/70 border border-blue-100 shadow-2xs">
-                    <CheckCircle2 className="w-5 h-5 text-[#16A34A] shrink-0 mt-0.5" />
+                  <div key={i} className="flex items-start gap-2.5 p-2 sm:p-2.5 rounded-xl bg-white/80 border border-blue-100/90 shadow-2xs">
+                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#16A34A] shrink-0 mt-0.5" />
                     <div>
-                      <span className="font-bold text-slate-800 text-sm block">{feat.title}</span>
-                      <span className="text-slate-500 text-xs hidden sm:block">{feat.desc}</span>
+                      <span className="font-bold text-slate-800 text-xs sm:text-sm block">{feat.title}</span>
+                      <span className="text-slate-500 text-[11px] sm:text-xs">{feat.desc}</span>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Buttons: Book Appointment, Home Dialysis Enquiry, Call Now */}
-              <div className="flex flex-wrap items-center gap-3.5 pt-3">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3.5 pt-2">
                 <button
                   onClick={() => onNavigate('appointment')}
-                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#005BBD] to-[#0EA5E9] hover:from-[#004A99] hover:to-[#0284C7] text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all transform active:scale-95 flex items-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#005BBD] to-[#0EA5E9] hover:from-[#004A99] hover:to-[#0284C7] text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
                   id="hero-book-appointment-btn"
                 >
-                  <Calendar className="w-5 h-5 text-cyan-200" />
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-200" />
                   <span>Book Appointment</span>
                 </button>
 
                 <button
                   onClick={() => onNavigate('home-dialysis')}
-                  className="px-5 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border-2 border-emerald-500/80 hover:border-emerald-600 font-bold text-sm sm:text-base shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border-2 border-emerald-500/80 hover:border-emerald-600 font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
                   id="hero-home-dialysis-btn"
                 >
-                  <Home className="w-5 h-5 text-[#16A34A]" />
+                  <Home className="w-4 h-4 sm:w-5 sm:h-5 text-[#16A34A]" />
                   <span>Home Dialysis Enquiry</span>
                 </button>
 
                 <a
                   href={`tel:${phone}`}
-                  className="px-5 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm sm:text-base shadow-sm transition-all flex items-center gap-2"
+                  className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2"
                   id="hero-call-now-btn"
                 >
                   <Phone className="w-4 h-4 text-emerald-400" />
@@ -256,27 +256,27 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       {/* 2. SUCCESS STATISTICS COUNTERS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-[#003875] via-[#005BBD] to-[#0EA5E9] rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-blue-400/30">
-            <div className="space-y-1">
-              <span className="text-3xl sm:text-5xl font-black tracking-tight block">15,000+</span>
-              <span className="text-xs sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Dialysis Sessions</span>
-              <span className="text-[11px] text-blue-200">Zero cross-infection standard</span>
+        <div className="bg-gradient-to-r from-[#003875] via-[#005BBD] to-[#0EA5E9] rounded-2xl sm:rounded-3xl p-5 sm:p-10 text-white shadow-xl relative overflow-hidden">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 text-center">
+            <div className="space-y-1 p-2 bg-white/5 rounded-xl sm:bg-transparent">
+              <span className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight block">15,000+</span>
+              <span className="text-[11px] sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Dialysis Sessions</span>
+              <span className="text-[10px] sm:text-xs text-blue-200">Zero cross-infection</span>
             </div>
-            <div className="space-y-1 pt-4 md:pt-0">
-              <span className="text-3xl sm:text-5xl font-black tracking-tight block">99.4%</span>
-              <span className="text-xs sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Safety Score</span>
-              <span className="text-[11px] text-blue-200">AAMI &amp; ISO ultrapure water</span>
+            <div className="space-y-1 p-2 bg-white/5 rounded-xl sm:bg-transparent">
+              <span className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight block">99.4%</span>
+              <span className="text-[11px] sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Safety Score</span>
+              <span className="text-[10px] sm:text-xs text-blue-200">AAMI &amp; ISO ultrapure</span>
             </div>
-            <div className="space-y-1 pt-4 md:pt-0">
-              <span className="text-3xl sm:text-5xl font-black tracking-tight block">24+</span>
-              <span className="text-xs sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Partner Hospitals</span>
-              <span className="text-[11px] text-blue-200">Across major metropolitan hubs</span>
+            <div className="space-y-1 p-2 bg-white/5 rounded-xl sm:bg-transparent">
+              <span className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight block">24+</span>
+              <span className="text-[11px] sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Partner Hospitals</span>
+              <span className="text-[10px] sm:text-xs text-blue-200">Metro healthcare network</span>
             </div>
-            <div className="space-y-1 pt-4 md:pt-0">
-              <span className="text-3xl sm:text-5xl font-black tracking-tight block">50+</span>
-              <span className="text-xs sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Nephrology Specialists</span>
-              <span className="text-[11px] text-blue-200">DM/DNB &amp; Certified Technicians</span>
+            <div className="space-y-1 p-2 bg-white/5 rounded-xl sm:bg-transparent">
+              <span className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight block">50+</span>
+              <span className="text-[11px] sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Specialists</span>
+              <span className="text-[10px] sm:text-xs text-blue-200">DM/DNB Nephrologists</span>
             </div>
           </div>
         </div>
@@ -497,19 +497,19 @@ export const HomePage: React.FC<HomePageProps> = ({
                 ))}
               </div>
 
-              <div className="pt-4 flex flex-wrap items-center gap-4">
+              <div className="pt-4 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">
                 <button
                   onClick={() => onNavigate('home-dialysis')}
-                  className="px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm shadow-lg transition-all transform active:scale-95 cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm shadow-lg transition-all transform active:scale-95 cursor-pointer text-center"
                 >
                   Request Home Visit Assessment
                 </button>
                 <a
                   href={`tel:${phone}`}
-                  className="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-all flex items-center gap-2"
+                  className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2"
                 >
                   <Phone className="w-4 h-4 text-emerald-300" />
-                  <span>Call Home Care Team: {phone}</span>
+                  <span>Call Home Care: {phone}</span>
                 </a>
               </div>
             </div>
@@ -842,26 +842,26 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       {/* 11. BOTTOM CALL TO ACTION BANNER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        <div className="rounded-3xl bg-gradient-to-r from-[#005BBD] to-[#0EA5E9] text-white p-8 sm:p-12 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-3 text-center md:text-left max-w-xl">
-            <h3 className="text-2xl sm:text-3xl font-black tracking-tight">
+        <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#005BBD] to-[#0EA5E9] text-white p-6 sm:p-12 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
+          <div className="space-y-2.5 text-center md:text-left max-w-xl">
+            <h3 className="text-xl sm:text-3xl font-black tracking-tight leading-snug">
               Ready to Experience Better Kidney Health?
             </h3>
-            <p className="text-blue-100 text-sm leading-relaxed">
+            <p className="text-blue-100 text-xs sm:text-sm leading-relaxed">
               Book a center visit, schedule an at-home dialysis evaluation, or speak directly with our Senior Nephrology Coordinator.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3.5">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full md:w-auto">
             <button
               onClick={() => onNavigate('appointment')}
-              className="px-6 py-3.5 rounded-xl bg-white text-[#005BBD] hover:bg-blue-50 font-black text-sm shadow-md transition-all cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white text-[#005BBD] hover:bg-blue-50 font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer text-center"
             >
               Book Appointment Now
             </button>
             <a
               href={`tel:${phone}`}
-              className="px-5 py-3.5 rounded-xl bg-[#003B77] hover:bg-[#002F5E] text-white font-bold text-sm transition-all flex items-center gap-2"
+              className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-[#003B77] hover:bg-[#002F5E] text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2"
             >
               <Phone className="w-4 h-4" />
               <span>Call: {phone}</span>

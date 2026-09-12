@@ -16,22 +16,22 @@ export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   const waUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(defaultMessage)}`;
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
+    <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 flex flex-col items-end pointer-events-none">
       {/* Floating Prompt Bubble */}
       {showTooltip && (
-        <div className="mb-2.5 max-w-xs bg-white text-slate-800 p-3 rounded-2xl shadow-xl border border-slate-100 text-xs flex items-start gap-2 animate-in fade-in slide-in-from-bottom-3 duration-300">
+        <div className="mb-2 max-w-[260px] sm:max-w-xs bg-white text-slate-800 p-3 rounded-2xl shadow-xl border border-slate-100 text-xs flex items-start gap-2 animate-in fade-in slide-in-from-bottom-3 duration-300 pointer-events-auto">
           <div className="flex-1">
             <div className="flex items-center gap-1.5 mb-0.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span className="font-bold text-slate-900 text-[11px]">Dialysis Helpdesk Online</span>
             </div>
             <p className="text-slate-600 text-[11px] leading-tight">
-              Need dialysis guidance or home visit booking? Chat with our clinical coordinator now.
+              Need dialysis guidance or home visit booking? Chat with our coordinator.
             </p>
           </div>
           <button
             onClick={() => setShowTooltip(false)}
-            className="text-slate-400 hover:text-slate-600 p-0.5 rounded focus:outline-none"
+            className="text-slate-400 hover:text-slate-600 p-0.5 rounded focus:outline-none cursor-pointer"
             title="Dismiss"
           >
             <X className="w-3.5 h-3.5" />
@@ -44,7 +44,7 @@ export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
         href={waUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="group relative flex items-center justify-center w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95"
+        className="group relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95 pointer-events-auto"
         aria-label="Chat with Renal Medicity on WhatsApp"
         id="floating-whatsapp-btn"
       >

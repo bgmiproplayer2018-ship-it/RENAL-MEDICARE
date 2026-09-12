@@ -102,7 +102,7 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
       </div>
 
       {/* Search Bar Box */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-8">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl p-4 sm:p-8">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -110,21 +110,23 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
           }}
           className="space-y-4"
         >
-          <div className="relative">
-            <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Enter Appointment ID (e.g. RM-2026-0001) or Mobile Number..."
-              className="w-full pl-12 pr-32 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-[#005BBD] focus:outline-none transition-all"
-            />
+          <div className="flex flex-col sm:flex-row gap-2 relative">
+            <div className="relative flex-1">
+              <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3 sm:top-3.5" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Enter Appointment ID (e.g. RM-2026-0001) or Mobile..."
+                className="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-[#005BBD] focus:outline-none transition-all"
+              />
+            </div>
             <button
               type="submit"
               disabled={isLoading}
-              className="absolute right-2 top-2 px-5 py-2 rounded-xl bg-[#005BBD] hover:bg-[#004A99] text-white text-xs font-bold shadow transition-all cursor-pointer disabled:opacity-50"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl sm:rounded-2xl bg-[#005BBD] hover:bg-[#004A99] text-white text-xs sm:text-sm font-bold shadow transition-all cursor-pointer disabled:opacity-50 text-center"
             >
-              {isLoading ? 'Checking...' : 'Track'}
+              {isLoading ? 'Checking...' : 'Track Appointment'}
             </button>
           </div>
 
@@ -149,7 +151,7 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
       {/* Results List */}
       {appointments && appointments.length > 0 && (
         <div className="space-y-6">
-          <h3 className="font-bold text-slate-900 text-base flex items-center justify-between">
+          <h3 className="font-bold text-slate-900 text-sm sm:text-base flex items-center justify-between">
             <span>Found {appointments.length} Appointment Record(s)</span>
             <button
               onClick={() => handleSearch()}
@@ -162,16 +164,16 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
           {appointments.map((app) => (
             <div
               key={app.id}
-              className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 sm:p-8 space-y-6"
+              className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-lg p-4 sm:p-8 space-y-6"
             >
               {/* Top Header Card */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                     Appointment Reference
                   </span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl font-black text-[#005BBD]">{app.id}</span>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <span className="text-lg sm:text-xl font-black text-[#005BBD]">{app.id}</span>
                     <span className="text-xs text-slate-400">&bull; Booked on {app.createdAt.slice(0, 10)}</span>
                   </div>
                 </div>
@@ -181,28 +183,28 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
 
               {/* Progress Stepper */}
               <div className="py-2">
-                <div className="grid grid-cols-4 gap-2 text-center relative">
+                <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center relative">
                   <div className="space-y-1">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto text-xs font-bold">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto text-xs font-bold">
                       1
                     </div>
-                    <span className="text-[11px] font-bold text-slate-800 block">Submitted</span>
+                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-800 block">Submitted</span>
                   </div>
 
                   <div className="space-y-1">
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
+                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
                         app.status !== 'Pending' ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-white animate-pulse'
                       }`}
                     >
                       2
                     </div>
-                    <span className="text-[11px] font-bold text-slate-800 block">Review</span>
+                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-800 block">Review</span>
                   </div>
 
                   <div className="space-y-1">
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
+                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
                         app.status === 'Accepted' || app.status === 'Completed' || app.status === 'Rescheduled'
                           ? 'bg-emerald-500 text-white'
                           : app.status === 'Rejected'
@@ -212,18 +214,18 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
                     >
                       3
                     </div>
-                    <span className="text-[11px] font-bold text-slate-800 block">Confirmed</span>
+                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-800 block">Confirmed</span>
                   </div>
 
                   <div className="space-y-1">
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
+                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
                         app.status === 'Completed' ? 'bg-[#005BBD] text-white' : 'bg-slate-200 text-slate-600'
                       }`}
                     >
                       4
                     </div>
-                    <span className="text-[11px] font-bold text-slate-800 block">Completed</span>
+                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-800 block">Completed</span>
                   </div>
                 </div>
               </div>

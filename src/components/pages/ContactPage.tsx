@@ -84,14 +84,14 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
     <div className="space-y-12 sm:space-y-16 py-8">
       {/* Header */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-blue-50 via-white to-emerald-50/50 p-8 sm:p-12 rounded-3xl border border-blue-100/80 shadow-xs space-y-4">
+        <div className="bg-gradient-to-r from-blue-50 via-white to-emerald-50/50 p-5 sm:p-12 rounded-2xl sm:rounded-3xl border border-blue-100/80 shadow-xs space-y-3 sm:space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#005BBD]/10 text-[#005BBD] text-xs font-bold uppercase tracking-wider">
             24x7 Patient Support
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
             Contact <span className="text-[#005BBD]">Renal Medicity</span>
           </h1>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl">
+          <p className="text-slate-600 text-xs sm:text-base leading-relaxed max-w-2xl">
             Whether you need urgent dialysis admission, second opinion on kidney transplant, or scheduling an at-home dialysis evaluation—our dedicated clinical coordination team is ready 24 hours a day.
           </p>
         </div>
@@ -99,32 +99,32 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
 
       {/* Main Grid: Info Cards + Contact Form */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
           
           {/* Left Column: Direct Helplines & Location */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="lg:col-span-5 space-y-5 sm:space-y-6">
             {/* 24x7 Emergency Card */}
-            <div className="p-6 rounded-3xl bg-red-600 text-white shadow-lg space-y-3">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-red-600 text-white shadow-lg space-y-3">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-red-200">
-                <ShieldAlert className="w-4 h-4 text-white animate-pulse" />
+                <ShieldAlert className="w-4 h-4 text-white animate-pulse shrink-0" />
                 <span>24x7 Emergency Dialysis SOS</span>
               </div>
-              <h3 className="text-xl font-black">Urgent Dialysis or ICU Admission</h3>
+              <h3 className="text-lg sm:text-xl font-black">Urgent Dialysis or ICU Admission</h3>
               <p className="text-xs text-red-100 leading-relaxed">
                 For acute kidney failure, pulmonary fluid overload, hyperkalemia, or catheter emergency.
               </p>
               <a
                 href={`tel:${phone}`}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-red-700 font-black text-sm shadow hover:bg-red-50 transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white text-red-700 font-black text-xs sm:text-sm shadow hover:bg-red-50 transition-colors text-center"
               >
-                <Phone className="w-4 h-4" />
+                <Phone className="w-4 h-4 shrink-0" />
                 <span>Call Emergency: +91 {phone}</span>
               </a>
             </div>
 
             {/* General Contact Info Cards */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
-              <h3 className="font-bold text-slate-900 text-lg border-b border-slate-100 pb-3">
+            <div className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm space-y-5 sm:space-y-6">
+              <h3 className="font-bold text-slate-900 text-base sm:text-lg border-b border-slate-100 pb-3">
                 Official Contact Information
               </h3>
 
@@ -207,9 +207,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
 
           {/* Right Column: Interactive Consultation & Message Form */}
           <div className="lg:col-span-7">
-            <div className="bg-white p-6 sm:p-10 rounded-3xl border border-slate-200 shadow-xl space-y-6">
+            <div className="bg-white p-5 sm:p-10 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl space-y-5 sm:space-y-6">
               <div className="space-y-1">
-                <h3 className="text-xl font-bold text-slate-900">Send an Inquiry or Message</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900">Send an Inquiry or Message</h3>
                 <p className="text-xs text-slate-500">
                   Fill out your details below. Our healthcare coordinator will get back to you promptly.
                 </p>
@@ -311,8 +311,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
 
       {/* Embedded Location Map Preview */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden p-4 sm:p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="font-bold text-slate-900 text-base">Find Our Main Center</h3>
               <p className="text-xs text-slate-500">Renal Medicity Institutional Hub &bull; New Delhi</p>
@@ -321,7 +321,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
               href="https://maps.google.com/?q=New+Delhi+India"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-50 text-[#005BBD] font-bold text-xs hover:bg-blue-100 transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-blue-50 text-[#005BBD] font-bold text-xs hover:bg-blue-100 transition-colors text-center"
             >
               <span>Open in Google Maps App</span>
               <ArrowRight className="w-3.5 h-3.5" />

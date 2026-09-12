@@ -25,15 +25,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, phone = '90696
     <div className="space-y-16 sm:space-y-24 py-8">
       {/* Top Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-blue-50 via-white to-emerald-50/50 p-8 sm:p-14 rounded-3xl border border-blue-100/80 shadow-xs">
-          <div className="max-w-3xl space-y-4">
+        <div className="bg-gradient-to-r from-blue-50 via-white to-emerald-50/50 p-5 sm:p-14 rounded-2xl sm:rounded-3xl border border-blue-100/80 shadow-xs">
+          <div className="max-w-3xl space-y-3 sm:space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#005BBD]/10 text-[#005BBD] text-xs font-bold uppercase tracking-wider">
               About Renal Medicity
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
               Pioneering Compassionate, Technologically Advanced <span className="text-[#005BBD]">Kidney Care</span>
             </h1>
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+            <p className="text-slate-600 text-xs sm:text-base leading-relaxed">
               At Renal Medicity, our tagline <strong className="text-[#005BBD]">"Caring For Kidney Health"</strong> is not just a motto—it is our daily clinical standard. We combine international-standard high-flux dialyzers, ultrapure water filtration, and certified personalized care to give dialysis patients back their vitality and independence.
             </p>
           </div>
@@ -42,35 +42,35 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, phone = '90696
 
       {/* Mission, Vision, Values */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {/* Mission */}
-          <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-4 relative overflow-hidden">
+          <div className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3 sm:space-y-4 relative overflow-hidden">
             <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#005BBD] flex items-center justify-center font-bold">
               <Target className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900">Our Mission</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900">Our Mission</h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
               To provide clinical excellence and infection-free dialysis therapy across both partner hospital networks and personalized home environments, ensuring that advanced kidney care is accessible, reliable, and deeply empathetic.
             </p>
           </div>
 
           {/* Vision */}
-          <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-4 relative overflow-hidden">
+          <div className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3 sm:space-y-4 relative overflow-hidden">
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-[#16A34A] flex items-center justify-center font-bold">
               <Compass className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900">Our Vision</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900">Our Vision</h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
               To be recognized as India’s benchmark kidney care ecosystem—where clinical precision meets heartfelt human touch, zero cross-infections become the standard, and patients thrive with optimal post-dialysis quality of life.
             </p>
           </div>
 
           {/* Values */}
-          <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-4 relative overflow-hidden">
+          <div className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3 sm:space-y-4 relative overflow-hidden">
             <div className="w-12 h-12 rounded-2xl bg-cyan-50 text-[#0EA5E9] flex items-center justify-center font-bold">
               <HeartHandshake className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900">Core Values</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900">Core Values</h3>
             <ul className="text-xs sm:text-sm text-slate-600 space-y-2">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-[#16A34A] shrink-0" />
@@ -160,15 +160,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, phone = '90696
                 alt="Nephrologist Doctor Team"
                 className="w-full h-96 object-cover"
               />
-              <div className="p-6 bg-white space-y-3">
-                <div className="flex items-center justify-between">
+              <div className="p-4 sm:p-6 bg-white space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <h4 className="font-bold text-slate-900 text-base">Board of Senior Nephrologists</h4>
+                    <h4 className="font-bold text-slate-900 text-sm sm:text-base">Board of Senior Nephrologists</h4>
                     <p className="text-xs text-slate-500">DM / DNB Certified Kidney Specialists &amp; Transplant Experts</p>
                   </div>
                   <button
                     onClick={() => onNavigate('appointment')}
-                    className="px-4 py-2 rounded-xl bg-[#005BBD] hover:bg-[#004A99] text-white font-bold text-xs shadow-xs"
+                    className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#005BBD] hover:bg-[#004A99] text-white font-bold text-xs shadow-xs text-center"
                   >
                     Consult Doctor
                   </button>
@@ -181,15 +181,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, phone = '90696
 
       {/* CTA Box */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
-        <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-[#003875] to-[#005BBD] text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="p-6 sm:p-12 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#003875] to-[#005BBD] text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
-            <h3 className="text-2xl font-black">Experience the Renal Medicity Difference</h3>
-            <p className="text-blue-100 text-sm">Schedule a center visit or request an at-home consultation assessment.</p>
+            <h3 className="text-xl sm:text-2xl font-black">Experience the Renal Medicity Difference</h3>
+            <p className="text-blue-100 text-xs sm:text-sm">Schedule a center visit or request an at-home consultation assessment.</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
             <button
               onClick={() => onNavigate('appointment')}
-              className="px-6 py-3 rounded-xl bg-white text-[#005BBD] font-black text-sm hover:bg-blue-50 shadow-md"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white text-[#005BBD] font-black text-xs sm:text-sm hover:bg-blue-50 shadow-md text-center"
             >
               Book an Appointment
             </button>

@@ -111,14 +111,14 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
   // SUCCESS CONFIRMATION VIEW
   if (confirmedAppointment) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl p-8 sm:p-12 text-center space-y-6">
-          <div className="w-16 h-16 bg-emerald-100 text-[#16A34A] rounded-full flex items-center justify-center mx-auto shadow-sm">
-            <CheckCircle2 className="w-10 h-10" />
+      <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-2xl p-5 sm:p-12 text-center space-y-6">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-emerald-100 text-[#16A34A] rounded-full flex items-center justify-center mx-auto shadow-sm">
+            <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10" />
           </div>
 
           <div className="space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#16A34A] bg-emerald-50 px-3 py-1 rounded-full">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#16A34A] bg-emerald-50 px-3 py-1 rounded-full">
               Appointment Successfully Confirmed
             </span>
             <h1 className="text-2xl sm:text-4xl font-black text-slate-900">
@@ -130,18 +130,18 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
           </div>
 
           {/* Appointment Ticket Card */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 text-left space-y-4 max-w-lg mx-auto">
+          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 sm:p-6 text-left space-y-4 max-w-lg mx-auto">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Appointment ID</span>
-                <span className="text-lg font-black text-[#005BBD]">{confirmedAppointment.id}</span>
+                <span className="text-base sm:text-lg font-black text-[#005BBD]">{confirmedAppointment.id}</span>
               </div>
               <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">
                 {confirmedAppointment.status}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <span className="text-slate-400 block font-semibold">Patient Name:</span>
                 <span className="font-bold text-slate-800">{confirmedAppointment.patientName}</span>
@@ -169,10 +169,10 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-2">
             <button
               onClick={() => onNavigate('tracking', confirmedAppointment.id)}
-              className="px-6 py-3 rounded-xl bg-[#005BBD] hover:bg-[#004A99] text-white font-bold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#005BBD] hover:bg-[#004A99] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Track Live Status</span>
               <ArrowRight className="w-4 h-4" />
@@ -195,7 +195,7 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
                   notes: '',
                 });
               }}
-              className="px-5 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-5 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm transition-colors cursor-pointer text-center"
             >
               Book Another Appointment
             </button>
@@ -214,12 +214,12 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
 
   // BOOKING FORM VIEW
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-10">
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-100 text-[#005BBD] text-xs font-bold uppercase tracking-wider">
           Direct Hospital &amp; Home Booking
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
           Book Your Dialysis &amp; Consultation Session
         </h1>
         <p className="text-slate-600 text-xs sm:text-sm max-w-xl mx-auto">
@@ -227,7 +227,7 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
         </p>
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-10">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl p-4 sm:p-10">
         {errors.submit && (
           <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -431,7 +431,7 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <div className="mt-6 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 text-center sm:text-left">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-[#16A34A]" />
             Encrypted &amp; Stored in Database

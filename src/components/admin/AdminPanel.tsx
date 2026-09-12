@@ -356,30 +356,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top Admin Header */}
-      <div className="bg-[#002B5C] text-white px-4 sm:px-8 py-3.5 border-b border-blue-900 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="bg-white p-1.5 rounded-lg shadow-xs">
+      <div className="bg-[#002B5C] text-white px-3 sm:px-8 py-3 border-b border-blue-900 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="bg-white p-1 rounded-lg shadow-xs shrink-0">
             <RenalLogo size="sm" showTagline={false} />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-sm text-white">Renal Medicity Management Console</span>
-              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/30">
-                PROD READY &bull; MONGODB SCHEMA
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="font-bold text-xs sm:text-sm text-white truncate">Management Console</span>
+              <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] sm:text-[10px] font-bold border border-emerald-400/30">
+                PROD READY
               </span>
             </div>
-            <span className="text-xs text-blue-200">Logged in as {adminUser.name} ({adminUser.role})</span>
+            <span className="text-[11px] text-blue-200 block truncate">Logged in as {adminUser.name}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => { fetchAppointments(); fetchInquiries(); }}
-            className="p-2 rounded-lg bg-blue-900/60 hover:bg-blue-800 text-blue-100 text-xs flex items-center gap-1 cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg bg-blue-900/60 hover:bg-blue-800 text-blue-100 text-xs flex items-center gap-1 cursor-pointer"
             title="Refresh Registry"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Refresh</span>
+            <span className="text-xs">Refresh</span>
           </button>
           <button
             onClick={onLogout}
@@ -392,22 +392,22 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       </div>
 
       {/* Main Admin Body */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6">
         
         {/* Navigation Tabs */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
+        <div className="flex overflow-x-auto no-scrollbar items-center gap-2 border-b border-slate-200 pb-3 w-full">
           {[
-            { id: 'appointments', label: `Appointments (${(appointments || []).filter(Boolean).length})`, icon: <Calendar className="w-4 h-4" /> },
-            { id: 'hospitals', label: `Hospitals (${(hospitals || []).filter(Boolean).length})`, icon: <Building className="w-4 h-4" /> },
-            { id: 'services', label: `Services & Pricing (${(services || []).filter(Boolean).length})`, icon: <Briefcase className="w-4 h-4" /> },
-            { id: 'inquiries', label: `Inquiries (${(inquiries || []).filter(Boolean).length})`, icon: <MessageSquare className="w-4 h-4" /> },
-            { id: 'settings', label: 'Company & Contact Settings', icon: <Settings className="w-4 h-4" /> },
-            { id: 'deployment', label: 'Deployment Setup Guides', icon: <Server className="w-4 h-4" /> },
+            { id: 'appointments', label: `Appointments (${(appointments || []).filter(Boolean).length})`, icon: <Calendar className="w-4 h-4 shrink-0" /> },
+            { id: 'hospitals', label: `Hospitals (${(hospitals || []).filter(Boolean).length})`, icon: <Building className="w-4 h-4 shrink-0" /> },
+            { id: 'services', label: `Services (${(services || []).filter(Boolean).length})`, icon: <Briefcase className="w-4 h-4 shrink-0" /> },
+            { id: 'inquiries', label: `Inquiries (${(inquiries || []).filter(Boolean).length})`, icon: <MessageSquare className="w-4 h-4 shrink-0" /> },
+            { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4 shrink-0" /> },
+            { id: 'deployment', label: 'Deployment Guides', icon: <Server className="w-4 h-4 shrink-0" /> },
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
+              className={`shrink-0 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'bg-[#005BBD] text-white shadow-sm'
                   : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
@@ -421,25 +421,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
         {/* TAB 1: APPOINTMENTS MANAGEMENT */}
         {activeTab === 'appointments' && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Top Toolbar */}
-            <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="relative">
+            <div className="bg-white p-3.5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
+                <div className="relative w-full sm:w-64">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                   <input
                     type="text"
                     value={searchFilter}
                     onChange={e => setSearchFilter(e.target.value)}
-                    placeholder="Search by ID, Name, Phone, Center..."
-                    className="pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 w-64 focus:ring-2 focus:ring-[#005BBD] focus:outline-none"
+                    placeholder="Search by ID, Name, Phone..."
+                    className="pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 w-full focus:ring-2 focus:ring-[#005BBD] focus:outline-none"
                   />
                 </div>
 
                 <select
                   value={statusFilter}
                   onChange={e => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-semibold text-slate-700"
+                  className="px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-semibold text-slate-700 w-full sm:w-auto"
                 >
                   <option value="All">All Statuses</option>
                   <option value="Pending">Pending</option>
@@ -452,7 +452,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
               <button
                 onClick={handleExportCSV}
-                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-xs"
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 <Download className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Export Appointments (CSV)</span>
@@ -582,9 +582,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         {/* TAB 2: HOSPITALS MANAGEMENT */}
         {activeTab === 'hospitals' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Hospital Network &amp; Dialysis Units</h3>
+                <h3 className="text-sm sm:text-base font-bold text-slate-900">Hospital Network &amp; Dialysis Units</h3>
                 <p className="text-xs text-slate-500">Manage partner hospitals, bed stations, and Google Maps coordinates.</p>
               </div>
               <button
@@ -602,10 +602,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=800&q=80'
                   }
                 })}
-                className="px-4 py-2 rounded-xl bg-[#005BBD] hover:bg-[#004A99] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#005BBD] hover:bg-[#004A99] text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add New Hospital Center</span>
+                <span>Add New Hospital</span>
               </button>
             </div>
 
@@ -645,9 +645,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         {/* TAB 3: SERVICES & PRICING MANAGEMENT */}
         {activeTab === 'services' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Services &amp; Pricing Management</h3>
+                <h3 className="text-sm sm:text-base font-bold text-slate-900">Services &amp; Pricing Management</h3>
                 <p className="text-xs text-slate-500">Edit pricing tags, session benefits, and descriptions instantly without code changes.</p>
               </div>
               <button
@@ -664,7 +664,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80'
                   }
                 })}
-                className="px-4 py-2 rounded-xl bg-[#005BBD] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#005BBD] text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add New Service</span>

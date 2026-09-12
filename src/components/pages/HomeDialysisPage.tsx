@@ -81,36 +81,36 @@ export const HomeDialysisPage: React.FC<HomeDialysisPageProps> = ({ onNavigate, 
     <div className="space-y-16 sm:space-y-24 py-8">
       {/* 1. Hero Overview */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-br from-[#064E3B] via-[#047857] to-[#003875] text-white p-8 sm:p-14 rounded-3xl shadow-xl relative overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-emerald-200 text-xs font-bold uppercase tracking-wider">
-                <Home className="w-4 h-4 text-emerald-300" />
-                <span>Premier At-Home Hemodialysis Program</span>
+        <div className="bg-gradient-to-br from-[#064E3B] via-[#047857] to-[#003875] text-white p-5 sm:p-14 rounded-2xl sm:rounded-3xl shadow-xl relative overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-center">
+            <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-emerald-200 text-xs font-bold uppercase tracking-wider">
+                <Home className="w-4 h-4 text-emerald-300 shrink-0" />
+                <span className="truncate">Premier At-Home Hemodialysis</span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+              <h1 className="text-2xl sm:text-5xl font-black tracking-tight leading-tight">
                 Hospital-Grade Kidney Care in the Safety &amp; Dignity of Your Home
               </h1>
 
-              <p className="text-emerald-100/90 text-sm sm:text-base leading-relaxed">
+              <p className="text-emerald-100/90 text-xs sm:text-base leading-relaxed">
                 Say goodbye to strenuous three-times-a-week hospital commutes. Renal Medicity delivers 
                 advanced hemodialysis right at your bedside, complete with a dedicated licensed dialysis technician, 
                 portable clinical Reverse Osmosis water purification, and real-time nephrologist video telemetry.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
                 <a
                   href="#home-visit-form"
-                  className="px-6 py-3.5 rounded-xl bg-white text-emerald-900 hover:bg-emerald-50 font-black text-sm shadow-md transition-all"
+                  className="px-6 py-3.5 rounded-xl bg-white text-emerald-900 hover:bg-emerald-50 font-black text-xs sm:text-sm shadow-md transition-all text-center"
                 >
                   Book Free Home Assessment
                 </a>
                 <a
                   href={`tel:${phone}`}
-                  className="px-5 py-3.5 rounded-xl bg-black/30 hover:bg-black/40 text-white font-bold text-sm transition-all flex items-center gap-2 border border-white/20"
+                  className="px-5 py-3.5 rounded-xl bg-black/30 hover:bg-black/40 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 border border-white/20 text-center"
                 >
-                  <Phone className="w-4 h-4 text-emerald-300" />
+                  <Phone className="w-4 h-4 text-emerald-300 shrink-0" />
                   <span>Call: {phone}</span>
                 </a>
               </div>
@@ -121,7 +121,7 @@ export const HomeDialysisPage: React.FC<HomeDialysisPageProps> = ({ onNavigate, 
                 <img
                   src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80"
                   alt="Home Dialysis Setup"
-                  className="w-full h-80 object-cover"
+                  className="w-full h-64 sm:h-80 object-cover"
                 />
               </div>
             </div>
@@ -286,12 +286,12 @@ export const HomeDialysisPage: React.FC<HomeDialysisPageProps> = ({ onNavigate, 
 
       {/* 5. Home Visit Request Form (Required by prompt) */}
       <section id="home-visit-form" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-8 sm:p-12 space-y-6">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl p-5 sm:p-12 space-y-5 sm:space-y-6">
           <div className="text-center max-w-xl mx-auto space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-100 text-[#16A34A] text-xs font-bold uppercase tracking-wider">
               Request Home Assessment
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">
               Schedule an In-Home Dialysis Visit
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm">

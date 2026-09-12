@@ -45,19 +45,19 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, settings }) => {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
               <a
                 href={`tel:${phone}`}
-                className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm shadow-md transition-colors flex items-center gap-2"
+                className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs sm:text-sm shadow-md transition-colors flex items-center justify-center gap-2 text-center"
               >
-                <Phone className="w-4 h-4" />
+                <Phone className="w-4 h-4 shrink-0" />
                 <span>Call Emergency: {phone}</span>
               </a>
               <button
                 onClick={() => onNavigate('appointment')}
-                className="px-4 py-2.5 rounded-xl bg-[#005BBD] hover:bg-[#004A99] text-white font-semibold text-sm transition-colors flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-[#005BBD] hover:bg-[#004A99] text-white font-semibold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer text-center"
               >
-                <Calendar className="w-4 h-4" />
+                <Calendar className="w-4 h-4 shrink-0" />
                 <span>Book Priority Slot</span>
               </button>
             </div>
@@ -220,9 +220,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, settings }) => {
         </div>
 
         {/* Bottom Copyright */}
-        <div className="mt-8 pt-6 border-t border-blue-950 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+        <div className="mt-8 pt-6 border-t border-blue-950 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 text-center sm:text-left">
           <p>© Renal Healthcare. All Rights Reserved.</p>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
             <button onClick={() => onNavigate('about')} className="hover:text-white cursor-pointer">
               Clinical Quality Policy
             </button>

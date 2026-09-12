@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from './components/common/Header.tsx';
 import { Footer } from './components/common/Footer.tsx';
 import { WhatsAppButton } from './components/common/WhatsAppButton.tsx';
+import { MobileBottomNav } from './components/common/MobileBottomNav.tsx';
 import { HomePage } from './components/pages/HomePage.tsx';
 import { AboutPage } from './components/pages/AboutPage.tsx';
 import { ServicesPage } from './components/pages/ServicesPage.tsx';
@@ -106,7 +107,7 @@ export default function App() {
       />
 
       {/* Main Content Pages */}
-      <main className="flex-1">
+      <main className={`flex-1 ${currentTab !== 'admin' ? 'pb-16 md:pb-0' : ''}`}>
         {currentTab === 'home' && (
           <HomePage
             onNavigate={handleNavigate}
@@ -213,6 +214,15 @@ export default function App() {
         onNavigate={handleNavigate}
         settings={settings}
       />
+
+      {/* Mobile Sticky Bottom Navigation */}
+      {currentTab !== 'admin' && (
+        <MobileBottomNav
+          currentTab={currentTab}
+          onNavigate={handleNavigate}
+          isAdminLoggedIn={Boolean(adminToken)}
+        />
+      )}
     </div>
   );
 }

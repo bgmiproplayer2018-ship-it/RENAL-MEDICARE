@@ -56,7 +56,24 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm border-b border-slate-100">
-      {/* Top Clinical Notification & Contact Ribbon */}
+      {/* Mobile Top Emergency & Call Ribbon */}
+      <div className="bg-[#002B5C] text-white text-[11px] py-1.5 px-3.5 flex items-center justify-between md:hidden border-b border-blue-900/50">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+          <span className="font-bold truncate">24x7 Dialysis SOS:</span>
+          <a href={`tel:${phone}`} className="font-extrabold text-emerald-300 hover:underline shrink-0">
+            {phone}
+          </a>
+        </div>
+        <a
+          href={`tel:${phone}`}
+          className="px-2.5 py-0.5 rounded-full bg-red-600 hover:bg-red-500 font-bold text-[10px] text-white shrink-0 ml-2 shadow-xs"
+        >
+          Call Now
+        </a>
+      </div>
+
+      {/* Top Clinical Notification & Contact Ribbon (Desktop) */}
       <div className="bg-[#003875] text-white text-xs py-1.5 px-4 hidden md:block">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-6">
@@ -125,7 +142,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo Left */}
           <button 
             onClick={() => handleNavClick('home')}
@@ -183,16 +200,23 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Mobile Menu Toggle Button */}
-          <div className="flex xl:hidden items-center gap-2">
+          <div className="flex xl:hidden items-center gap-1.5 sm:gap-2">
+            <a
+              href={`tel:${phone}`}
+              className="sm:hidden p-2 rounded-xl text-emerald-600 bg-emerald-50 border border-emerald-200"
+              aria-label="Call Emergency Hotline"
+            >
+              <Phone className="w-4 h-4" />
+            </a>
             <button
               onClick={() => handleNavClick('appointment')}
-              className="sm:hidden px-3 py-1.5 rounded-lg bg-[#005BBD] text-white text-xs font-bold"
+              className="sm:hidden px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#005BBD] to-[#0EA5E9] text-white text-xs font-bold shadow-xs active:scale-95"
             >
               Book
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 rounded-xl text-slate-700 hover:text-[#005BBD] hover:bg-slate-100 focus:outline-none"
+              className="p-2 sm:p-2.5 rounded-xl text-slate-700 hover:text-[#005BBD] hover:bg-slate-100 focus:outline-none"
               aria-label="Toggle Menu"
               id="mobile-menu-toggle-btn"
             >
@@ -204,8 +228,8 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="xl:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-2 shadow-xl animate-in slide-in-from-top duration-200">
-          <div className="py-2 px-3 bg-blue-50 rounded-lg flex items-center justify-between text-xs text-blue-900 mb-3">
+        <div className="xl:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-2 shadow-xl max-h-[80vh] overflow-y-auto animate-in slide-in-from-top duration-200">
+          <div className="py-2 px-3 bg-blue-50 rounded-xl flex items-center justify-between text-xs text-blue-900 mb-3">
             <span className="font-bold flex items-center gap-1.5">
               <HeartPulse className="w-4 h-4 text-red-500 animate-pulse" />
               Emergency 24x7 Helpline

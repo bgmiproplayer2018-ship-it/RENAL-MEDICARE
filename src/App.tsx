@@ -15,6 +15,7 @@ import { AdminLogin } from './components/admin/AdminLogin.tsx';
 import { AdminPanel } from './components/admin/AdminPanel.tsx';
 
 import { ServiceItem, Hospital, BlogPost, FAQItem, Testimonial, CompanySettings } from './types.ts';
+import { apiFetch } from './lib/apiFallback.ts';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<string>('home');
@@ -50,12 +51,12 @@ export default function App() {
   const loadAllData = async () => {
     try {
       const [srvRes, hospRes, blogRes, faqRes, testRes, setRes] = await Promise.all([
-        fetch('/api/services').then(r => r.json()),
-        fetch('/api/hospitals').then(r => r.json()),
-        fetch('/api/blogs').then(r => r.json()),
-        fetch('/api/faqs').then(r => r.json()),
-        fetch('/api/testimonials').then(r => r.json()),
-        fetch('/api/settings').then(r => r.json()),
+        apiFetch('/api/services').then(r => r.json()),
+        apiFetch('/api/hospitals').then(r => r.json()),
+        apiFetch('/api/blogs').then(r => r.json()),
+        apiFetch('/api/faqs').then(r => r.json()),
+        apiFetch('/api/testimonials').then(r => r.json()),
+        apiFetch('/api/settings').then(r => r.json()),
       ]);
 
       if (srvRes.success) setServices(srvRes.services);

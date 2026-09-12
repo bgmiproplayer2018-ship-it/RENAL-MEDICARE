@@ -15,6 +15,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { CompanySettings } from '../../types.ts';
+import { apiFetch } from '../../lib/apiFallback.ts';
 
 interface HomeDialysisPageProps {
   onNavigate: (tab: string) => void;
@@ -40,7 +41,7 @@ export const HomeDialysisPage: React.FC<HomeDialysisPageProps> = ({ onNavigate, 
     setSubmitResult(null);
 
     try {
-      const res = await fetch('/api/contact', {
+      const res = await apiFetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

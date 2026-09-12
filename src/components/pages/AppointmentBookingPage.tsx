@@ -15,6 +15,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Hospital, ServiceItem, Appointment, CompanySettings } from '../../types.ts';
+import { apiFetch } from '../../lib/apiFallback.ts';
 
 interface AppointmentBookingPageProps {
   hospitals: Hospital[];
@@ -75,7 +76,7 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
 
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/appointments', {
+      const res = await apiFetch('/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

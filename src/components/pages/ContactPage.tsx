@@ -13,6 +13,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { CompanySettings } from '../../types.ts';
+import { apiFetch } from '../../lib/apiFallback.ts';
 
 interface ContactPageProps {
   settings?: CompanySettings;
@@ -42,7 +43,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
     setSubmitStatus(null);
 
     try {
-      const res = await fetch('/api/contact', {
+      const res = await apiFetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

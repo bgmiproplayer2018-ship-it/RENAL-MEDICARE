@@ -1,4 +1,4 @@
-{
+export const initialData = {
   "services": [
     {
       "id": "srv-1",
@@ -530,4 +530,4 @@
       "isRead": true
     }
   ]
-}
+} as const;

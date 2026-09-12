@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { ServiceItem, Hospital, BlogPost, FAQItem, Testimonial, CompanySettings } from '../../types.ts';
 import { RenalLogo } from '../common/RenalLogo.tsx';
+import { apiFetch } from '../../lib/apiFallback.ts';
 
 interface HomePageProps {
   onNavigate: (tab: string, param?: string) => void;
@@ -61,7 +62,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const handleQuickContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/contact', {
+      const res = await apiFetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

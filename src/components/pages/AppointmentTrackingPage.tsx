@@ -15,6 +15,7 @@ import {
   FileText
 } from 'lucide-react';
 import { Appointment, CompanySettings } from '../../types.ts';
+import { apiFetch } from '../../lib/apiFallback.ts';
 
 interface AppointmentTrackingPageProps {
   initialTrackingId?: string;
@@ -53,7 +54,7 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
     setSearched(true);
 
     try {
-      const res = await fetch(`/api/appointments/track/${encodeURIComponent(q)}`);
+      const res = await apiFetch(`/api/appointments/track/${encodeURIComponent(q)}`);
       const data = await res.json();
       if (res.ok && data.success) {
         setAppointments(data.appointments);

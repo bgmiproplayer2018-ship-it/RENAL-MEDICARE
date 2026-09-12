@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { Appointment, Hospital, ServiceItem, BlogPost, ContactMessage, CompanySettings } from '../../types.ts';
 import { RenalLogo } from '../common/RenalLogo.tsx';
+import { apiFetch } from '../../lib/apiFallback.ts';
 
 interface AdminPanelProps {
   token: string;
@@ -96,7 +97,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const fetchAppointments = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/appointments', {
+      const res = await apiFetch('/api/appointments', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -112,12 +113,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const fetchInquiries = async () => {
     try {
-      const res = await fetch('/api/contact', {
+      const res = await apiFetch('/api/contact', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
-      if (data.success) {
-        setInquiries(data.contacts);
+      if (data.success && Array.isArray(data.contacts)) {
+        setInquiries(data.contacts.filter((c: any): c is ContactMessage => Boolean(c && typeof c === 'object' && c.id)));
       }
     } catch (e) {
       console.error(e);
@@ -127,7 +128,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   // Appointment Status update
   const handleUpdateStatus = async (id: string, newStatus: Appointment['status'], extra?: any) => {
     try {
-      const res = await fetch(`/api/appointments/${id}/status`, {
+      const res = await apiFetch(`/api/appointments/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -148,7 +149,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleDeleteAppointment = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this appointment record?')) return;
     try {
-      const res = await fetch(`/api/appointments/${id}`, {
+      const res = await apiFetch(`/api/appointments/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -196,7 +197,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const method = isEdit ? 'PUT' : 'POST';
 
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(hospitalModal.data)
@@ -219,7 +220,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleDeleteHospital = async (id: string) => {
     if (!confirm('Are you sure you want to remove this hospital from the network?')) return;
     try {
-      const res = await fetch(`/api/hospitals/${id}`, {
+      const res = await apiFetch(`/api/hospitals/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -241,7 +242,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const method = isEdit ? 'PUT' : 'POST';
 
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(serviceModal.data)
@@ -264,7 +265,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleDeleteService = async (id: string) => {
     if (!confirm('Are you sure you want to remove this service?')) return;
     try {
-      const res = await fetch(`/api/services/${id}`, {
+      const res = await apiFetch(`/api/services/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -282,7 +283,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/settings', {
+      const res = await apiFetch('/api/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(settings)
@@ -301,13 +302,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   // Inquiries Actions
   const handleMarkInquiryRead = async (id: string) => {
     try {
-      const res = await fetch(`/api/contact/${id}/read`, {
+      const res = await apiFetch(`/api/contact/${id}/read`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
       if (data.success) {
-        setInquiries(prev => prev.map(i => i.id === id ? data.contact : i));
+        setInquiries(prev => (prev || []).map(i => {
+          if (!i) return i;
+          if (i.id === id) {
+            return data.contact || { ...i, isRead: true };
+          }
+          return i;
+        }).filter(Boolean));
       }
     } catch {
       alert('Error updating inquiry status');
@@ -317,13 +324,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleDeleteInquiry = async (id: string) => {
     if (!confirm('Delete this message?')) return;
     try {
-      const res = await fetch(`/api/contact/${id}`, {
+      const res = await apiFetch(`/api/contact/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
       if (data.success) {
-        setInquiries(prev => prev.filter(i => i.id !== id));
+        setInquiries(prev => (prev || []).filter(i => i && i.id !== id));
       }
     } catch {
       alert('Error deleting inquiry');
@@ -331,13 +338,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   // Filtered Appointments
-  const filteredAppointments = appointments.filter(a => {
+  const filteredAppointments = (appointments || []).filter(a => {
+    if (!a) return false;
     const matchesStatus = statusFilter === 'All' || a.status === statusFilter;
+    const name = a.patientName || (a as any).fullName || '';
+    const id = a.id || '';
+    const phone = a.phone || (a as any).mobileNumber || '';
+    const hosp = a.hospitalId || (a as any).hospitalLocation || '';
     const matchesSearch = 
-      a.patientName.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      a.id.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      a.phone.includes(searchFilter) ||
-      a.hospitalId.toLowerCase().includes(searchFilter.toLowerCase());
+      name.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      id.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      phone.includes(searchFilter) ||
+      hosp.toLowerCase().includes(searchFilter.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
@@ -385,10 +397,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         {/* Navigation Tabs */}
         <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
           {[
-            { id: 'appointments', label: `Appointments (${appointments.length})`, icon: <Calendar className="w-4 h-4" /> },
-            { id: 'hospitals', label: `Hospitals (${hospitals.length})`, icon: <Building className="w-4 h-4" /> },
-            { id: 'services', label: `Services & Pricing (${services.length})`, icon: <Briefcase className="w-4 h-4" /> },
-            { id: 'inquiries', label: `Inquiries (${inquiries.length})`, icon: <MessageSquare className="w-4 h-4" /> },
+            { id: 'appointments', label: `Appointments (${(appointments || []).filter(Boolean).length})`, icon: <Calendar className="w-4 h-4" /> },
+            { id: 'hospitals', label: `Hospitals (${(hospitals || []).filter(Boolean).length})`, icon: <Building className="w-4 h-4" /> },
+            { id: 'services', label: `Services & Pricing (${(services || []).filter(Boolean).length})`, icon: <Briefcase className="w-4 h-4" /> },
+            { id: 'inquiries', label: `Inquiries (${(inquiries || []).filter(Boolean).length})`, icon: <MessageSquare className="w-4 h-4" /> },
             { id: 'settings', label: 'Company & Contact Settings', icon: <Settings className="w-4 h-4" /> },
             { id: 'deployment', label: 'Deployment Setup Guides', icon: <Server className="w-4 h-4" /> },
           ].map(tab => (
@@ -598,7 +610,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {hospitals.map(h => (
+              {(hospitals || []).filter(Boolean).map(h => (
                 <div key={h.id} className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 shadow-2xs flex flex-col justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -660,7 +672,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {services.map(s => (
+              {(services || []).filter(Boolean).map(s => (
                 <div key={s.id} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-2xs flex flex-col justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -713,61 +725,64 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {inquiries.length === 0 ? (
+                  {(!inquiries || inquiries.filter(Boolean).length === 0) ? (
                     <tr>
                       <td colSpan={6} className="py-8 text-center text-slate-400">
                         No inquiries received yet.
                       </td>
                     </tr>
                   ) : (
-                    inquiries.map(inq => (
-                      <tr key={inq.id} className={inq.isRead ? 'bg-white' : 'bg-blue-50/30 font-semibold'}>
-                        <td className="py-3 px-4">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            inq.type === 'home-dialysis-request' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-800'
-                          }`}>
-                            {inq.type === 'home-dialysis-request' ? 'Home Visit' : 'General'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="font-bold text-slate-900">{inq.name}</div>
-                          <div className="text-[11px] text-slate-500">{inq.phone}</div>
-                          {inq.email && <div className="text-[10px] text-slate-400">{inq.email}</div>}
-                        </td>
-                        <td className="py-3 px-4 max-w-sm">
-                          {inq.subject && <div className="font-bold text-slate-800 text-[11px]">{inq.subject}</div>}
-                          <p className="text-slate-600 text-xs">{inq.message}</p>
-                          {inq.address && <p className="text-emerald-700 text-[11px]">📍 Address: {inq.address}</p>}
-                          {inq.preferredDate && <p className="text-blue-700 text-[11px]">📅 Preferred Date: {inq.preferredDate}</p>}
-                        </td>
-                        <td className="py-3 px-4 text-slate-400 text-[11px]">
-                          {inq.createdAt.slice(0, 10)}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${inq.isRead ? 'bg-slate-100 text-slate-500' : 'bg-amber-100 text-amber-800'}`}>
-                            {inq.isRead ? 'Read' : 'New'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {!inq.isRead && (
+                    inquiries.filter((inq): inq is ContactMessage => Boolean(inq && inq.id)).map(inq => {
+                      const isRead = Boolean(inq.isRead);
+                      return (
+                        <tr key={inq.id} className={isRead ? 'bg-white' : 'bg-blue-50/30 font-semibold'}>
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              inq.type === 'home-dialysis-request' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-800'
+                            }`}>
+                              {inq.type === 'home-dialysis-request' ? 'Home Visit' : 'General'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="font-bold text-slate-900">{inq.name}</div>
+                            <div className="text-[11px] text-slate-500">{inq.phone}</div>
+                            {inq.email && <div className="text-[10px] text-slate-400">{inq.email}</div>}
+                          </td>
+                          <td className="py-3 px-4 max-w-sm">
+                            {inq.subject && <div className="font-bold text-slate-800 text-[11px]">{inq.subject}</div>}
+                            <p className="text-slate-600 text-xs">{inq.message}</p>
+                            {inq.address && <p className="text-emerald-700 text-[11px]">📍 Address: {inq.address}</p>}
+                            {inq.preferredDate && <p className="text-blue-700 text-[11px]">📅 Preferred Date: {inq.preferredDate}</p>}
+                          </td>
+                          <td className="py-3 px-4 text-slate-400 text-[11px]">
+                            {(inq.createdAt || '').slice(0, 10)}
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${isRead ? 'bg-slate-100 text-slate-500' : 'bg-amber-100 text-amber-800'}`}>
+                              {isRead ? 'Read' : 'New'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {!isRead && (
+                                <button
+                                  onClick={() => handleMarkInquiryRead(inq.id)}
+                                  className="text-[11px] font-bold text-[#005BBD] hover:underline cursor-pointer"
+                                >
+                                  Mark Read
+                                </button>
+                              )}
                               <button
-                                onClick={() => handleMarkInquiryRead(inq.id)}
-                                className="text-[11px] font-bold text-[#005BBD] hover:underline cursor-pointer"
+                                onClick={() => handleDeleteInquiry(inq.id)}
+                                className="text-slate-400 hover:text-red-600 cursor-pointer"
                               >
-                                Mark Read
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
-                            )}
-                            <button
-                              onClick={() => handleDeleteInquiry(inq.id)}
-                              className="text-slate-400 hover:text-red-600 cursor-pointer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -933,15 +948,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </div>
 
               {/* Netlify Guide */}
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-3">
-                <span className="px-2.5 py-1 rounded bg-teal-600 text-white text-[11px] font-bold">Netlify SPA</span>
-                <h4 className="font-bold text-slate-900 text-base">Static Frontend &amp; Redirects</h4>
+              <div className="bg-white p-6 rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50/40 to-white space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded bg-teal-600 text-white text-[11px] font-bold">Netlify (100% Ready)</span>
+                  <span className="text-[10px] font-bold text-teal-700 bg-teal-100 px-2 py-0.5 rounded-full">Serverless + SPA Preconfigured</span>
+                </div>
+                <h4 className="font-bold text-slate-900 text-base">Netlify One-Click Deployment</h4>
                 <ol className="text-xs text-slate-600 space-y-2 list-decimal pl-4">
-                  <li>Connect Git repo to Netlify.</li>
-                  <li>Publish directory: <code>dist</code></li>
-                  <li>Build command: <code>npm run build</code></li>
-                  <li>Vite SPA fallback configured for clean route history.</li>
+                  <li><strong>Repository:</strong> Push or connect this project to GitHub / GitLab.</li>
+                  <li><strong>Netlify Import:</strong> Click <em>&ldquo;Add new site&rdquo;</em> &rarr; <em>&ldquo;Import an existing project&rdquo;</em>.</li>
+                  <li><strong>Build Command:</strong> <code>npm run build</code> (pre-configured in <code>netlify.toml</code>)</li>
+                  <li><strong>Publish Directory:</strong> <code>dist</code></li>
+                  <li><strong>Functions Directory:</strong> <code>netlify/functions</code> (auto-detected)</li>
+                  <li><strong>Routes &amp; Fallbacks:</strong> <code>netlify.toml</code> and <code>public/_redirects</code> route all SPA links and API calls seamlessly.</li>
                 </ol>
+                <div className="pt-2 text-[11px] text-teal-800 bg-teal-50 p-2.5 rounded-xl border border-teal-100">
+                  ✨ <strong>Zero-Configuration:</strong> Includes auto-resilient client storage fallback, so appointments, inquiries, tracking, and admin logins work whether deployed with Netlify Functions or static Netlify Drop.
+                </div>
               </div>
             </div>
           </div>

@@ -45,7 +45,8 @@ contactRouter.patch('/:id/read', requireAuth, (req, res) => {
   if (!ok) {
     return res.status(404).json({ error: 'Message not found' });
   }
-  res.json({ success: true, message: 'Message marked as read' });
+  const contact = db.getContacts().find(c => c.id === id);
+  res.json({ success: true, message: 'Message marked as read', contact });
 });
 
 // DELETE /api/contact/:id (Admin delete message)

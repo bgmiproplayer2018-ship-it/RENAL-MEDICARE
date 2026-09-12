@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { RenalLogo } from '../common/RenalLogo.tsx';
 import { ShieldCheck, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
+import { apiFetch } from '../../lib/apiFallback.ts';
 
 interface AdminLoginProps {
   onLoginSuccess: (token: string, user: { name: string; email: string; role: string }) => void;
@@ -19,7 +20,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onCancel
     setError(null);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await apiFetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), password }),

@@ -22,11 +22,21 @@ import {
   ChevronRight,
   ShieldCheck,
   Server,
-  Code
+  Code,
+  Bell,
+  Smartphone,
+  Mail,
+  Send,
+  Check
 } from 'lucide-react';
-import { Appointment, Hospital, ServiceItem, BlogPost, ContactMessage, CompanySettings } from '../../types.ts';
+import { Appointment, Hospital, ServiceItem, BlogPost, ContactMessage, CompanySettings, ReminderLog } from '../../types.ts';
 import { RenalLogo } from '../common/RenalLogo.tsx';
 import { apiFetch } from '../../lib/apiFallback.ts';
+import { 
+  generate24HourReminderContent, 
+  isAppointmentDueForReminder, 
+  calculateReminderScheduledTime 
+} from '../../lib/notificationEngine.ts';
 
 interface AdminPanelProps {
   token: string;
@@ -88,11 +98,101 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const [settingsStatus, setSettingsStatus] = useState<string | null>(null);
 
-  // Fetch appointments & inquiries on load
+  // Automated 24-hour notification states
+  const [notificationStatus, setNotificationStatus] = useState<any>(null);
+  const [isScanningReminders, setIsScanningReminders] = useState(false);
+  const [reminderScanMessage, setReminderScanMessage] = useState<string | null>(null);
+  const [reminderModalApp, setReminderModalApp] = useState<Appointment | null>(null);
+  const [reminderModalChannel, setReminderModalChannel] = useState<'both' | 'whatsapp' | 'email'>('both');
+  const [isSendingReminder, setIsSendingReminder] = useState(false);
+  const [showAuditLogsModal, setShowAuditLogsModal] = useState(false);
+  const [auditLogs, setAuditLogs] = useState<ReminderLog[]>([]);
+
+  // Fetch appointments, inquiries & notification status on load
   useEffect(() => {
     fetchAppointments();
     fetchInquiries();
+    fetchNotificationStatus();
   }, []);
+
+  const fetchNotificationStatus = async () => {
+    try {
+      const res = await apiFetch('/api/notifications/status', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNotificationStatus(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const fetchAuditLogs = async () => {
+    try {
+      const res = await apiFetch('/api/notifications/logs', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAuditLogs(data.logs || []);
+        setShowAuditLogsModal(true);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleTriggerScanner = async () => {
+    setIsScanningReminders(true);
+    setReminderScanMessage(null);
+    try {
+      const res = await apiFetch('/api/notifications/run-reminders', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReminderScanMessage(`Automated scan completed: ${data.dispatchedCount} reminders processed.`);
+        await fetchAppointments();
+        await fetchNotificationStatus();
+      } else {
+        setReminderScanMessage(data.error || 'Failed to trigger scan');
+      }
+    } catch (e) {
+      setReminderScanMessage('Network error triggering reminder scanner');
+    } finally {
+      setIsScanningReminders(false);
+      setTimeout(() => setReminderScanMessage(null), 6000);
+    }
+  };
+
+  const handleSendReminder = async (appointmentId: string, channel: 'whatsapp' | 'email' | 'both') => {
+    setIsSendingReminder(true);
+    try {
+      const res = await apiFetch(`/api/notifications/send/${appointmentId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ channel })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReminderModalApp(null);
+        await fetchAppointments();
+        await fetchNotificationStatus();
+      } else {
+        alert(data.error || 'Failed to dispatch notification');
+      }
+    } catch (e) {
+      alert('Network error dispatching notification');
+    } finally {
+      setIsSendingReminder(false);
+    }
+  };
 
   const fetchAppointments = async () => {
     setIsLoading(true);
@@ -422,6 +522,85 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         {/* TAB 1: APPOINTMENTS MANAGEMENT */}
         {activeTab === 'appointments' && (
           <div className="space-y-4 sm:space-y-6">
+            {/* Automated 24h Notifications Management Banner */}
+            <div className="bg-gradient-to-r from-blue-900 via-slate-900 to-[#005BBD] text-white p-4 sm:p-5 rounded-2xl shadow-sm space-y-3">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0 border border-white/20">
+                    <Bell className="w-5 h-5 text-emerald-400 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm sm:text-base font-bold text-white">
+                        Automated 24-Hour Patient Reminders
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-extrabold uppercase">
+                        Background Service Active
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300">
+                      Background worker automatically scans dialysis bookings every 30s and dispatches WhatsApp &amp; Email reminders 24 hours prior to scheduled session time.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleTriggerScanner}
+                    disabled={isScanningReminders}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-sm transition-all"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isScanningReminders ? 'animate-spin' : ''}`} />
+                    <span>{isScanningReminders ? 'Scanning Queue...' : 'Run 24h Scan Now'}</span>
+                  </button>
+
+                  <button
+                    onClick={fetchAuditLogs}
+                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs flex items-center gap-2 cursor-pointer transition-all"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-cyan-300" />
+                    <span>Audit Logs</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Status metrics */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-white/10 text-xs">
+                <div className="bg-white/5 rounded-xl p-2.5 border border-white/10">
+                  <span className="text-[10px] text-slate-400 block font-semibold uppercase">Total Reminders Sent</span>
+                  <span className="text-base font-black text-emerald-400">
+                    {appointments.filter(a => a.reminderStatus === 'sent').length}
+                  </span>
+                </div>
+                <div className="bg-white/5 rounded-xl p-2.5 border border-white/10">
+                  <span className="text-[10px] text-slate-400 block font-semibold uppercase">Scheduled (24h Ahead)</span>
+                  <span className="text-base font-black text-cyan-300">
+                    {appointments.filter(a => a.reminderStatus !== 'sent' && a.reminderStatus !== 'cancelled').length}
+                  </span>
+                </div>
+                <div className="bg-white/5 rounded-xl p-2.5 border border-white/10">
+                  <span className="text-[10px] text-slate-400 block font-semibold uppercase">Due for Dispatch Now</span>
+                  <span className="text-base font-black text-amber-300">
+                    {appointments.filter(a => isAppointmentDueForReminder(a, 24).isDue && a.reminderStatus !== 'sent').length}
+                  </span>
+                </div>
+                <div className="bg-white/5 rounded-xl p-2.5 border border-white/10">
+                  <span className="text-[10px] text-slate-400 block font-semibold uppercase">Scanner Loop</span>
+                  <span className="text-xs font-bold text-slate-200">
+                    Active (every 30s)
+                  </span>
+                </div>
+              </div>
+
+              {reminderScanMessage && (
+                <div className="p-2.5 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-200 text-xs flex items-center gap-2 animate-fadeIn">
+                  <Check className="w-4 h-4 text-emerald-400" />
+                  <span>{reminderScanMessage}</span>
+                </div>
+              )}
+            </div>
+
             {/* Top Toolbar */}
             <div className="bg-white p-3.5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
@@ -471,13 +650,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       <th className="py-3.5 px-4">Center / Location</th>
                       <th className="py-3.5 px-4">Schedule</th>
                       <th className="py-3.5 px-4">Status</th>
+                      <th className="py-3.5 px-4">24h Reminder</th>
                       <th className="py-3.5 px-4 text-right">Admin Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {filteredAppointments.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="py-8 text-center text-slate-400">
+                        <td colSpan={8} className="py-8 text-center text-slate-400">
                           No appointment records found matching criteria.
                         </td>
                       </tr>
@@ -513,8 +693,66 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                               {app.status}
                             </span>
                           </td>
+                          <td className="py-3.5 px-4">
+                            {(() => {
+                              const isSent = app.reminderStatus === 'sent';
+                              const due = isAppointmentDueForReminder(app, 24);
+                              const scheduled = app.reminderScheduledFor 
+                                ? new Date(app.reminderScheduledFor)
+                                : calculateReminderScheduledTime(app.preferredDate, app.timeSlot || app.preferredTime || '', 24);
+
+                              if (isSent) {
+                                return (
+                                  <div>
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                      <Check className="w-3 h-3 text-emerald-600" />
+                                      Sent ({app.reminderChannel || 'All'})
+                                    </span>
+                                    {app.reminderSentAt && (
+                                      <div className="text-[10px] text-slate-400 mt-0.5">
+                                        {new Date(app.reminderSentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              }
+
+                              if (due.isDue) {
+                                return (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 animate-pulse">
+                                    <Clock className="w-3 h-3 text-amber-600" />
+                                    Due Now (&lt;24h)
+                                  </span>
+                                );
+                              }
+
+                              return (
+                                <div>
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#005BBD]">
+                                    <Clock className="w-3 h-3 text-[#005BBD]" />
+                                    Scheduled
+                                  </span>
+                                  <div className="text-[10px] text-slate-400 mt-0.5">
+                                    {scheduled.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} {scheduled.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </td>
                           <td className="py-3.5 px-4 text-right">
                             <div className="flex items-center justify-end gap-1.5">
+                              {/* 24h Reminder Trigger Button */}
+                              <button
+                                onClick={() => {
+                                  setReminderModalApp(app);
+                                  setReminderModalChannel(app.reminderPreference === 'none' ? 'both' : (app.reminderPreference || 'both'));
+                                }}
+                                title="Dispatch or Preview 24h Reminder"
+                                className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold cursor-pointer"
+                              >
+                                <Bell className="w-4 h-4" />
+                              </button>
+
                               {app.status !== 'Accepted' && app.status !== 'Completed' && (
                                 <button
                                   onClick={() => handleUpdateStatus(app.id, 'Accepted')}
@@ -1224,6 +1462,234 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 24-HOUR REMINDER DISPATCH & PREVIEW MODAL */}
+      {reminderModalApp && (() => {
+        const reminderContent = generate24HourReminderContent(reminderModalApp, settings.phone);
+        const scheduledTime = reminderModalApp.reminderScheduledFor 
+          ? new Date(reminderModalApp.reminderScheduledFor)
+          : calculateReminderScheduledTime(reminderModalApp.preferredDate, reminderModalApp.timeSlot || reminderModalApp.preferredTime || '', 24);
+
+        return (
+          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
+                    <Bell className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900 text-base">
+                      24-Hour Dialysis Reminder Console
+                    </h3>
+                    <span className="text-[11px] text-slate-500">
+                      Appointment Ref: {reminderModalApp.id}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setReminderModalApp(null)}
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Patient Info Summary */}
+              <div className="grid grid-cols-2 gap-3 p-3.5 bg-slate-50 rounded-2xl text-xs border border-slate-200/70">
+                <div>
+                  <span className="text-slate-400 font-semibold block">Patient</span>
+                  <span className="font-bold text-slate-800">{reminderModalApp.patientName}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 font-semibold block">Mobile / WhatsApp</span>
+                  <span className="font-bold text-slate-800">{reminderModalApp.phone}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 font-semibold block">Scheduled Dialysis</span>
+                  <span className="font-bold text-[#005BBD]">{reminderModalApp.preferredDate} ({reminderModalApp.timeSlot})</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 font-semibold block">24h Reminder Schedule</span>
+                  <span className="font-bold text-emerald-700">
+                    {scheduledTime.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} at {scheduledTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              </div>
+
+              {/* Channel Selector */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-700 block">
+                  Select Dispatch Channel:
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setReminderModalChannel('both')}
+                    className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all cursor-pointer ${
+                      reminderModalChannel === 'both'
+                        ? 'border-[#005BBD] bg-blue-50 text-[#005BBD]'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Bell className="w-4 h-4 text-[#005BBD]" />
+                    <span>WhatsApp &amp; Email</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setReminderModalChannel('whatsapp')}
+                    className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all cursor-pointer ${
+                      reminderModalChannel === 'whatsapp'
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Smartphone className="w-4 h-4 text-[#25D366]" />
+                    <span>WhatsApp Only</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setReminderModalChannel('email')}
+                    className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all cursor-pointer ${
+                      reminderModalChannel === 'email'
+                        ? 'border-sky-500 bg-sky-50 text-sky-700'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Mail className="w-4 h-4 text-sky-600" />
+                    <span>Email Only</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Message Content Preview */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-700">Pre-Dialysis Message Preview:</span>
+                  <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
+                    Includes Fistula Care &amp; Weight Limits
+                  </span>
+                </div>
+                <div className="p-3.5 bg-slate-900 text-slate-100 rounded-xl text-xs font-mono whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto border border-slate-700">
+                  {reminderContent.whatsappText}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                <a
+                  href={reminderContent.whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
+                >
+                  <Smartphone className="w-4 h-4" />
+                  <span>Open in WhatsApp Web</span>
+                  <ExternalLink className="w-3 h-3 opacity-80" />
+                </a>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setReminderModalApp(null)}
+                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
+                  >
+                    Close
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isSendingReminder}
+                    onClick={() => handleSendReminder(reminderModalApp.id, reminderModalChannel)}
+                    className="px-5 py-2.5 rounded-xl bg-[#005BBD] hover:bg-[#004A99] disabled:opacity-50 text-white font-bold text-xs flex items-center justify-center gap-2 shadow cursor-pointer transition-all"
+                  >
+                    <Send className={`w-3.5 h-3.5 ${isSendingReminder ? 'animate-pulse' : ''}`} />
+                    <span>{isSendingReminder ? 'Dispatching...' : 'Dispatch Reminder Now'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* NOTIFICATION AUDIT LOGS MODAL */}
+      {showAuditLogsModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-3xl w-full p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">
+                    24-Hour Reminder Notification Audit Trail
+                  </h3>
+                  <span className="text-[11px] text-slate-500">
+                    Live dispatch logs &amp; delivery verification
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAuditLogsModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            {auditLogs.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 space-y-2">
+                <Bell className="w-8 h-8 mx-auto text-slate-300" />
+                <p className="text-xs">No notification logs recorded yet.</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 border border-slate-100 rounded-2xl overflow-hidden text-xs">
+                {auditLogs.map(log => (
+                  <div key={log.id} className="p-3.5 hover:bg-slate-50/80 transition-colors space-y-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-900">{log.patientName}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-[#005BBD]">
+                          Appt: {log.appointmentId}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800">
+                          {log.channel}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-slate-400 font-mono">
+                        {new Date(log.timestamp).toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="text-[11px] text-slate-600 font-mono line-clamp-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                      {log.messagePreview}
+                    </div>
+
+                    <div className="text-[10px] text-slate-400 flex items-center justify-between pt-0.5">
+                      <span>Recipient: {log.recipientPhone} &bull; {log.recipientEmail || 'N/A'}</span>
+                      <span className="text-emerald-600 font-bold uppercase">Status: {log.status}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setShowAuditLogsModal(false)}
+                className="px-5 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 cursor-pointer"
+              >
+                Close Audit Logs
+              </button>
+            </div>
           </div>
         </div>
       )}

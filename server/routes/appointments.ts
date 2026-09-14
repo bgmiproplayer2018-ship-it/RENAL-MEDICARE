@@ -1,6 +1,11 @@
 import express from 'express';
 import { db } from '../db/store.ts';
 import { requireAuth } from './auth.ts';
+import { 
+  calculateReminderScheduledTime, 
+  isAppointmentDueForReminder, 
+  processAppointmentReminder 
+} from '../../src/lib/notificationEngine.ts';
 
 export const appointmentRouter = express.Router();
 
@@ -25,7 +30,14 @@ const formatApp = (a: any) => ({
   additionalNotes: a.additionalNotes || a.notes || '',
   status: a.status,
   createdAt: a.createdAt,
-  updatedAt: a.updatedAt
+  updatedAt: a.updatedAt,
+  reminderPreference: a.reminderPreference || 'both',
+  reminderConsent: a.reminderConsent !== false,
+  reminderStatus: a.reminderStatus || 'scheduled',
+  reminderScheduledFor: a.reminderScheduledFor || calculateReminderScheduledTime(a.preferredDate, a.preferredTime || a.timeSlot || '').toISOString(),
+  reminderSentAt: a.reminderSentAt,
+  reminderChannels: a.reminderChannels || (a.reminderPreference === 'whatsapp' ? ['whatsapp'] : a.reminderPreference === 'email' ? ['email'] : ['whatsapp', 'email']),
+  reminderLogs: a.reminderLogs || []
 });
 
 // GET /api/appointments (Admin can filter by status or search text)
@@ -88,6 +100,8 @@ appointmentRouter.post('/', (req, res) => {
   const preferredTime = req.body.preferredTime || req.body.timeSlot || 'Morning (07:00 AM - 11:00 AM)';
   const address = req.body.address || 'Address provided during intake';
   const additionalNotes = req.body.additionalNotes || req.body.notes || '';
+  const reminderPreference = req.body.reminderPreference || 'both'; // 'whatsapp' | 'email' | 'both' | 'none'
+  const reminderConsent = req.body.reminderConsent !== false;
 
   // Validation
   if (!fullName || !mobileNumber || !preferredDate) {
@@ -100,7 +114,10 @@ appointmentRouter.post('/', (req, res) => {
     return res.status(400).json({ error: 'Please provide a valid 10-digit mobile number.' });
   }
 
-  const newApp = db.createAppointment({
+  const reminderScheduledFor = calculateReminderScheduledTime(preferredDate, preferredTime, 24).toISOString();
+  const reminderChannels = reminderPreference === 'whatsapp' ? ['whatsapp'] : reminderPreference === 'email' ? ['email'] : ['whatsapp', 'email'];
+
+  let newApp = db.createAppointment({
     fullName: fullName.trim(),
     mobileNumber: mobileNumber.trim(),
     email: email ? email.trim().toLowerCase() : `${cleanPhone}@patient.renalmedicity.com`,
@@ -112,15 +129,45 @@ appointmentRouter.post('/', (req, res) => {
     preferredTime,
     address: address.trim(),
     additionalNotes: additionalNotes ? additionalNotes.trim() : '',
-    status: 'Pending'
+    status: 'Pending',
+    reminderPreference,
+    reminderConsent,
+    reminderStatus: 'scheduled',
+    reminderScheduledFor,
+    reminderChannels: reminderChannels as any,
+    reminderLogs: []
   });
+
+  // Check if session is already within 24 hours (e.g. booked for tomorrow or later today)
+  const dueCheck = isAppointmentDueForReminder(newApp, 24);
+  let immediateReminderSent = false;
+  if (dueCheck.isDue && reminderPreference !== 'none') {
+    const settings = db.getSettings();
+    const phone = settings?.phone || '9069645840';
+    const { updatedAppointment } = processAppointmentReminder(
+      newApp,
+      reminderPreference,
+      'automated_24h',
+      phone
+    );
+    db.updateAppointment(newApp.id, updatedAppointment);
+    newApp = updatedAppointment;
+    immediateReminderSent = true;
+  }
 
   const formatted = formatApp(newApp);
 
   res.status(201).json({
     success: true,
-    message: 'Appointment scheduled successfully! Please save your unique Appointment ID for tracking.',
-    appointment: formatted
+    message: immediateReminderSent
+      ? 'Appointment scheduled and automated 24-hour reminder sent to your WhatsApp / Email!'
+      : 'Appointment scheduled successfully! Your automated 24-hour reminder has been scheduled.',
+    appointment: formatted,
+    reminderInfo: {
+      scheduledFor: reminderScheduledFor,
+      channels: reminderChannels,
+      immediateReminderSent
+    }
   });
 });
 

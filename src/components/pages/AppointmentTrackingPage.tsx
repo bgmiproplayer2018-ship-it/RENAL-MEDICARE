@@ -12,10 +12,20 @@ import {
   RotateCcw,
   Sparkles,
   ArrowRight,
-  FileText
+  FileText,
+  Bell,
+  Smartphone,
+  Mail,
+  ExternalLink,
+  Check
 } from 'lucide-react';
 import { Appointment, CompanySettings } from '../../types.ts';
 import { apiFetch } from '../../lib/apiFallback.ts';
+import { 
+  generate24HourReminderContent, 
+  calculateReminderScheduledTime, 
+  isAppointmentDueForReminder 
+} from '../../lib/notificationEngine.ts';
 
 interface AppointmentTrackingPageProps {
   initialTrackingId?: string;
@@ -270,6 +280,90 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
                   <span className="font-bold text-slate-800">{app.timeSlot}</span>
                 </div>
               </div>
+
+              {/* Automated 24-Hour Dialysis Reminder Block */}
+              {(() => {
+                const reminderContent = generate24HourReminderContent(app, phone);
+                const scheduledDate = app.reminderScheduledFor 
+                  ? new Date(app.reminderScheduledFor)
+                  : calculateReminderScheduledTime(app.preferredDate, app.timeSlot || app.preferredTime || '', 24);
+                const isSent = app.reminderStatus === 'sent';
+                const dueCheck = isAppointmentDueForReminder(app, 24);
+
+                return (
+                  <div className="bg-gradient-to-br from-emerald-50/60 to-blue-50/60 border border-emerald-200/80 rounded-2xl p-4 text-xs space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-100 pb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center">
+                          <Bell className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <span className="font-bold text-slate-900 block">
+                            Automated 24-Hour Session Reminder
+                          </span>
+                          <span className="text-[10px] text-slate-500 block">
+                            Sends email or WhatsApp reminder 24 hours prior to session
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        {isSent ? (
+                          <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase flex items-center gap-1 w-fit">
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            Dispatched to Patient
+                          </span>
+                        ) : dueCheck.isDue ? (
+                          <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase flex items-center gap-1 w-fit animate-pulse">
+                            <Clock className="w-3 h-3 text-amber-600" />
+                            Due Now (Within 24 Hours)
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-full bg-blue-100 text-[#005BBD] text-[10px] font-extrabold uppercase flex items-center gap-1 w-fit">
+                            <Clock className="w-3 h-3 text-[#005BBD]" />
+                            Scheduled (24h Before)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="text-[11px] text-slate-600 leading-relaxed">
+                      {isSent ? (
+                        <span>
+                          Reminder notification was dispatched via <strong>WhatsApp &amp; Email</strong> on{' '}
+                          {app.reminderSentAt ? new Date(app.reminderSentAt).toLocaleString() : 'recently'}.
+                        </span>
+                      ) : (
+                        <span>
+                          Automated alert will trigger on{' '}
+                          <strong>
+                            {scheduledDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })} at{' '}
+                            {scheduledDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </strong>{' '}
+                          with fistula care precautions, fluid limit instructions, and hospital desk arrival directions.
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <a
+                        href={reminderContent.whatsappUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-3 py-1.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-[11px] flex items-center gap-1.5 shadow-xs transition-all"
+                      >
+                        <Smartphone className="w-3.5 h-3.5" />
+                        <span>{isSent ? 'View / Resend WhatsApp Reminder' : 'Test / Open WhatsApp Reminder'}</span>
+                        <ExternalLink className="w-3 h-3 opacity-80" />
+                      </a>
+
+                      <span className="text-[10px] text-slate-400">
+                        Recipient: {app.phone} &bull; {app.email || 'Email registered'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Admin / Doctor Notes */}
               {app.adminNotes && (

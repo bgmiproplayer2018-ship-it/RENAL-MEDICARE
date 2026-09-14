@@ -1,5 +1,18 @@
 export type AppointmentStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Rescheduled' | 'Completed';
 
+export type ReminderChannel = 'whatsapp' | 'email' | 'both';
+export type ReminderStatus = 'scheduled' | 'due' | 'sent' | 'failed' | 'disabled';
+
+export interface ReminderLog {
+  id: string;
+  timestamp: string;
+  channel: 'whatsapp' | 'email';
+  status: 'sent' | 'delivered' | 'failed' | 'simulated';
+  recipient: string;
+  messageSnippet: string;
+  triggerType: 'automated_24h' | 'manual_admin' | 'patient_test';
+}
+
 export interface Appointment {
   id: string;
   fullName: string;
@@ -19,6 +32,33 @@ export interface Appointment {
   adminNotes?: string;
   createdAt: string;
   updatedAt: string;
+
+  // Automated 24-Hour Notification & Reminders
+  reminderPreference?: 'whatsapp' | 'email' | 'both' | 'none';
+  reminderConsent?: boolean;
+  reminderStatus?: ReminderStatus;
+  reminderScheduledFor?: string; // e.g. calculated 24h prior to session
+  reminderSentAt?: string;
+  reminderChannels?: ('whatsapp' | 'email')[];
+  reminderLogs?: ReminderLog[];
+
+  // Patient / Client aliases
+  patientName?: string;
+  phone?: string;
+  hospitalId?: string;
+  timeSlot?: string;
+  notes?: string;
+}
+
+export interface NotificationConfig {
+  autoReminder24hEnabled: boolean;
+  reminderHoursBefore: number;
+  enableWhatsApp: boolean;
+  enableEmail: boolean;
+  whatsappSenderNumber: string;
+  emailSenderAddress: string;
+  lastAutomatedCheckAt?: string;
+  totalRemindersSentCount?: number;
 }
 
 export interface ServiceItem {

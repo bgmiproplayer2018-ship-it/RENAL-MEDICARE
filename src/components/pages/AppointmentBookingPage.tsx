@@ -12,10 +12,17 @@ import {
   ShieldCheck, 
   ArrowRight,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  Bell,
+  MessageSquare,
+  Send,
+  Smartphone,
+  Check,
+  ExternalLink
 } from 'lucide-react';
 import { Hospital, ServiceItem, Appointment, CompanySettings } from '../../types.ts';
 import { apiFetch } from '../../lib/apiFallback.ts';
+import { generate24HourReminderContent, calculateReminderScheduledTime } from '../../lib/notificationEngine.ts';
 
 interface AppointmentBookingPageProps {
   hospitals: Hospital[];
@@ -52,11 +59,14 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
     timeSlot: 'Morning (07:00 AM - 11:00 AM)',
     address: '',
     notes: '',
+    reminderPreference: 'both' as 'whatsapp' | 'email' | 'both' | 'none',
+    reminderConsent: true,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmedAppointment, setConfirmedAppointment] = useState<Appointment | null>(null);
+  const [showReminderPreview, setShowReminderPreview] = useState(false);
 
   const phone = settings?.phone || '9069645840';
 
@@ -81,16 +91,23 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           patientName: formData.patientName.trim(),
+          fullName: formData.patientName.trim(),
           phone: formData.phone.trim(),
+          mobileNumber: formData.phone.trim(),
           email: formData.email.trim() || undefined,
           age: formData.age ? Number(formData.age) : undefined,
           gender: formData.gender,
           hospitalId: formData.hospitalId,
+          hospitalLocation: formData.hospitalId,
           serviceType: formData.serviceType,
           preferredDate: formData.preferredDate,
           timeSlot: formData.timeSlot,
+          preferredTime: formData.timeSlot,
           address: formData.address.trim() || undefined,
           notes: formData.notes.trim() || undefined,
+          additionalNotes: formData.notes.trim() || undefined,
+          reminderPreference: formData.reminderPreference,
+          reminderConsent: formData.reminderConsent,
         }),
       });
 
@@ -110,22 +127,27 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
 
   // SUCCESS CONFIRMATION VIEW
   if (confirmedAppointment) {
+    const reminderContent = generate24HourReminderContent(confirmedAppointment, phone);
+    const scheduledReminderTime = confirmedAppointment.reminderScheduledFor 
+      ? new Date(confirmedAppointment.reminderScheduledFor)
+      : calculateReminderScheduledTime(confirmedAppointment.preferredDate, confirmedAppointment.preferredTime || confirmedAppointment.timeSlot || '', 24);
+
     return (
       <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-2xl p-5 sm:p-12 text-center space-y-6">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-2xl p-5 sm:p-10 text-center space-y-6">
           <div className="w-14 h-14 sm:w-16 sm:h-16 bg-emerald-100 text-[#16A34A] rounded-full flex items-center justify-center mx-auto shadow-sm">
             <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10" />
           </div>
 
           <div className="space-y-2">
             <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#16A34A] bg-emerald-50 px-3 py-1 rounded-full">
-              Appointment Successfully Confirmed
+              Appointment Successfully Registered
             </span>
-            <h1 className="text-2xl sm:text-4xl font-black text-slate-900">
-              Booking Received!
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
+              Session Booked &amp; Reminder Scheduled!
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto">
-              Your appointment request has been logged into Renal Medicity's clinical registry. Our patient coordinator will contact you shortly to confirm room preparation.
+              Your appointment request has been logged. Automated 24-hour notifications have been configured for your upcoming dialysis session.
             </p>
           </div>
 
@@ -144,11 +166,11 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <span className="text-slate-400 block font-semibold">Patient Name:</span>
-                <span className="font-bold text-slate-800">{confirmedAppointment.patientName}</span>
+                <span className="font-bold text-slate-800">{confirmedAppointment.patientName || confirmedAppointment.fullName}</span>
               </div>
               <div>
                 <span className="text-slate-400 block font-semibold">Contact Mobile:</span>
-                <span className="font-bold text-slate-800">{confirmedAppointment.phone}</span>
+                <span className="font-bold text-slate-800">{confirmedAppointment.phone || confirmedAppointment.mobileNumber}</span>
               </div>
               <div>
                 <span className="text-slate-400 block font-semibold">Service Selected:</span>
@@ -156,7 +178,7 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
               </div>
               <div>
                 <span className="text-slate-400 block font-semibold">Center / Facility:</span>
-                <span className="font-bold text-slate-800">{confirmedAppointment.hospitalId}</span>
+                <span className="font-bold text-slate-800">{confirmedAppointment.hospitalId || confirmedAppointment.hospitalLocation}</span>
               </div>
               <div>
                 <span className="text-slate-400 block font-semibold">Scheduled Date:</span>
@@ -164,9 +186,75 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
               </div>
               <div>
                 <span className="text-slate-400 block font-semibold">Time Slot:</span>
-                <span className="font-bold text-slate-800">{confirmedAppointment.timeSlot}</span>
+                <span className="font-bold text-slate-800">{confirmedAppointment.timeSlot || confirmedAppointment.preferredTime}</span>
               </div>
             </div>
+          </div>
+
+          {/* Automated 24-Hour Notification Highlight Card */}
+          <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-blue-50 border border-emerald-200 rounded-2xl p-4 sm:p-5 text-left max-w-lg mx-auto space-y-3 shadow-xs">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <Bell className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-emerald-900">
+                    Automated 24-Hour Pre-Dialysis Reminder
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-800 text-[10px] font-extrabold uppercase">
+                    Active
+                  </span>
+                </div>
+                <p className="text-xs text-emerald-800/90 leading-relaxed">
+                  Scheduled for <strong>{scheduledReminderTime.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })} at {scheduledReminderTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong> (24 hours prior to your session).
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 text-[11px] font-semibold text-emerald-900/80 bg-white/70 rounded-xl p-2.5 border border-emerald-100">
+              <span className="flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                Channels: WhatsApp ({confirmedAppointment.phone || confirmedAppointment.mobileNumber}) &amp; Email
+              </span>
+              <span className="flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                Includes AV Fistula Care &amp; Fluid Weight Limits
+              </span>
+            </div>
+
+            {/* Quick Action Buttons for WhatsApp & Preview */}
+            <div className="flex flex-col sm:flex-row gap-2 pt-1">
+              <a
+                href={reminderContent.whatsappUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+              >
+                <Smartphone className="w-4 h-4" />
+                <span>Open / Send WhatsApp Reminder</span>
+                <ExternalLink className="w-3 h-3 opacity-80" />
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setShowReminderPreview(!showReminderPreview)}
+                className="px-4 py-2.5 rounded-xl bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-50 font-bold text-xs transition-colors cursor-pointer"
+              >
+                {showReminderPreview ? 'Hide Reminder Text' : 'Preview Message'}
+              </button>
+            </div>
+
+            {/* Expandable Preview */}
+            {showReminderPreview && (
+              <div className="mt-3 p-3.5 bg-slate-900 text-slate-100 rounded-xl text-xs font-mono whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto border border-slate-700">
+                <div className="text-emerald-400 font-bold pb-2 border-b border-slate-800 flex items-center justify-between">
+                  <span>Sample WhatsApp Message Content:</span>
+                  <span className="text-[10px] text-slate-400">Sent automatically</span>
+                </div>
+                {reminderContent.whatsappText}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-2">
@@ -174,7 +262,7 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
               onClick={() => onNavigate('tracking', confirmedAppointment.id)}
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#005BBD] hover:bg-[#004A99] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Track Live Status</span>
+              <span>Track Live Status &amp; Notifications</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
@@ -193,6 +281,8 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
                   timeSlot: 'Morning (07:00 AM - 11:00 AM)',
                   address: '',
                   notes: '',
+                  reminderPreference: 'both',
+                  reminderConsent: true,
                 });
               }}
               className="w-full sm:w-auto px-5 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm transition-colors cursor-pointer text-center"
@@ -418,6 +508,128 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-[#005BBD] focus:outline-none"
               ></textarea>
             </div>
+          </div>
+
+          {/* Section 4: Automated 24-Hour Notification & Reminders */}
+          <div className="space-y-4 pt-2">
+            <div className="border-b border-slate-100 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                <Bell className="w-4 h-4 text-[#005BBD]" />
+                <span>4. Automated 24-Hour Session Reminder</span>
+              </h3>
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 w-fit">
+                Clinical Safety Feature
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Dialysis preparation is vital for patient safety. Our automated system notifies you <strong>24 hours prior</strong> with essential AV fistula hygiene advice, fluid balance reminders, and clinic station readiness.
+            </p>
+
+            {/* Reminder Consent Toggle */}
+            <label className="flex items-start gap-3 p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl cursor-pointer hover:bg-blue-50 transition-colors">
+              <input
+                type="checkbox"
+                checked={formData.reminderConsent}
+                onChange={e => {
+                  const checked = e.target.checked;
+                  setFormData({
+                    ...formData,
+                    reminderConsent: checked,
+                    reminderPreference: checked ? (formData.reminderPreference === 'none' ? 'both' : formData.reminderPreference) : 'none'
+                  });
+                }}
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#005BBD] focus:ring-[#005BBD] cursor-pointer"
+              />
+              <div className="space-y-0.5">
+                <span className="text-xs font-bold text-slate-900 block">
+                  Send me automated notifications 24 hours before my dialysis session
+                </span>
+                <span className="text-[11px] text-slate-600 block">
+                  Includes shift check-in time, duty nephrologist details, and pre-dialysis dry weight precautions.
+                </span>
+              </div>
+            </label>
+
+            {/* Channels Selection */}
+            {formData.reminderConsent && (
+              <div className="space-y-2 pt-1">
+                <label className="text-xs font-bold text-slate-700 block">
+                  Select Notification Channels:
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Both */}
+                  <div
+                    onClick={() => setFormData({ ...formData, reminderPreference: 'both' })}
+                    className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                      formData.reminderPreference === 'both'
+                        ? 'border-[#005BBD] bg-blue-50/50 shadow-xs'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900">
+                        <Bell className="w-4 h-4 text-[#005BBD]" />
+                        <span>WhatsApp &amp; Email</span>
+                      </div>
+                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#005BBD] text-white">
+                        Recommended
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-snug">
+                      Complete coverage for patient and family caregiver.
+                    </p>
+                  </div>
+
+                  {/* WhatsApp Only */}
+                  <div
+                    onClick={() => setFormData({ ...formData, reminderPreference: 'whatsapp' })}
+                    className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                      formData.reminderPreference === 'whatsapp'
+                        ? 'border-emerald-500 bg-emerald-50/40 shadow-xs'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900 mb-1.5">
+                      <Smartphone className="w-4 h-4 text-[#25D366]" />
+                      <span>WhatsApp Only</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-snug">
+                      Instant message directly to mobile with one-tap helpline.
+                    </p>
+                  </div>
+
+                  {/* Email Only */}
+                  <div
+                    onClick={() => setFormData({ ...formData, reminderPreference: 'email' })}
+                    className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                      formData.reminderPreference === 'email'
+                        ? 'border-[#005BBD] bg-blue-50/50 shadow-xs'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900 mb-1.5">
+                      <Mail className="w-4 h-4 text-sky-600" />
+                      <span>Email Only</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-snug">
+                      Comprehensive clinical intake &amp; prescription instructions.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Pre-dialysis checklist preview callout */}
+                <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs text-amber-900 flex items-start gap-2.5 mt-2">
+                  <Clock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="font-bold">What is in the 24-hour reminder?</strong>
+                    <p className="text-[11px] text-amber-800/90 mt-0.5">
+                      Checklist for AV Fistula wash protocol, overnight fluid limit warning, blood pressure medication schedule, and 15-minute prior arrival time.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <button

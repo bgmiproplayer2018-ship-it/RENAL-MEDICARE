@@ -7,8 +7,15 @@ import {
   FAQItem, 
   Testimonial, 
   ContactMessage, 
-  CompanySettings 
+  CompanySettings,
+  ReminderLog 
 } from '../types.ts';
+import {
+  calculateReminderScheduledTime,
+  isAppointmentDueForReminder,
+  processAppointmentReminder,
+  generate24HourReminderContent
+} from './notificationEngine.ts';
 
 const STORAGE_KEYS = {
   SERVICES: 'rm_services',
@@ -260,27 +267,188 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
     if (method === 'POST') {
       const appointments = ClientDataStore.getAppointments();
       const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      const newApp: Appointment = {
+      const preferredDate = body.preferredDate || new Date().toISOString().slice(0, 10);
+      const preferredTime = body.preferredTime || body.timeSlot || 'Morning (07:00 AM - 11:00 AM)';
+      const reminderPreference = body.reminderPreference || 'both';
+      const reminderConsent = body.reminderConsent !== false;
+      const scheduledReminderTime = calculateReminderScheduledTime(preferredDate, preferredTime, 24).toISOString();
+      const reminderChannels = reminderPreference === 'whatsapp' ? ['whatsapp'] : reminderPreference === 'email' ? ['email'] : ['whatsapp', 'email'];
+
+      let newApp: Appointment = {
         id: `RM-2026-${randomSuffix}`,
         fullName: body.fullName || body.patientName || 'Patient',
+        patientName: body.fullName || body.patientName || 'Patient',
         mobileNumber: body.mobileNumber || body.phone || '',
+        phone: body.mobileNumber || body.phone || '',
         email: body.email || '',
         age: Number(body.age) || 45,
         gender: body.gender || 'Male',
-        hospitalLocation: body.hospitalLocation || body.hospitalId || 'Delhi Central Flagship',
-        serviceType: body.serviceType || body.serviceId || 'hemodialysis',
-        preferredDate: body.preferredDate || new Date().toISOString().slice(0, 10),
-        preferredTime: body.preferredTime || '10:00 AM - 02:00 PM (Morning Slot)',
+        hospitalLocation: body.hospitalLocation || body.hospitalId || 'Renal Medicity Main Hub',
+        hospitalId: body.hospitalLocation || body.hospitalId || 'Renal Medicity Main Hub',
+        serviceType: body.serviceType || body.serviceId || 'Hemodialysis',
+        preferredDate,
+        preferredTime,
+        timeSlot: preferredTime,
         address: body.address || '',
-        additionalNotes: body.additionalNotes || body.medicalHistory || '',
+        additionalNotes: body.additionalNotes || body.notes || '',
         status: 'Pending',
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        reminderPreference,
+        reminderConsent,
+        reminderStatus: 'scheduled',
+        reminderScheduledFor: scheduledReminderTime,
+        reminderChannels: reminderChannels as any,
+        reminderLogs: []
       };
+
+      // If scheduled within 24 hours, automatically dispatch 24h reminder
+      const dueCheck = isAppointmentDueForReminder(newApp, 24);
+      if (dueCheck.isDue && reminderPreference !== 'none') {
+        const settings = ClientDataStore.getSettings();
+        const supportPhone = settings?.phone || '9069645840';
+        const { updatedAppointment } = processAppointmentReminder(newApp, reminderPreference, 'automated_24h', supportPhone);
+        newApp = updatedAppointment;
+      }
+
       appointments.unshift(newApp);
       ClientDataStore.saveAppointments(appointments);
-      return { status: 201, data: { success: true, message: 'Appointment booked successfully', appointment: newApp } };
+      return { 
+        status: 201, 
+        data: { 
+          success: true, 
+          message: newApp.reminderStatus === 'sent'
+            ? 'Appointment scheduled and automated 24-hour reminder sent to your WhatsApp / Email!'
+            : 'Appointment booked successfully! Automated 24-hour reminder has been scheduled.', 
+          appointment: newApp 
+        } 
+      };
     }
+  }
+
+  // Notifications API
+  if (path === '/api/notifications/status' && method === 'GET') {
+    const apps = ClientDataStore.getAppointments();
+    const active = apps.filter(a => a.status !== 'Rejected' && a.status !== 'Completed');
+    const sent = apps.filter(a => a.reminderStatus === 'sent');
+    const due = active.filter(a => isAppointmentDueForReminder(a, 24).isDue);
+    return {
+      status: 200,
+      data: {
+        success: true,
+        status: {
+          isSchedulerActive: true,
+          totalAppointments: apps.length,
+          activeDialysisSessions: active.length,
+          remindersSentCount: sent.length,
+          remindersDueNowCount: due.length,
+          reminderWindowHours: 24,
+          serverTime: new Date().toISOString()
+        }
+      }
+    };
+  }
+
+  if (path === '/api/notifications/run-reminders' && method === 'POST') {
+    const apps = ClientDataStore.getAppointments();
+    const settings = ClientDataStore.getSettings();
+    const supportPhone = settings?.phone || '9069645840';
+    let dispatchedCount = 0;
+    const dispatchedApps: any[] = [];
+
+    const updated = apps.map(app => {
+      if (app.status === 'Rejected' || app.status === 'Completed' || app.reminderStatus === 'sent') {
+        return app;
+      }
+      const dueCheck = isAppointmentDueForReminder(app, 24);
+      if (dueCheck.isDue) {
+        const targetChannel = (app.reminderPreference === 'none' ? 'both' : (app.reminderPreference || 'both')) as any;
+        const { updatedAppointment } = processAppointmentReminder(app, targetChannel, 'automated_24h', supportPhone);
+        dispatchedCount++;
+        dispatchedApps.push({ id: app.id, patientName: app.fullName, channels: updatedAppointment.reminderChannels });
+        return updatedAppointment;
+      }
+      return app;
+    });
+
+    if (dispatchedCount > 0) {
+      ClientDataStore.saveAppointments(updated);
+    }
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: `Scanned ${apps.length} appointments. Dispatched ${dispatchedCount} automated reminders.`,
+        results: {
+          scannedCount: apps.length,
+          dispatchedCount,
+          dispatchedAppointments: dispatchedApps,
+          timestamp: new Date().toISOString()
+        }
+      }
+    };
+  }
+
+  // Single reminder send: /api/notifications/send/:id
+  const sendMatch = path.match(/^\/api\/notifications\/send\/([^/]+)$/);
+  if (sendMatch && method === 'POST') {
+    const id = sendMatch[1];
+    const apps = ClientDataStore.getAppointments();
+    const idx = apps.findIndex(a => a.id.toLowerCase() === id.toLowerCase());
+    if (idx === -1) return { status: 404, data: { error: 'Appointment not found' } };
+
+    const { channel = 'both', triggerType = 'manual_admin' } = body || {};
+    const settings = ClientDataStore.getSettings();
+    const supportPhone = settings?.phone || '9069645840';
+
+    const { updatedAppointment, content } = processAppointmentReminder(
+      apps[idx],
+      channel,
+      triggerType,
+      supportPhone
+    );
+
+    apps[idx] = updatedAppointment;
+    ClientDataStore.saveAppointments(apps);
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: `24-Hour Dialysis Reminder sent successfully via ${channel === 'both' ? 'WhatsApp & Email' : channel}.`,
+        appointment: updatedAppointment,
+        content
+      }
+    };
+  }
+
+  // Preview reminder: /api/notifications/preview/:id
+  const previewMatch = path.match(/^\/api\/notifications\/preview\/([^/]+)$/);
+  if (previewMatch && method === 'GET') {
+    const id = previewMatch[1];
+    const apps = ClientDataStore.getAppointments();
+    const app = apps.find(a => a.id.toLowerCase() === id.toLowerCase());
+    if (!app) return { status: 404, data: { error: 'Appointment not found' } };
+
+    const settings = ClientDataStore.getSettings();
+    const supportPhone = settings?.phone || '9069645840';
+    const preview = generate24HourReminderContent(app, supportPhone);
+
+    return { status: 200, data: { success: true, preview } };
+  }
+
+  // Logs: /api/notifications/logs
+  if (path === '/api/notifications/logs' && method === 'GET') {
+    const apps = ClientDataStore.getAppointments();
+    const logs: ReminderLog[] = [];
+    for (const a of apps) {
+      if (a.reminderLogs && Array.isArray(a.reminderLogs)) {
+        logs.push(...a.reminderLogs);
+      }
+    }
+    logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    return { status: 200, data: { success: true, count: logs.length, logs } };
   }
 
   // Track appointment: /api/appointments/track/:query

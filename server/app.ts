@@ -8,6 +8,7 @@ import { contactRouter } from './routes/contact.ts';
 import { faqRouter } from './routes/faqs.ts';
 import { testimonialRouter } from './routes/testimonials.ts';
 import { settingsRouter } from './routes/settings.ts';
+import { notificationRouter } from './routes/notifications.ts';
 import { db } from './db/store.ts';
 
 export function createApp() {
@@ -61,6 +62,7 @@ export function createApp() {
     ['/faqs', faqRouter],
     ['/testimonials', testimonialRouter],
     ['/settings', settingsRouter],
+    ['/notifications', notificationRouter],
   ];
 
   for (const [prefix, router] of routers) {

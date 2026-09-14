@@ -229,8 +229,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, settings }) => {
             <button onClick={() => onNavigate('contact')} className="hover:text-white cursor-pointer">
               Privacy &amp; Patient Rights
             </button>
-            <button onClick={() => onNavigate('admin')} className="text-blue-400 hover:text-white cursor-pointer">
-              Staff &amp; Admin Portal
+            <button onClick={() => onNavigate('contact')} className="hover:text-white cursor-pointer">
+              Help &amp; Support
             </button>
           </div>
         </div>

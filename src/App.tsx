@@ -73,6 +73,32 @@ export default function App() {
 
   useEffect(() => {
     loadAllData();
+
+    // Direct staff access via URL hash (#admin) or query parameter (?admin=true)
+    const checkAdminRoute = () => {
+      const hash = window.location.hash.toLowerCase();
+      const params = new URLSearchParams(window.location.search);
+      if (hash === '#admin' || params.get('admin') === 'true' || params.get('tab') === 'admin') {
+        setCurrentTab('admin');
+      }
+    };
+
+    checkAdminRoute();
+    window.addEventListener('hashchange', checkAdminRoute);
+
+    // Discreet staff shortcut: Ctrl + Shift + A (or Cmd + Shift + A)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        setCurrentTab((prev) => (prev === 'admin' ? 'home' : 'admin'));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('hashchange', checkAdminRoute);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const handleNavigate = (tab: string, param?: string) => {

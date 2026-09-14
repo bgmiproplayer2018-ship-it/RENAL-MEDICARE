@@ -9,7 +9,6 @@ import {
   Search, 
   ShieldCheck, 
   UserCheck, 
-  LogIn, 
   LogOut,
   ChevronRight,
   HeartPulse
@@ -109,32 +108,26 @@ export const Header: React.FC<HeaderProps> = ({
               <Search className="w-3 h-3 text-cyan-300" />
               <span>Track Appointment</span>
             </button>
-            <span className="text-blue-400">|</span>
-            {isAdminLoggedIn ? (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleNavClick('admin')}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-0.5 rounded text-[11px] font-semibold flex items-center gap-1 cursor-pointer"
-                >
-                  <ShieldCheck className="w-3 h-3" />
-                  Admin Panel
-                </button>
-                <button
-                  onClick={onAdminLogout}
-                  title="Logout"
-                  className="text-blue-200 hover:text-red-300 cursor-pointer"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => handleNavClick('admin')}
-                className="text-blue-200 hover:text-white flex items-center gap-1 cursor-pointer"
-              >
-                <LogIn className="w-3 h-3" />
-                <span>Admin Login</span>
-              </button>
+            {isAdminLoggedIn && (
+              <>
+                <span className="text-blue-400">|</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleNavClick('admin')}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-0.5 rounded text-[11px] font-semibold flex items-center gap-1 cursor-pointer"
+                  >
+                    <ShieldCheck className="w-3 h-3" />
+                    Admin Panel
+                  </button>
+                  <button
+                    onClick={onAdminLogout}
+                    title="Logout"
+                    className="text-blue-200 hover:text-red-300 cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -268,13 +261,15 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Book Appointment Now</span>
             </button>
 
-            <button
-              onClick={() => handleNavClick('admin')}
-              className="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs text-center flex items-center justify-center gap-2"
-            >
-              <ShieldCheck className="w-4 h-4 text-slate-600" />
-              <span>{isAdminLoggedIn ? 'Go to Admin Dashboard' : 'Admin Portal Login'}</span>
-            </button>
+            {isAdminLoggedIn && (
+              <button
+                onClick={() => handleNavClick('admin')}
+                className="w-full py-2.5 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs text-center flex items-center justify-center gap-2"
+              >
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>Go to Admin Dashboard</span>
+              </button>
+            )}
           </div>
         </div>
       )}

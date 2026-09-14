@@ -117,7 +117,7 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
       status: 200,
       data: {
         status: 'ok',
-        service: 'Renal Medicity (Client Storage & Netlify Ready)',
+        service: 'Renal Medicare (Client Storage & Netlify Ready)',
         timestamp: new Date().toISOString(),
       }
     };
@@ -126,17 +126,17 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
   // Auth: /api/auth/login
   if (path === '/api/auth/login' && method === 'POST') {
     const { email, password } = body || {};
-    const validEmails = ['admin@renalmedicity.com', 'admin'];
-    const validPasswords = ['Admin@RenalMedicity2026', 'admin', 'password'];
+    const validEmails = ['admin@renalmedicare.com', 'admin@renalmedicity.com', 'admin'];
+    const validPasswords = ['Admin@RenalMedicare2026', 'Admin@RenalMedicity2026', 'admin', 'password'];
 
     if (email && password && validEmails.includes(email.toLowerCase()) && validPasswords.includes(password)) {
       return {
         status: 200,
         data: {
           success: true,
-          token: 'demo-jwt-token-renal-medicity-admin',
+          token: 'demo-jwt-token-renal-medicare-admin',
           user: {
-            email: 'admin@renalmedicity.com',
+            email: 'admin@renalmedicare.com',
             role: 'admin',
             name: 'Dr. Medical Director'
           }
@@ -145,7 +145,7 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
     }
     return {
       status: 401,
-      data: { error: 'Invalid email or password. Use admin@renalmedicity.com / Admin@RenalMedicity2026' }
+      data: { error: 'Invalid email or password. Use admin@renalmedicare.com / Admin@RenalMedicare2026' }
     };
   }
 
@@ -283,8 +283,8 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
         email: body.email || '',
         age: Number(body.age) || 45,
         gender: body.gender || 'Male',
-        hospitalLocation: body.hospitalLocation || body.hospitalId || 'Renal Medicity Main Hub',
-        hospitalId: body.hospitalLocation || body.hospitalId || 'Renal Medicity Main Hub',
+        hospitalLocation: body.hospitalLocation || body.hospitalId || 'Renal Medicare Main Hub',
+        hospitalId: body.hospitalLocation || body.hospitalId || 'Renal Medicare Main Hub',
         serviceType: body.serviceType || body.serviceId || 'Hemodialysis',
         preferredDate,
         preferredTime,

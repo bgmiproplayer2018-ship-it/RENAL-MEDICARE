@@ -38,7 +38,7 @@ blogRouter.post('/', requireAuth, (req, res) => {
     category: category || 'Dialysis Care',
     tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : ['Dialysis']),
     featuredImage: featuredImage || 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80',
-    author: author || 'Renal Medicity Clinical Team',
+    author: author || 'Renal Medicare Clinical Team',
     readTime: readTime || '5 min read',
     metaTitle: metaTitle || title,
     metaDescription: metaDescription || excerpt

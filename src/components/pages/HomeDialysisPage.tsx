@@ -94,7 +94,7 @@ export const HomeDialysisPage: React.FC<HomeDialysisPageProps> = ({ onNavigate, 
               </h1>
 
               <p className="text-emerald-100/90 text-xs sm:text-base leading-relaxed">
-                Say goodbye to strenuous three-times-a-week hospital commutes. Renal Medicity delivers 
+                Say goodbye to strenuous three-times-a-week hospital commutes. Renal Medicare delivers 
                 advanced hemodialysis right at your bedside, complete with a dedicated licensed dialysis technician, 
                 portable clinical Reverse Osmosis water purification, and real-time nephrologist video telemetry.
               </p>
@@ -189,7 +189,7 @@ export const HomeDialysisPage: React.FC<HomeDialysisPageProps> = ({ onNavigate, 
               Step-By-Step Process
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              How Renal Medicity Home Dialysis Works
+              How Renal Medicare Home Dialysis Works
             </h2>
             <p className="text-slate-600 text-sm">
               We handle every detail from water chemistry testing to emergency medication backup.

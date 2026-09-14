@@ -138,7 +138,7 @@ const initialServices: ServiceItem[] = [
 const initialHospitals: Hospital[] = [
   {
     id: 'hosp-1',
-    name: 'Renal Medicity Super Specialty Kidney Center',
+    name: 'Renal Medicare Super Specialty Kidney Center',
     address: 'Plot 14, Ring Road Institutional Area, South Extension Part-II',
     city: 'New Delhi',
     state: 'Delhi',
@@ -151,7 +151,7 @@ const initialHospitals: Hospital[] = [
   },
   {
     id: 'hosp-2',
-    name: 'Renal Medicity Dialysis & Critical Care Center',
+    name: 'Renal Medicare Dialysis & Critical Care Center',
     address: 'Sector 51, Golf Course Extension Road, Opposite Artemis Hospital',
     city: 'Gurugram',
     state: 'Haryana',
@@ -164,7 +164,7 @@ const initialHospitals: Hospital[] = [
   },
   {
     id: 'hosp-3',
-    name: 'Renal Medicity Nephro Care Hub',
+    name: 'Renal Medicare Nephro Care Hub',
     address: 'Express Trade Towers, Sector 132, Expressway Corridor',
     city: 'Noida',
     state: 'Uttar Pradesh',
@@ -177,7 +177,7 @@ const initialHospitals: Hospital[] = [
   },
   {
     id: 'hosp-4',
-    name: 'Renal Medicity Regional Kidney Institute',
+    name: 'Renal Medicare Regional Kidney Institute',
     address: 'S.V. Road, Near Bandra Medical Enclave, Bandra West',
     city: 'Mumbai',
     state: 'Maharashtra',
@@ -190,7 +190,7 @@ const initialHospitals: Hospital[] = [
   },
   {
     id: 'hosp-5',
-    name: 'Renal Medicity Advanced Dialysis Wing',
+    name: 'Renal Medicare Advanced Dialysis Wing',
     address: '100 Feet Road, Indiranagar, Near Metro Pillar 84',
     city: 'Bengaluru',
     state: 'Karnataka',
@@ -203,7 +203,7 @@ const initialHospitals: Hospital[] = [
   },
   {
     id: 'hosp-6',
-    name: 'Renal Medicity Kidney & Dialysis Center',
+    name: 'Renal Medicare Kidney & Dialysis Center',
     address: 'Madhya Marg, Sector 7-C, Near PGI Medical Corridor',
     city: 'Chandigarh',
     state: 'Punjab',
@@ -235,7 +235,7 @@ Peritoneal dialysis utilizes the patient's own natural abdominal lining (the per
 - **Types:** Continuous Ambulatory (CAPD) with manual bag exchanges, or Automated Peritoneal Dialysis (APD) performed at night with a gentle cycler machine.
 - **Benefits:** Can be performed anywhere, preserves residual urine output longer, and requires fewer dietary restrictions.
 
-At Renal Medicity, our nephrologists help you choose the best modality tailored to your cardiovascular status, lifestyle, and clinical parameters.`,
+At Renal Medicare, our nephrologists help you choose the best modality tailored to your cardiovascular status, lifestyle, and clinical parameters.`,
     category: 'Dialysis Guide',
     tags: ['Dialysis', 'Kidney Health', 'Hemodialysis', 'Peritoneal Dialysis'],
     featuredImage: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80',
@@ -243,7 +243,7 @@ At Renal Medicity, our nephrologists help you choose the best modality tailored 
     publishedDate: 'September 10, 2026',
     readTime: '6 min read',
     metaTitle: 'Hemodialysis vs Peritoneal Dialysis: Which Is Right For You?',
-    metaDescription: 'A clinical guide comparing Hemodialysis and Peritoneal Dialysis by Renal Medicity nephrologists.'
+    metaDescription: 'A clinical guide comparing Hemodialysis and Peritoneal Dialysis by Renal Medicare nephrologists.'
   },
   {
     id: 'blog-2',
@@ -279,7 +279,7 @@ Work with your renal dietitian to determine your exact daily fluid target based 
     publishedDate: 'September 04, 2026',
     readTime: '5 min read',
     metaTitle: 'Renal Diet Guide: Sodium, Potassium & Phosphorus Management',
-    metaDescription: 'Expert nutrition advice for chronic kidney disease and dialysis patients from Renal Medicity.'
+    metaDescription: 'Expert nutrition advice for chronic kidney disease and dialysis patients from Renal Medicare.'
   },
   {
     id: 'blog-3',
@@ -294,7 +294,7 @@ Work with your renal dietitian to determine your exact daily fluid target based 
 3. **No Commute Stress:** Eliminates travel fatigue, traffic delays, and dependence on hospital transport.
 4. **Improved Clinical Outcomes:** Studies show that patients receiving relaxed home treatments experience more stable blood pressure and faster post-dialysis recovery time (washout).
 
-At Renal Medicity, our Home Dialysis Program includes a pre-installation water quality audit, dual RO installation, emergency backups, and an experienced certified technician dedicated exclusively to your care during every minute of the session.`,
+At Renal Medicare, our Home Dialysis Program includes a pre-installation water quality audit, dual RO installation, emergency backups, and an experienced certified technician dedicated exclusively to your care during every minute of the session.`,
     category: 'Home Dialysis',
     tags: ['Home Dialysis', 'Patient Comfort', 'Safety', 'Technology'],
     featuredImage: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80',
@@ -302,7 +302,7 @@ At Renal Medicity, our Home Dialysis Program includes a pre-installation water q
     publishedDate: 'August 28, 2026',
     readTime: '4 min read',
     metaTitle: 'Home Dialysis Benefits: Safety and Freedom for Patients',
-    metaDescription: 'How Renal Medicity delivers hospital-grade home dialysis with certified technicians.'
+    metaDescription: 'How Renal Medicare delivers hospital-grade home dialysis with certified technicians.'
   }
 ];
 
@@ -316,12 +316,12 @@ const initialFaqs: FAQItem[] = [
   {
     id: 'faq-2',
     question: 'Is home dialysis safe compared to hospital dialysis?',
-    answer: 'Yes, absolutely. In fact, home dialysis provides superior infection control as it eliminates exposure to hospital-acquired pathogens. At Renal Medicity, every home session is administered in person by a certified, licensed dialysis technician equipped with hospital-grade equipment, ultrapure RO water filtration, and direct real-time telemetry connected to our senior nephrologists.',
+    answer: 'Yes, absolutely. In fact, home dialysis provides superior infection control as it eliminates exposure to hospital-acquired pathogens. At Renal Medicare, every home session is administered in person by a certified, licensed dialysis technician equipped with hospital-grade equipment, ultrapure RO water filtration, and direct real-time telemetry connected to our senior nephrologists.',
     category: 'home-dialysis'
   },
   {
     id: 'faq-3',
-    question: 'What is the cost of dialysis at Renal Medicity?',
+    question: 'What is the cost of dialysis at Renal Medicare?',
     answer: 'Our hospital center hemodialysis begins at ₹2,200 per session including consumables. Comprehensive Home Dialysis with a dedicated technician is ₹3,800 per session. Monthly automated peritoneal packages start from ₹18,500. We also accept major insurance policies and cashless TPA partnerships.',
     category: 'general'
   },
@@ -340,7 +340,7 @@ const initialFaqs: FAQItem[] = [
   {
     id: 'faq-6',
     question: 'What happens during a sudden dialysis emergency or fluid overload?',
-    answer: 'Renal Medicity operates 24x7 emergency dialysis and ICU bedside CRRT across our hospital network. For immediate assistance, dial our emergency numbers 9069645840 or 7522805397 for rapid patient transfer and immediate triage.',
+    answer: 'Renal Medicare operates 24x7 emergency dialysis and ICU bedside CRRT across our hospital network. For immediate assistance, dial our emergency numbers 9069645840 or 7522805397 for rapid patient transfer and immediate triage.',
     category: 'dialysis'
   }
 ];
@@ -350,7 +350,7 @@ const initialTestimonials: Testimonial[] = [
     id: 'test-1',
     patientName: 'Harish Chander Malhotra',
     treatment: 'Home Hemodialysis Patient (2 Years)',
-    quote: 'Switching to Renal Medicity home dialysis changed our lives. My father no longer has to endure 3-hour traffic journeys to the hospital. The technician is exceptionally gentle, punctual, and maintains complete ICU-level sterilization in our home.',
+    quote: 'Switching to Renal Medicare home dialysis changed our lives. My father no longer has to endure 3-hour traffic journeys to the hospital. The technician is exceptionally gentle, punctual, and maintains complete ICU-level sterilization in our home.',
     rating: 5,
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
     location: 'South Delhi',
@@ -360,7 +360,7 @@ const initialTestimonials: Testimonial[] = [
     id: 'test-2',
     patientName: 'Sunita Rawat',
     treatment: 'Hospital Center Maintenance Dialysis',
-    quote: 'The nursing staff at Renal Medicity treats every patient like family. The high-flux dialysis machines and ultrapure water system have made a huge difference—I rarely feel nauseous or washed out after my sessions now.',
+    quote: 'The nursing staff at Renal Medicare treats every patient like family. The high-flux dialysis machines and ultrapure water system have made a huge difference—I rarely feel nauseous or washed out after my sessions now.',
     rating: 5,
     image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
     location: 'Gurugram',
@@ -386,7 +386,7 @@ const initialAppointments: Appointment[] = [
     email: 'rajesh.verma@example.com',
     age: 58,
     gender: 'Male',
-    hospitalLocation: 'Renal Medicity Super Specialty Kidney Center - South Delhi',
+    hospitalLocation: 'Renal Medicare Super Specialty Kidney Center - South Delhi',
     serviceType: 'Hemodialysis',
     preferredDate: '2026-09-14',
     preferredTime: '08:00 AM - 12:00 PM',
@@ -404,7 +404,7 @@ const initialAppointments: Appointment[] = [
     email: 'kavita.sharma@example.com',
     age: 46,
     gender: 'Female',
-    hospitalLocation: 'Renal Medicity Dialysis & Critical Care - Gurugram',
+    hospitalLocation: 'Renal Medicare Dialysis & Critical Care - Gurugram',
     serviceType: 'Nephrologist Consultation',
     preferredDate: '2026-09-13',
     preferredTime: '11:00 AM - 01:00 PM',
@@ -439,7 +439,7 @@ const initialAppointments: Appointment[] = [
     email: 'ananya.d@example.com',
     age: 39,
     gender: 'Female',
-    hospitalLocation: 'Renal Medicity Regional Kidney Institute - Mumbai',
+    hospitalLocation: 'Renal Medicare Regional Kidney Institute - Mumbai',
     serviceType: 'Kidney Consultation',
     preferredDate: '2026-09-16',
     preferredTime: '04:00 PM - 06:00 PM',
@@ -455,21 +455,21 @@ const initialAppointments: Appointment[] = [
 ];
 
 const initialSettings: CompanySettings = {
-  companyName: 'Renal Medicity',
+  companyName: 'Renal Medicare',
   tagline: 'Caring For Kidney Health',
   phone: '9069645840',
   alternatePhone: '7522805397',
   email: 'renalhealthcare01@gmail.com',
   whatsapp: '9069645840',
-  address: 'Renal Medicity Kidney Care Hub, Institutional Medical Area, New Delhi - 110049, India',
+  address: 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049, India',
   workingHours: '24 Hours Emergency Dialysis | OPD: 8:00 AM - 8:00 PM',
   emergencyLine: '+91-9069645840',
   socialLinks: {
-    facebook: 'https://facebook.com/renalmedicity',
-    twitter: 'https://twitter.com/renalmedicity',
-    instagram: 'https://instagram.com/renalmedicity',
-    linkedin: 'https://linkedin.com/company/renalmedicity',
-    youtube: 'https://youtube.com/@renalmedicity'
+    facebook: 'https://facebook.com/renalmedicare',
+    twitter: 'https://twitter.com/renalmedicare',
+    instagram: 'https://instagram.com/renalmedicare',
+    linkedin: 'https://linkedin.com/company/renalmedicare',
+    youtube: 'https://youtube.com/@renalmedicare'
   },
   primaryColor: '#005BBD',
   secondaryColor: '#4FA9FF',

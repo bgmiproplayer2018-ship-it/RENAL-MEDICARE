@@ -41,7 +41,7 @@ export const AppointmentBookingPage: React.FC<AppointmentBookingPageProps> = ({
 }) => {
   const initialHospital = preselectedService?.startsWith('Hospital: ')
     ? preselectedService.replace('Hospital: ', '')
-    : hospitals[0]?.name || 'Renal Medicity Care Suite - Apollo Spectra';
+    : hospitals[0]?.name || 'Renal Medicare Care Suite - Apollo Spectra';
 
   const initialService = preselectedService && !preselectedService.startsWith('Hospital: ')
     ? preselectedService

@@ -1,5 +1,5 @@
 /**
- * Mongoose Schemas & Models for Renal Medicity
+ * Mongoose Schemas & Models for Renal Medicare
  * Ready for MongoDB Atlas deployment
  */
 
@@ -131,20 +131,20 @@ export const MongoDBSchemas = {
   Settings: {
     name: 'Settings',
     schema: {
-      companyName: { type: String, default: 'Renal Medicity' },
+      companyName: { type: String, default: 'Renal Medicare' },
       tagline: { type: String, default: 'Caring For Kidney Health' },
       phone: { type: String, default: '9069645840' },
       alternatePhone: { type: String, default: '7522805397' },
       email: { type: String, default: 'renalhealthcare01@gmail.com' },
       whatsapp: { type: String, default: '9069645840' },
-      address: { type: String, default: 'Renal Medicity Kidney Care Hub, Institutional Medical Area, New Delhi, India' },
+      address: { type: String, default: 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi, India' },
       workingHours: { type: String, default: '24x7 Dialysis & Emergency Care' },
       emergencyLine: { type: String, default: '+91-9069645840' },
       socialLinks: {
-        facebook: { type: String, default: 'https://facebook.com/renalmedicity' },
-        twitter: { type: String, default: 'https://twitter.com/renalmedicity' },
-        instagram: { type: String, default: 'https://instagram.com/renalmedicity' },
-        linkedin: { type: String, default: 'https://linkedin.com/company/renalmedicity' }
+        facebook: { type: String, default: 'https://facebook.com/renalmedicare' },
+        twitter: { type: String, default: 'https://twitter.com/renalmedicare' },
+        instagram: { type: String, default: 'https://instagram.com/renalmedicare' },
+        linkedin: { type: String, default: 'https://linkedin.com/company/renalmedicare' }
       }
     }
   }

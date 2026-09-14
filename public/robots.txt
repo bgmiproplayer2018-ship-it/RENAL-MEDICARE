@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://renalmedicity.com/sitemap.xml
+Sitemap: https://renalmedicare.com/sitemap.xml

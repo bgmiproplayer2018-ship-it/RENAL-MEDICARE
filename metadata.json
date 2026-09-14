@@ -1,6 +1,6 @@
 {
-  "name": "Renal Medicity",
-  "description": "Renal Medicity - Advanced Kidney Care & Dialysis Center with automated 24-hour pre-dialysis WhatsApp & email reminder notifications, multi-center hospital network, and session scheduling.",
+  "name": "Renal Medicare",
+  "description": "Renal Medicare - Advanced Kidney Care & Dialysis Center with automated 24-hour pre-dialysis WhatsApp & email reminder notifications, multi-center hospital network, and session scheduling.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

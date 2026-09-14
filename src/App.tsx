@@ -29,7 +29,7 @@ export default function App() {
   const [faqs, setFaqs] = useState<FAQItem[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [settings, setSettings] = useState<CompanySettings>({
-    companyName: 'Renal Medicity',
+    companyName: 'Renal Medicare',
     tagline: 'Caring For Kidney Health',
     phone: '9069645840',
     alternatePhone: '7522805397',
@@ -39,7 +39,7 @@ export default function App() {
     secondaryColor: '#4FA9FF',
     accentColor: '#0EA5E9',
     backgroundColor: '#FFFFFF',
-    address: 'Renal Medicity Kidney Care Hub, Institutional Medical Area, New Delhi - 110049'
+    address: 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049'
   });
 
   // Admin Auth State

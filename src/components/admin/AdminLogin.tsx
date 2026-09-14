@@ -9,8 +9,8 @@ interface AdminLoginProps {
 }
 
 export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onCancel }) => {
-  const [email, setEmail] = useState('admin@renalmedicity.com');
-  const [password, setPassword] = useState('Admin@RenalMedicity2026');
+  const [email, setEmail] = useState('admin@renalmedicare.com');
+  const [password, setPassword] = useState('Admin@RenalMedicare2026');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,7 +48,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onCancel
         {/* Brand Logo Header */}
         <div className="text-center space-y-3">
           <div className="flex justify-center">
-            <RenalLogo size="md" />
+            <RenalLogo size="md" variant="stacked" />
           </div>
           <div className="pt-2">
             <span className="px-3 py-1 rounded-full bg-blue-50 text-[#005BBD] text-xs font-bold uppercase tracking-wider inline-flex items-center gap-1.5">
@@ -81,7 +81,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onCancel
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="admin@renalmedicity.com"
+                placeholder="admin@renalmedicare.com"
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-[#005BBD] focus:outline-none"
               />
             </div>
@@ -118,8 +118,8 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onCancel
           <span className="font-bold block text-[11px] uppercase tracking-wider text-[#005BBD]">
             Default Admin Credentials
           </span>
-          <p className="text-slate-600 font-mono text-[11px]">Email: <strong>admin@renalmedicity.com</strong></p>
-          <p className="text-slate-600 font-mono text-[11px]">Pass: <strong>Admin@RenalMedicity2026</strong></p>
+          <p className="text-slate-600 font-mono text-[11px]">Email: <strong>admin@renalmedicare.com</strong></p>
+          <p className="text-slate-600 font-mono text-[11px]">Pass: <strong>Admin@RenalMedicare2026</strong></p>
         </div>
 
         <div className="text-center pt-2">

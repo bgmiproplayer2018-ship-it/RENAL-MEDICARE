@@ -14,7 +14,7 @@ contactRouter.post('/', (req, res) => {
 
   const newContact = db.addContact({
     name: name.trim(),
-    email: (email || 'not-provided@renalmedicity.com').trim(),
+    email: (email || 'not-provided@renalmedicare.com').trim(),
     phone: phone.trim(),
     subject: subject || (type === 'home-dialysis-request' ? 'Home Dialysis Visit Request' : 'General Inquiry'),
     message: message.trim(),

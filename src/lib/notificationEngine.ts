@@ -6,7 +6,7 @@ export const DEFAULT_NOTIFICATION_CONFIG: NotificationConfig = {
   enableWhatsApp: true,
   enableEmail: true,
   whatsappSenderNumber: '9069645840',
-  emailSenderAddress: 'care@renalmedicity.com',
+  emailSenderAddress: 'care@renalmedicare.com',
   totalRemindersSentCount: 0
 };
 
@@ -158,14 +158,14 @@ export function generate24HourReminderContent(
   const patientName = appointment.fullName || appointment.patientName || 'Valued Patient';
   const cleanPhone = String(appointment.mobileNumber || appointment.phone || '').replace(/\D/g, '');
   const service = appointment.serviceType || 'Hemodialysis Treatment';
-  const center = appointment.hospitalLocation || appointment.hospitalId || 'Renal Medicity Dialysis Center';
+  const center = appointment.hospitalLocation || appointment.hospitalId || 'Renal Medicare Dialysis Center';
   const date = appointment.preferredDate;
   const time = appointment.timeSlot || appointment.preferredTime || 'Scheduled Shift';
-  const email = appointment.email || `${cleanPhone}@patient.renalmedicity.com`;
+  const email = appointment.email || `${cleanPhone}@patient.renalmedicare.com`;
 
   // WhatsApp Message
   const whatsappText = 
-`🏥 *RENAL MEDICITY - 24-HOUR DIALYSIS REMINDER* 🏥
+`🏥 *RENAL MEDICARE - 24-HOUR DIALYSIS REMINDER* 🏥
 
 Dear *${patientName}*,
 This is an automated reminder that your scheduled dialysis session is booked for *tomorrow*.
@@ -196,7 +196,7 @@ This is an automated reminder that your scheduled dialysis session is booked for
 • Quick Reply on WhatsApp: https://wa.me/91${supportPhone}
 
 Wishing you a smooth, comfortable dialysis session!
-_Renal Medicity Clinical Operations_`;
+_Renal Medicare Clinical Operations_`;
 
   // WhatsApp Web / App direct click-to-chat URL
   const whatsappTargetPhone = cleanPhone.startsWith('91') && cleanPhone.length > 10 
@@ -205,12 +205,12 @@ _Renal Medicity Clinical Operations_`;
   const whatsappUrl = `https://api.whatsapp.com/send?phone=${encodeURIComponent(whatsappTargetPhone)}&text=${encodeURIComponent(whatsappText)}`;
 
   // Email Subject & Content
-  const emailSubject = `⏰ 24-Hour Dialysis Reminder: Your Session Tomorrow at Renal Medicity [Ref: ${appointment.id}]`;
+  const emailSubject = `⏰ 24-Hour Dialysis Reminder: Your Session Tomorrow at Renal Medicare [Ref: ${appointment.id}]`;
 
   const emailText = 
 `Dear ${patientName},
 
-This is an automated 24-hour reminder from Renal Medicity regarding your scheduled dialysis session.
+This is an automated 24-hour reminder from Renal Medicare regarding your scheduled dialysis session.
 
 APPOINTMENT DETAILS:
 - Reference ID: ${appointment.id}
@@ -230,9 +230,9 @@ PRE-DIALYSIS PREPARATION GUIDELINES:
 For any emergencies, acute respiratory distress, or rescheduling requests, call our 24x7 dialysis helpline immediately at +91 ${supportPhone}.
 
 Warm regards,
-Renal Medicity Clinical Nephrology Team
+Renal Medicare Clinical Nephrology Team
 Institutional Medical Area, New Delhi
-Website: https://renalmedicity.com`;
+Website: https://renalmedicare.com`;
 
   const emailHtml = `
 <!DOCTYPE html>
@@ -288,7 +288,7 @@ Website: https://renalmedicity.com`;
       </div>
     </div>
     <div class="footer">
-      Renal Medicity Kidney Care Hub &bull; 24x7 Emergency Line: +91 ${supportPhone}<br>
+      Renal Medicare Kidney Care Hub &bull; 24x7 Emergency Line: +91 ${supportPhone}<br>
       Automated Patient Communication Engine
     </div>
   </div>

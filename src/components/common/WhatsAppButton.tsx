@@ -8,7 +8,7 @@ interface WhatsAppButtonProps {
 
 export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   phone = '9069645840',
-  defaultMessage = 'Hello Renal Healthcare, I would like to know more about dialysis services.',
+  defaultMessage = 'Hello Renal Medicare, I would like to know more about dialysis services.',
 }) => {
   const [showTooltip, setShowTooltip] = useState(true);
 
@@ -45,7 +45,7 @@ export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
         target="_blank"
         rel="noopener noreferrer"
         className="group relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95 pointer-events-auto"
-        aria-label="Chat with Renal Medicity on WhatsApp"
+        aria-label="Chat with Renal Medicare on WhatsApp"
         id="floating-whatsapp-btn"
       >
         {/* Glow ring */}

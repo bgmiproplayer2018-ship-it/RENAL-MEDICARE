@@ -28,13 +28,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, phone = '90696
         <div className="bg-gradient-to-r from-blue-50 via-white to-emerald-50/50 p-5 sm:p-14 rounded-2xl sm:rounded-3xl border border-blue-100/80 shadow-xs">
           <div className="max-w-3xl space-y-3 sm:space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#005BBD]/10 text-[#005BBD] text-xs font-bold uppercase tracking-wider">
-              About Renal Medicity
+              About Renal Medicare
             </div>
             <h1 className="text-2xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
               Pioneering Compassionate, Technologically Advanced <span className="text-[#005BBD]">Kidney Care</span>
             </h1>
             <p className="text-slate-600 text-xs sm:text-base leading-relaxed">
-              At Renal Medicity, our tagline <strong className="text-[#005BBD]">"Caring For Kidney Health"</strong> is not just a motto—it is our daily clinical standard. We combine international-standard high-flux dialyzers, ultrapure water filtration, and certified personalized care to give dialysis patients back their vitality and independence.
+              At Renal Medicare, our tagline <strong className="text-[#005BBD]">"Caring For Kidney Health"</strong> is not just a motto—it is our daily clinical standard. We combine international-standard high-flux dialyzers, ultrapure water filtration, and certified personalized care to give dialysis patients back their vitality and independence.
             </p>
           </div>
         </div>
@@ -126,13 +126,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, phone = '90696
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6 space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-100 text-[#16A34A] text-xs font-bold uppercase tracking-wider">
-              The Renal Medicity Standard
+              The Renal Medicare Standard
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
               Hospital-Grade Sterility, Ultrapure Water, and Zero Fatigue
             </h2>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-              Standard dialysis often leaves patients exhausted due to trace endotoxins in the water or inadequate toxin clearance. At Renal Medicity, we install industrial-grade double-pass RO systems that purify water to parts-per-billion standards. Coupled with biocompatible high-flux synthetic membranes, our patients report dramatic reductions in post-dialysis washout.
+              Standard dialysis often leaves patients exhausted due to trace endotoxins in the water or inadequate toxin clearance. At Renal Medicare, we install industrial-grade double-pass RO systems that purify water to parts-per-billion standards. Coupled with biocompatible high-flux synthetic membranes, our patients report dramatic reductions in post-dialysis washout.
             </p>
 
             <div className="space-y-3 text-sm text-slate-700">
@@ -183,7 +183,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, phone = '90696
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
         <div className="p-6 sm:p-12 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#003875] to-[#005BBD] text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
-            <h3 className="text-xl sm:text-2xl font-black">Experience the Renal Medicity Difference</h3>
+            <h3 className="text-xl sm:text-2xl font-black">Experience the Renal Medicare Difference</h3>
             <p className="text-blue-100 text-xs sm:text-sm">Schedule a center visit or request an at-home consultation assessment.</p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">

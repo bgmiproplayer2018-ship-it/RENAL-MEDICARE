@@ -1,53 +1,76 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 190" width="100%" height="100%" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
   <defs>
-    <linearGradient id="favKidneyL" x1="20%" y1="10%" x2="80%" y2="90%">
-      <stop offset="0%" stop-color="#2563EB" />
-      <stop offset="50%" stop-color="#005BBD" />
-      <stop offset="100%" stop-color="#00357A" />
+    <linearGradient id="favRedArch" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444" />
+      <stop offset="40%" stop-color="#DC2626" />
+      <stop offset="100%" stop-color="#991B1B" />
     </linearGradient>
-    <linearGradient id="favKidneyR" x1="20%" y1="10%" x2="80%" y2="90%">
+
+    <linearGradient id="favKidneyL" x1="15%" y1="15%" x2="85%" y2="85%">
       <stop offset="0%" stop-color="#3B82F6" />
-      <stop offset="50%" stop-color="#005BBD" />
-      <stop offset="100%" stop-color="#003272" />
+      <stop offset="30%" stop-color="#2563EB" />
+      <stop offset="70%" stop-color="#1D4ED8" />
+      <stop offset="100%" stop-color="#0F172A" />
     </linearGradient>
+
+    <linearGradient id="favKidneyR" x1="85%" y1="15%" x2="15%" y2="85%">
+      <stop offset="0%" stop-color="#60A5FA" />
+      <stop offset="30%" stop-color="#2563EB" />
+      <stop offset="70%" stop-color="#1D4ED8" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <linearGradient id="favUreter" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1E3A8A" />
+      <stop offset="50%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+
     <linearGradient id="favHand" x1="0%" y1="20%" x2="100%" y2="80%">
-      <stop offset="0%" stop-color="#22C55E" />
-      <stop offset="50%" stop-color="#16A34A" />
-      <stop offset="100%" stop-color="#15803D" />
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="40%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#022C22" />
     </linearGradient>
-    <linearGradient id="favArch" x1="0%" y1="50%" x2="100%" y2="50%">
-      <stop offset="0%" stop-color="#DC2626" />
-      <stop offset="100%" stop-color="#E11D48" />
-    </linearGradient>
-    <filter id="fShadow" x="-10%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="1" dy="2" stdDeviation="2.5" flood-color="#001840" flood-opacity="0.25" />
+
+    <filter id="favShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="1" dy="2" stdDeviation="1.5" flood-color="#001840" flood-opacity="0.25" />
     </filter>
   </defs>
 
-  <rect width="190" height="190" rx="36" fill="#FFFFFF" />
-
-  <g transform="translate(4, 16)">
+  <g transform="translate(0, 5)" filter="url(#favShadow)">
     <!-- Red Arch -->
-    <path d="M 32 94 A 62 62 0 0 1 150 94" stroke="url(#favArch)" stroke-width="8" stroke-linecap="round" fill="none" />
+    <path 
+      d="M 32 86 C 39 46 66 23 100 23 C 134 23 161 46 168 86 C 163 83 140 32 100 32 C 60 32 37 83 32 86 Z" 
+      fill="url(#favRedArch)" 
+    />
 
-    <!-- Kidneys with shadow -->
-    <g filter="url(#fShadow)">
-      <!-- Left Kidney -->
-      <path d="M 68 56 C 50 56 38 72 38 92 C 38 112 50 130 68 130 C 78 130 84 122 84 110 C 84 100 78 96 78 92 C 78 88 84 84 84 74 C 84 62 78 56 68 56 Z" 
-            fill="url(#favKidneyL)" />
-      <path d="M 54 70 C 47 79 47 98 54 112" stroke="#93C5FD" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
-      
-      <!-- Right Kidney -->
-      <path d="M 114 56 C 132 56 144 72 144 92 C 144 112 132 130 114 130 C 104 130 98 122 98 110 C 98 100 104 96 104 92 C 104 88 98 84 98 74 C 98 62 104 56 114 56 Z" 
-            fill="url(#favKidneyR)" />
-      <path d="M 128 70 C 135 79 135 98 128 112" stroke="#93C5FD" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
-    </g>
+    <!-- Ureters -->
+    <path d="M 85 82 C 92 90 95 104 96 128" stroke="url(#favUreter)" stroke-width="5" stroke-linecap="round" />
+    <path d="M 115 82 C 108 90 105 104 104 128" stroke="url(#favUreter)" stroke-width="5" stroke-linecap="round" />
+    <path d="M 84 81 C 92 78 108 78 116 81" stroke="#2563EB" stroke-width="3.5" stroke-linecap="round" />
 
-    <!-- Hand -->
-    <g filter="url(#fShadow)">
-      <path d="M 24 122 C 36 128 52 140 76 144 C 104 148 132 144 154 128 C 160 124 165 120 167 118 C 167 121 160 132 150 140 C 132 154 100 159 68 153 C 48 149 34 139 24 131 Z" 
-            fill="url(#favHand)" />
-      <path d="M 42 126 C 50 130 60 132 72 134" stroke="#86EFAC" stroke-width="3" stroke-linecap="round" opacity="0.85" />
-    </g>
+    <!-- Left Kidney -->
+    <path 
+      d="M 82 44 C 62 44 48 58 48 80 C 48 102 62 118 78 118 C 86 118 90 110 90 100 C 90 92 84 88 84 82 C 84 76 90 70 90 58 C 90 48 88 44 82 44 Z" 
+      fill="url(#favKidneyL)" 
+    />
+    <path d="M 58 56 C 52 66 52 86 60 98" stroke="#93C5FD" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+    <path d="M 76 74 C 73 78 73 86 76 90" stroke="#93C5FD" stroke-width="2" stroke-linecap="round" opacity="0.7" />
+
+    <!-- Right Kidney -->
+    <path 
+      d="M 118 44 C 138 44 152 58 152 80 C 152 102 138 118 122 118 C 114 118 110 110 110 100 C 110 92 116 88 116 82 C 116 76 110 70 110 58 C 110 48 112 44 118 44 Z" 
+      fill="url(#favKidneyR)" 
+    />
+    <path d="M 142 56 C 148 66 148 86 140 98" stroke="#93C5FD" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+    <path d="M 124 74 C 127 78 127 86 124 90" stroke="#93C5FD" stroke-width="2" stroke-linecap="round" opacity="0.7" />
+
+    <!-- Green Caring Hand -->
+    <path 
+      d="M 36 142 C 45 135 56 128 66 125 C 74 122 82 121 88 123 C 86 126 80 129 74 131 C 84 131 94 133 102 134 C 116 135 130 131 142 124 C 148 120 154 115 156 112 C 158 114 156 120 152 126 C 146 134 135 142 120 148 C 102 154 78 155 58 150 C 48 147 40 144 36 142 Z" 
+      fill="url(#favHand)" 
+    />
+    <path d="M 98 134 C 114 135 130 131 144 123 C 150 119 155 114 156 112" stroke="#6EE7B7" stroke-width="2.5" stroke-linecap="round" opacity="0.85" />
+    <path d="M 64 126 C 72 122 80 122 86 124" stroke="#A7F3D0" stroke-width="2.2" stroke-linecap="round" opacity="0.8" />
   </g>
 </svg>

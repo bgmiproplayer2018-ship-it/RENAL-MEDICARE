@@ -35,7 +35,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
   const altPhone = settings?.alternatePhone || '7522805397';
   const email = settings?.email || 'renalhealthcare01@gmail.com';
   const whatsapp = settings?.whatsapp || '9069645840';
-  const address = settings?.address || 'Renal Medicity Kidney Care Hub, Institutional Medical Area, New Delhi - 110049';
+  const address = settings?.address || 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +89,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
             24x7 Patient Support
           </div>
           <h1 className="text-2xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            Contact <span className="text-[#005BBD]">Renal Medicity</span>
+            Contact <span className="text-[#005BBD]">Renal Medicare</span>
           </h1>
           <p className="text-slate-600 text-xs sm:text-base leading-relaxed max-w-2xl">
             Whether you need urgent dialysis admission, second opinion on kidney transplant, or scheduling an at-home dialysis evaluation—our dedicated clinical coordination team is ready 24 hours a day.
@@ -315,7 +315,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="font-bold text-slate-900 text-base">Find Our Main Center</h3>
-              <p className="text-xs text-slate-500">Renal Medicity Institutional Hub &bull; New Delhi</p>
+              <p className="text-xs text-slate-500">Renal Medicare Institutional Hub &bull; New Delhi</p>
             </div>
             <a
               href="https://maps.google.com/?q=New+Delhi+India"
@@ -330,7 +330,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
 
           <div className="h-72 w-full rounded-2xl overflow-hidden border border-slate-100 bg-slate-100 relative">
             <iframe
-              title="Renal Medicity Location Map"
+              title="Renal Medicare Location Map"
               width="100%"
               height="100%"
               style={{ border: 0 }}

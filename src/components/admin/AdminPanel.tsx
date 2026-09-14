@@ -65,7 +65,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [services, setServices] = useState<ServiceItem[]>(initialServices);
   const [inquiries, setInquiries] = useState<ContactMessage[]>([]);
   const [settings, setSettings] = useState<CompanySettings>(initialSettings || {
-    companyName: 'Renal Medicity',
+    companyName: 'Renal Medicare',
     tagline: 'Caring For Kidney Health',
     phone: '9069645840',
     alternatePhone: '7522805397',
@@ -75,7 +75,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     secondaryColor: '#4FA9FF',
     accentColor: '#0EA5E9',
     backgroundColor: '#FFFFFF',
-    address: 'Renal Medicity Kidney Care Hub, Institutional Medical Area, New Delhi - 110049'
+    address: 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049'
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -1141,7 +1141,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 Production Deployment Documentation
               </h3>
               <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                Renal Medicity is designed with a full-stack architecture (Vite + React 19 Frontend with Express Node.js Backend and MongoDB Atlas Mongoose database models). Follow the guides below for seamless one-click hosting:
+                Renal Medicare is designed with a full-stack architecture (Vite + React 19 Frontend with Express Node.js Backend and MongoDB Atlas Mongoose database models). Follow the guides below for seamless one-click hosting:
               </p>
             </div>
 

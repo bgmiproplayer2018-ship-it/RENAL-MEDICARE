@@ -45,7 +45,7 @@ export function createApp() {
   app.get(['/api/health', '/health'], (req, res) => {
     res.json({
       status: 'ok',
-      service: 'Renal Medicity Healthcare API (Netlify & Container Ready)',
+      service: 'Renal Medicare Healthcare API (Netlify & Container Ready)',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'production',
     });

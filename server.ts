@@ -26,7 +26,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Renal Medicity server running on http://0.0.0.0:${PORT}`);
+    console.log(`Renal Medicare server running on http://0.0.0.0:${PORT}`);
   });
 }
 

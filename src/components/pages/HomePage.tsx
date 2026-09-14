@@ -169,7 +169,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-white">
                 <img
                   src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000&q=80"
-                  alt="Renal Medicity Dialysis Suite"
+                  alt="Renal Medicare Dialysis Suite"
                   className="w-full h-80 object-cover"
                 />
                 
@@ -287,7 +287,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6 space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-100 text-[#16A34A] text-xs font-bold uppercase tracking-wider">
-              About Renal Medicity
+              About Renal Medicare
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
@@ -296,7 +296,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             </h2>
 
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-              Renal Medicity was founded with a singular conviction: every kidney patient deserves world-class, 
+              Renal Medicare was founded with a singular conviction: every kidney patient deserves world-class, 
               dignified, and technologically superior dialysis care without agonizing travel or fear of infection. 
               We operate state-of-the-art dialysis suites embedded in leading hospitals alongside our pioneering, 
               NABH-compliant At-Home Hemodialysis service.
@@ -524,7 +524,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6">
                   <span className="text-emerald-400 font-bold text-xs uppercase">Certified Quality</span>
                   <p className="text-white font-bold text-sm">
-                    "My father has had 120+ home dialysis sessions with Renal Medicity. His health and happiness are better than ever."
+                    "My father has had 120+ home dialysis sessions with Renal Medicare. His health and happiness are better than ever."
                   </p>
                   <span className="text-xs text-slate-300 mt-1">&mdash; Malhotra Family, South Delhi</span>
                 </div>
@@ -622,7 +622,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               Clinical Excellence
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Why Patients &amp; Families Choose Renal Medicity
+              Why Patients &amp; Families Choose Renal Medicare
             </h2>
             <p className="text-slate-600 text-sm sm:text-base">
               Engineered from the ground up to reduce patient washout fatigue, eradicate infection risks, and provide continuous doctor oversight.

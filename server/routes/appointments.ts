@@ -94,7 +94,7 @@ appointmentRouter.post('/', (req, res) => {
   const email = req.body.email || '';
   const age = req.body.age ? Number(req.body.age) : 45;
   const gender = req.body.gender || 'Not Specified';
-  const hospitalLocation = req.body.hospitalLocation || req.body.hospitalId || 'Renal Medicity Main Hub';
+  const hospitalLocation = req.body.hospitalLocation || req.body.hospitalId || 'Renal Medicare Main Hub';
   const serviceType = req.body.serviceType || 'Hemodialysis';
   const preferredDate = req.body.preferredDate;
   const preferredTime = req.body.preferredTime || req.body.timeSlot || 'Morning (07:00 AM - 11:00 AM)';
@@ -120,7 +120,7 @@ appointmentRouter.post('/', (req, res) => {
   let newApp = db.createAppointment({
     fullName: fullName.trim(),
     mobileNumber: mobileNumber.trim(),
-    email: email ? email.trim().toLowerCase() : `${cleanPhone}@patient.renalmedicity.com`,
+    email: email ? email.trim().toLowerCase() : `${cleanPhone}@patient.renalmedicare.com`,
     age: Number(age) || 45,
     gender,
     hospitalLocation,

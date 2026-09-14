@@ -151,7 +151,7 @@ export const initialData = {
   "hospitals": [
     {
       "id": "hosp-1",
-      "name": "Renal Medicity Super Specialty Kidney Center",
+      "name": "Renal Medicare Super Specialty Kidney Center",
       "address": "B-16 rohini sector-16 delhi 110089",
       "city": "New Delhi",
       "state": "Delhi",
@@ -170,7 +170,7 @@ export const initialData = {
     },
     {
       "id": "hosp-2",
-      "name": "Renal Medicity Dialysis Centre (Shivam multispeciality hospital)",
+      "name": "Renal Medicare Dialysis Centre (Shivam multispeciality hospital)",
       "address": "Sector 51, Golf Course Extension Road, Opposite Artemis Hospital",
       "city": "Gurugram",
       "state": "Haryana",
@@ -188,7 +188,7 @@ export const initialData = {
     },
     {
       "id": "hosp-3",
-      "name": "Renal Medicity Nephro Care Hub",
+      "name": "Renal Medicare Nephro Care Hub",
       "address": "Express Trade Towers, Sector 132, Expressway Corridor",
       "city": "Noida",
       "state": "Uttar Pradesh",
@@ -206,7 +206,7 @@ export const initialData = {
     },
     {
       "id": "hosp-4",
-      "name": "Renal Medicity (Saroj multispeciality hospital)",
+      "name": "Renal Medicare (Saroj multispeciality hospital)",
       "address": "S.V. Road, Near Bandra Medical Enclave, Bandra West",
       "city": "Mumbai",
       "state": "Maharashtra",
@@ -224,7 +224,7 @@ export const initialData = {
     },
     {
       "id": "hosp-5",
-      "name": "Renal Medicity Advanced Dialysis Wing",
+      "name": "Renal Medicare Advanced Dialysis Wing",
       "address": "100 Feet Road, Indiranagar, Near Metro Pillar 84",
       "city": "Bengaluru",
       "state": "Karnataka",
@@ -241,7 +241,7 @@ export const initialData = {
     },
     {
       "id": "hosp-6",
-      "name": "Renal Medicity Kidney & Dialysis Center",
+      "name": "Renal Medicare Kidney & Dialysis Center",
       "address": "Madhya Marg, Sector 7-C, Near PGI Medical Corridor",
       "city": "Chandigarh",
       "state": "Punjab",
@@ -264,7 +264,7 @@ export const initialData = {
       "title": "Understanding Dialysis: Hemodialysis vs. Peritoneal Dialysis Explained",
       "slug": "hemodialysis-vs-peritoneal-dialysis-explained",
       "excerpt": "Explore the key differences, lifestyle impacts, dietary freedoms, and clinical suitability of Hemodialysis versus Peritoneal Dialysis.",
-      "content": "Kidney failure requires renal replacement therapy to remove metabolic toxins, excess fluid, and balance electrolytes. The two primary modalities available today are Hemodialysis (HD) and Peritoneal Dialysis (PD).\n\n### What is Hemodialysis?\nIn hemodialysis, blood is drawn from a vascular access (usually an Arteriovenous Fistula, Graft, or central catheter) into an external artificial kidney known as a dialyzer. Inside the dialyzer, microscopic semi-permeable capillary fibers filter toxins and fluid across an ultrapure dialysate fluid gradient.\n- **Frequency:** Typically performed 3 times weekly, lasting 4 hours per session.\n- **Environment:** Conducted in dedicated hospital dialysis suites or at home under technician supervision.\n- **Benefits:** Fast fluid removal, supervised by clinical team, high clearance rates.\n\n### What is Peritoneal Dialysis?\nPeritoneal dialysis utilizes the patient's own natural abdominal lining (the peritoneum) as a biological filter. A sterile dialysate fluid is infused into the peritoneal cavity via a soft silicone catheter. After several hours (dwell time), the fluid absorbs waste and is drained out.\n- **Types:** Continuous Ambulatory (CAPD) with manual bag exchanges, or Automated Peritoneal Dialysis (APD) performed at night with a gentle cycler machine.\n- **Benefits:** Can be performed anywhere, preserves residual urine output longer, and requires fewer dietary restrictions.\n\nAt Renal Medicity, our nephrologists help you choose the best modality tailored to your cardiovascular status, lifestyle, and clinical parameters.",
+      "content": "Kidney failure requires renal replacement therapy to remove metabolic toxins, excess fluid, and balance electrolytes. The two primary modalities available today are Hemodialysis (HD) and Peritoneal Dialysis (PD).\n\n### What is Hemodialysis?\nIn hemodialysis, blood is drawn from a vascular access (usually an Arteriovenous Fistula, Graft, or central catheter) into an external artificial kidney known as a dialyzer. Inside the dialyzer, microscopic semi-permeable capillary fibers filter toxins and fluid across an ultrapure dialysate fluid gradient.\n- **Frequency:** Typically performed 3 times weekly, lasting 4 hours per session.\n- **Environment:** Conducted in dedicated hospital dialysis suites or at home under technician supervision.\n- **Benefits:** Fast fluid removal, supervised by clinical team, high clearance rates.\n\n### What is Peritoneal Dialysis?\nPeritoneal dialysis utilizes the patient's own natural abdominal lining (the peritoneum) as a biological filter. A sterile dialysate fluid is infused into the peritoneal cavity via a soft silicone catheter. After several hours (dwell time), the fluid absorbs waste and is drained out.\n- **Types:** Continuous Ambulatory (CAPD) with manual bag exchanges, or Automated Peritoneal Dialysis (APD) performed at night with a gentle cycler machine.\n- **Benefits:** Can be performed anywhere, preserves residual urine output longer, and requires fewer dietary restrictions.\n\nAt Renal Medicare, our nephrologists help you choose the best modality tailored to your cardiovascular status, lifestyle, and clinical parameters.",
       "category": "Dialysis Guide",
       "tags": [
         "Dialysis",
@@ -277,7 +277,7 @@ export const initialData = {
       "publishedDate": "September 10, 2026",
       "readTime": "6 min read",
       "metaTitle": "Hemodialysis vs Peritoneal Dialysis: Which Is Right For You?",
-      "metaDescription": "A clinical guide comparing Hemodialysis and Peritoneal Dialysis by Renal Medicity nephrologists."
+      "metaDescription": "A clinical guide comparing Hemodialysis and Peritoneal Dialysis by Renal Medicare nephrologists."
     },
     {
       "id": "blog-2",
@@ -298,14 +298,14 @@ export const initialData = {
       "publishedDate": "September 04, 2026",
       "readTime": "5 min read",
       "metaTitle": "Renal Diet Guide: Sodium, Potassium & Phosphorus Management",
-      "metaDescription": "Expert nutrition advice for chronic kidney disease and dialysis patients from Renal Medicity."
+      "metaDescription": "Expert nutrition advice for chronic kidney disease and dialysis patients from Renal Medicare."
     },
     {
       "id": "blog-3",
       "title": "Why Home Dialysis is Becoming the Gold Standard in Kidney Care",
       "slug": "why-home-dialysis-is-becoming-gold-standard",
       "excerpt": "Discover why thousands of patients are choosing comfortable, infection-free at-home hemodialysis with certified technicians.",
-      "content": "Historically, kidney dialysis required frequent, exhausting commutes to crowded hospital wards three times a week. Today, advances in compact dialyzer technology, certified technician home delivery, and ultrapure mobile water purification are transforming dialysis at home.\n\n### Benefits of Receiving Dialysis at Home\n1. **Zero Infection Risk:** Eliminates hospital-acquired infections (nosocomial pathogens) and exposure to respiratory viruses.\n2. **Personal Dignity & Comfort:** Patients rest in their own bed, watch their favorite shows, or spend time with family while undergoing treatment.\n3. **No Commute Stress:** Eliminates travel fatigue, traffic delays, and dependence on hospital transport.\n4. **Improved Clinical Outcomes:** Studies show that patients receiving relaxed home treatments experience more stable blood pressure and faster post-dialysis recovery time (washout).\n\nAt Renal Medicity, our Home Dialysis Program includes a pre-installation water quality audit, dual RO installation, emergency backups, and an experienced certified technician dedicated exclusively to your care during every minute of the session.",
+      "content": "Historically, kidney dialysis required frequent, exhausting commutes to crowded hospital wards three times a week. Today, advances in compact dialyzer technology, certified technician home delivery, and ultrapure mobile water purification are transforming dialysis at home.\n\n### Benefits of Receiving Dialysis at Home\n1. **Zero Infection Risk:** Eliminates hospital-acquired infections (nosocomial pathogens) and exposure to respiratory viruses.\n2. **Personal Dignity & Comfort:** Patients rest in their own bed, watch their favorite shows, or spend time with family while undergoing treatment.\n3. **No Commute Stress:** Eliminates travel fatigue, traffic delays, and dependence on hospital transport.\n4. **Improved Clinical Outcomes:** Studies show that patients receiving relaxed home treatments experience more stable blood pressure and faster post-dialysis recovery time (washout).\n\nAt Renal Medicare, our Home Dialysis Program includes a pre-installation water quality audit, dual RO installation, emergency backups, and an experienced certified technician dedicated exclusively to your care during every minute of the session.",
       "category": "Home Dialysis",
       "tags": [
         "Home Dialysis",
@@ -318,7 +318,7 @@ export const initialData = {
       "publishedDate": "August 28, 2026",
       "readTime": "4 min read",
       "metaTitle": "Home Dialysis Benefits: Safety and Freedom for Patients",
-      "metaDescription": "How Renal Medicity delivers hospital-grade home dialysis with certified technicians."
+      "metaDescription": "How Renal Medicare delivers hospital-grade home dialysis with certified technicians."
     }
   ],
   "faqs": [
@@ -331,12 +331,12 @@ export const initialData = {
     {
       "id": "faq-2",
       "question": "Is home dialysis safe compared to hospital dialysis?",
-      "answer": "Yes, absolutely. In fact, home dialysis provides superior infection control as it eliminates exposure to hospital-acquired pathogens. At Renal Medicity, every home session is administered in person by a certified, licensed dialysis technician equipped with hospital-grade equipment, ultrapure RO water filtration, and direct real-time telemetry connected to our senior nephrologists.",
+      "answer": "Yes, absolutely. In fact, home dialysis provides superior infection control as it eliminates exposure to hospital-acquired pathogens. At Renal Medicare, every home session is administered in person by a certified, licensed dialysis technician equipped with hospital-grade equipment, ultrapure RO water filtration, and direct real-time telemetry connected to our senior nephrologists.",
       "category": "home-dialysis"
     },
     {
       "id": "faq-3",
-      "question": "What is the cost of dialysis at Renal Medicity?",
+      "question": "What is the cost of dialysis at Renal Medicare?",
       "answer": "Our hospital center hemodialysis begins at ₹2,200 per session including consumables. Comprehensive Home Dialysis with a dedicated technician is ₹3,800 per session. Monthly automated peritoneal packages start from ₹18,500. We also accept major insurance policies and cashless TPA partnerships.",
       "category": "general"
     },
@@ -355,7 +355,7 @@ export const initialData = {
     {
       "id": "faq-6",
       "question": "What happens during a sudden dialysis emergency or fluid overload?",
-      "answer": "Renal Medicity operates 24x7 emergency dialysis and ICU bedside CRRT across our hospital network. For immediate assistance, dial our emergency numbers 9069645840 or 7522805397 for rapid patient transfer and immediate triage.",
+      "answer": "Renal Medicare operates 24x7 emergency dialysis and ICU bedside CRRT across our hospital network. For immediate assistance, dial our emergency numbers 9069645840 or 7522805397 for rapid patient transfer and immediate triage.",
       "category": "dialysis"
     }
   ],
@@ -364,7 +364,7 @@ export const initialData = {
       "id": "test-1",
       "patientName": "Harish Chander Malhotra",
       "treatment": "Home Hemodialysis Patient (2 Years)",
-      "quote": "Switching to Renal Medicity home dialysis changed our lives. My father no longer has to endure 3-hour traffic journeys to the hospital. The technician is exceptionally gentle, punctual, and maintains complete ICU-level sterilization in our home.",
+      "quote": "Switching to Renal Medicare home dialysis changed our lives. My father no longer has to endure 3-hour traffic journeys to the hospital. The technician is exceptionally gentle, punctual, and maintains complete ICU-level sterilization in our home.",
       "rating": 5,
       "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
       "location": "South Delhi",
@@ -374,7 +374,7 @@ export const initialData = {
       "id": "test-2",
       "patientName": "Sunita Rawat",
       "treatment": "Hospital Center Maintenance Dialysis",
-      "quote": "The nursing staff at Renal Medicity treats every patient like family. The high-flux dialysis machines and ultrapure water system have made a huge difference—I rarely feel nauseous or washed out after my sessions now.",
+      "quote": "The nursing staff at Renal Medicare treats every patient like family. The high-flux dialysis machines and ultrapure water system have made a huge difference—I rarely feel nauseous or washed out after my sessions now.",
       "rating": 5,
       "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
       "location": "Gurugram",
@@ -395,10 +395,10 @@ export const initialData = {
     {
       "fullName": "Rajesh Verma",
       "mobileNumber": "9069645840",
-      "email": "9069645840@patient.renalmedicity.com",
+      "email": "9069645840@patient.renalmedicare.com",
       "age": 45,
       "gender": "Not Specified",
-      "hospitalLocation": "Renal Medicity Super Specialty Kidney Center, New Delhi",
+      "hospitalLocation": "Renal Medicare Super Specialty Kidney Center, New Delhi",
       "serviceType": "In-Center Hemodialysis",
       "preferredDate": "2026-09-25",
       "preferredTime": "Morning (07:00 AM - 11:00 AM)",
@@ -416,7 +416,7 @@ export const initialData = {
       "email": "rajesh.verma@example.com",
       "age": 58,
       "gender": "Male",
-      "hospitalLocation": "Renal Medicity Super Specialty Kidney Center - South Delhi",
+      "hospitalLocation": "Renal Medicare Super Specialty Kidney Center - South Delhi",
       "serviceType": "Hemodialysis",
       "preferredDate": "2026-09-14",
       "preferredTime": "08:00 AM - 12:00 PM",
@@ -434,7 +434,7 @@ export const initialData = {
       "email": "kavita.sharma@example.com",
       "age": 46,
       "gender": "Female",
-      "hospitalLocation": "Renal Medicity Dialysis & Critical Care - Gurugram",
+      "hospitalLocation": "Renal Medicare Dialysis & Critical Care - Gurugram",
       "serviceType": "Nephrologist Consultation",
       "preferredDate": "2026-09-13",
       "preferredTime": "11:00 AM - 01:00 PM",
@@ -469,7 +469,7 @@ export const initialData = {
       "email": "ananya.d@example.com",
       "age": 39,
       "gender": "Female",
-      "hospitalLocation": "Renal Medicity Regional Kidney Institute - Mumbai",
+      "hospitalLocation": "Renal Medicare Regional Kidney Institute - Mumbai",
       "serviceType": "Kidney Consultation",
       "preferredDate": "2026-09-16",
       "preferredTime": "04:00 PM - 06:00 PM",
@@ -484,21 +484,21 @@ export const initialData = {
     }
   ],
   "settings": {
-    "companyName": "Renal Medicity",
+    "companyName": "Renal Medicare",
     "tagline": "Caring For Kidney Health",
     "phone": "9069645840",
     "alternatePhone": "7522805397",
     "email": "renalhealthcare01@gmail.com",
     "whatsapp": "9069645840",
-    "address": "Renal Medicity Kidney Care Hub, Institutional Medical Area, New Delhi - 110049, India",
+    "address": "Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049, India",
     "workingHours": "24 Hours Emergency Dialysis | OPD: 8:00 AM - 8:00 PM",
     "emergencyLine": "+91-9069645840",
     "socialLinks": {
-      "facebook": "https://facebook.com/renalmedicity",
-      "twitter": "https://twitter.com/renalmedicity",
-      "instagram": "https://instagram.com/renalmedicity",
-      "linkedin": "https://linkedin.com/company/renalmedicity",
-      "youtube": "https://youtube.com/@renalmedicity"
+      "facebook": "https://facebook.com/renalmedicare",
+      "twitter": "https://twitter.com/renalmedicare",
+      "instagram": "https://instagram.com/renalmedicare",
+      "linkedin": "https://linkedin.com/company/renalmedicare",
+      "youtube": "https://youtube.com/@renalmedicare"
     },
     "primaryColor": "#005BBD",
     "secondaryColor": "#4FA9FF",

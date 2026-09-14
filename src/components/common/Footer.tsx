@@ -23,7 +23,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, settings }) => {
   const altPhone = settings?.alternatePhone || '7522805397';
   const email = settings?.email || 'renalhealthcare01@gmail.com';
   const whatsapp = settings?.whatsapp || '9069645840';
-  const address = settings?.address || 'Renal Medicity Kidney Care Hub, Institutional Medical Area, New Delhi - 110049';
+  const address = settings?.address || 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049';
 
   return (
     <footer className="bg-[#00224A] text-slate-300 border-t border-blue-900/60 relative overflow-hidden">
@@ -75,7 +75,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, settings }) => {
             </div>
 
             <p className="text-sm text-slate-300 leading-relaxed max-w-md">
-              Renal Medicity is a dedicated Center of Excellence in Nephrology &amp; Dialysis. 
+              Renal Medicare is a dedicated Center of Excellence in Nephrology &amp; Dialysis. 
               We bring clinical precision, ultrapure high-flux dialysis, infection-free home dialysis, and 
               compassionate renal care to thousands of patients across India.
             </p>

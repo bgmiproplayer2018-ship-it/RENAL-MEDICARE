@@ -23,7 +23,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, settings }) => {
   const altPhone = settings?.alternatePhone || '7522805397';
   const email = settings?.email || 'renalhealthcare01@gmail.com';
   const whatsapp = settings?.whatsapp || '9069645840';
-  const address = settings?.address || 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049';
+  const address = settings?.address || (() => {
+    try {
+      const raw = localStorage.getItem('rm_settings');
+      if (raw) {
+        const p = JSON.parse(raw);
+        if (p?.address) return p.address;
+      }
+    } catch {}
+    return 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049';
+  })();
 
   return (
     <footer className="bg-[#00224A] text-slate-300 border-t border-blue-900/60 relative overflow-hidden">

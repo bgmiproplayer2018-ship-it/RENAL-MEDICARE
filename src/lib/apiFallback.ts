@@ -645,10 +645,11 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
     if (method === 'GET') {
       return { status: 200, data: { success: true, settings: ClientDataStore.getSettings() } };
     }
-    if (method === 'POST') {
+    if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
       const current = ClientDataStore.getSettings();
       const updated = { ...current, ...body };
       ClientDataStore.saveSettings(updated);
+      triggerBackgroundServerSync();
       return { status: 200, data: { success: true, message: 'Settings saved successfully', settings: updated } };
     }
   }
@@ -659,6 +660,13 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
 function syncServerResponseWithClient(urlString: string, method: string, bodyData: any, json: any) {
   if (!json || typeof json !== 'object') return;
   const path = urlString.replace(/^https?:\/\/[^/]+/, '').replace(/\?.*$/, '').replace(/\/$/, '');
+
+  // SETTINGS SYNC
+  if (path === '/api/settings' || path === '/settings') {
+    if (json.settings && typeof json.settings === 'object') {
+      ClientDataStore.saveSettings(json.settings);
+    }
+  }
 
   // APPOINTMENTS SYNC
   if (path === '/api/appointments' || path === '/appointments') {
@@ -755,6 +763,14 @@ export function triggerBackgroundServerSync(): void {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contacts })
+        }).catch(() => {});
+      }
+      const settings = ClientDataStore.getSettings();
+      if (settings && settings.address) {
+        await nativeFetch('/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer demo-token' },
+          body: JSON.stringify(settings)
         }).catch(() => {});
       }
     } catch {

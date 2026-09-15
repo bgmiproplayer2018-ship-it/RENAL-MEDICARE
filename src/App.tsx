@@ -28,18 +28,27 @@ export default function App() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [faqs, setFaqs] = useState<FAQItem[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [settings, setSettings] = useState<CompanySettings>({
-    companyName: 'Renal Medicare',
-    tagline: 'Caring For Kidney Health',
-    phone: '9069645840',
-    alternatePhone: '7522805397',
-    email: 'renalhealthcare01@gmail.com',
-    whatsapp: '9069645840',
-    primaryColor: '#005BBD',
-    secondaryColor: '#4FA9FF',
-    accentColor: '#0EA5E9',
-    backgroundColor: '#FFFFFF',
-    address: 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049'
+  const [settings, setSettings] = useState<CompanySettings>(() => {
+    try {
+      const cached = localStorage.getItem('rm_settings');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.address) return parsed;
+      }
+    } catch {}
+    return {
+      companyName: 'Renal Medicare',
+      tagline: 'Caring For Kidney Health',
+      phone: '9069645840',
+      alternatePhone: '7522805397',
+      email: 'renalhealthcare01@gmail.com',
+      whatsapp: '9069645840',
+      primaryColor: '#005BBD',
+      secondaryColor: '#4FA9FF',
+      accentColor: '#0EA5E9',
+      backgroundColor: '#FFFFFF',
+      address: 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049'
+    };
   });
 
   // Admin Auth State
@@ -65,7 +74,12 @@ export default function App() {
       if (blogRes.success) setBlogs(blogRes.blogs);
       if (faqRes.success) setFaqs(faqRes.faqs);
       if (testRes.success) setTestimonials(testRes.testimonials);
-      if (setRes.success) setSettings(setRes.settings);
+      if (setRes.success && setRes.settings) {
+        setSettings(setRes.settings);
+        try {
+          localStorage.setItem('rm_settings', JSON.stringify(setRes.settings));
+        } catch {}
+      }
     } catch (err) {
       console.warn('Initial fetch using fallback or local default states:', err);
     }

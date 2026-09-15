@@ -10,9 +10,16 @@ settingsRouter.get('/', (req, res) => {
   res.json({ success: true, settings });
 });
 
-// PUT /api/settings (Admin update contact & branding details)
-settingsRouter.put('/', requireAuth, (req, res) => {
+// PUT & POST /api/settings (Admin update contact & branding details)
+const handleUpdateSettings = (req: express.Request, res: express.Response) => {
   const updates = req.body;
+  if (!updates || typeof updates !== 'object') {
+    return res.status(400).json({ error: 'Invalid settings body' });
+  }
   const updated = db.updateSettings(updates);
   res.json({ success: true, message: 'Settings updated successfully', settings: updated });
-});
+};
+
+settingsRouter.put('/', requireAuth, handleUpdateSettings);
+settingsRouter.post('/', requireAuth, handleUpdateSettings);
+

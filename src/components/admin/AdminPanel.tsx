@@ -111,12 +111,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [showAuditLogsModal, setShowAuditLogsModal] = useState(false);
   const [auditLogs, setAuditLogs] = useState<ReminderLog[]>([]);
 
-  // Fetch appointments, inquiries & notification status on load
+  // Fetch appointments, inquiries, settings & notification status on load
   useEffect(() => {
     fetchAppointments();
     fetchInquiries();
+    fetchSettings();
     fetchNotificationStatus();
   }, []);
+
+  // Synchronize when initialSettings prop changes from parent loadAllData
+  useEffect(() => {
+    if (initialSettings && initialSettings.address) {
+      setSettings(initialSettings);
+    }
+  }, [initialSettings]);
 
   const fetchNotificationStatus = async () => {
     try {
@@ -229,6 +237,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const res = await apiFetch('/api/settings');
+      const data = await res.json();
+      if (data.success && data.settings) {
+        setSettings(data.settings);
+        try {
+          localStorage.setItem('rm_settings', JSON.stringify(data.settings));
+        } catch {}
+      }
+    } catch (e) {
+      console.error('Failed to fetch settings:', e);
     }
   };
 
@@ -427,6 +450,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // 1. Immediately persist locally so refresh never reverts
+      try {
+        localStorage.setItem('rm_settings', JSON.stringify(settings));
+      } catch {}
+
+      // 2. Persist to server / fallback API
       const res = await apiFetch('/api/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -434,9 +463,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       });
       const data = await res.json();
       if (data.success) {
+        const savedSettings = data.settings || settings;
+        setSettings(savedSettings);
+        try {
+          localStorage.setItem('rm_settings', JSON.stringify(savedSettings));
+        } catch {}
         setSettingsStatus('Settings updated successfully!');
         setTimeout(() => setSettingsStatus(null), 3500);
         onRefreshData();
+      } else {
+        alert(data.error || 'Failed to update company settings');
       }
     } catch {
       alert('Failed to update company settings');
@@ -518,7 +554,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
         <div className="flex items-center justify-end gap-2">
           <button
-            onClick={() => { fetchAppointments(); fetchInquiries(); }}
+            onClick={() => { fetchAppointments(); fetchInquiries(); fetchSettings(); }}
             className="px-2.5 py-1.5 rounded-lg bg-blue-900/60 hover:bg-blue-800 text-blue-100 text-xs flex items-center gap-1 cursor-pointer"
             title="Refresh Registry"
           >

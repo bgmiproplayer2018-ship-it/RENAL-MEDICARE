@@ -204,8 +204,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
-      if (data.success) {
-        setAppointments(data.appointments);
+      if (data.success && Array.isArray(data.appointments)) {
+        const mockIds = new Set(['RM-2026-8941', 'RM-2026-6219', 'RM-2026-4712', 'RM-2026-1033']);
+        const realApps = data.appointments.filter((a: any) => a && a.id && !mockIds.has(a.id));
+        setAppointments(realApps);
       }
     } catch (e) {
       console.error(e);
@@ -221,7 +223,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.contacts)) {
-        setInquiries(data.contacts.filter((c: any): c is ContactMessage => Boolean(c && typeof c === 'object' && c.id)));
+        const mockIds = new Set(['cnt-1', 'cnt-2']);
+        const realContacts = data.contacts.filter((c: any): c is ContactMessage => Boolean(c && typeof c === 'object' && c.id && !mockIds.has(c.id)));
+        setInquiries(realContacts);
       }
     } catch (e) {
       console.error(e);

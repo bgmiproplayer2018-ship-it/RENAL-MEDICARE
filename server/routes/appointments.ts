@@ -64,6 +64,16 @@ appointmentRouter.get('/', (req, res) => {
   res.json({ success: true, count: list.length, appointments: list.map(formatApp) });
 });
 
+// POST /api/appointments/sync (Bidirectional synchronization for permanent storage)
+appointmentRouter.post('/sync', (req, res) => {
+  const incoming = req.body.appointments;
+  if (Array.isArray(incoming) && incoming.length > 0) {
+    db.syncAppointments(incoming);
+  }
+  const all = db.getAppointments();
+  res.json({ success: true, count: all.length, appointments: all.map(formatApp) });
+});
+
 // GET /api/appointments/track/:query (Public patient tracking)
 appointmentRouter.get('/track/:query', (req, res) => {
   const query = req.params.query;

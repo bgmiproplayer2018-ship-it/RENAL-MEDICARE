@@ -52,6 +52,9 @@ function saveToStorage<T>(key: string, data: T): void {
   }
 }
 
+const MOCK_APPOINTMENT_IDS = new Set(['RM-2026-8941', 'RM-2026-6219', 'RM-2026-4712', 'RM-2026-1033']);
+const MOCK_CONTACT_IDS = new Set(['cnt-1', 'cnt-2']);
+
 export class ClientDataStore {
   static getServices(): ServiceItem[] {
     return loadFromStorage<ServiceItem[]>(STORAGE_KEYS.SERVICES, (initialData.services as unknown) as ServiceItem[]);
@@ -82,11 +85,17 @@ export class ClientDataStore {
   }
 
   static getAppointments(): Appointment[] {
-    return loadFromStorage<Appointment[]>(STORAGE_KEYS.APPOINTMENTS, (initialData.appointments as unknown) as Appointment[]);
+    const list = loadFromStorage<Appointment[]>(STORAGE_KEYS.APPOINTMENTS, (initialData.appointments as unknown) as Appointment[]);
+    const clean = Array.isArray(list) ? list.filter(a => a && a.id && !MOCK_APPOINTMENT_IDS.has(a.id)) : [];
+    if (Array.isArray(list) && clean.length !== list.length) {
+      saveToStorage(STORAGE_KEYS.APPOINTMENTS, clean);
+    }
+    return clean;
   }
 
   static saveAppointments(appointments: Appointment[]): void {
-    saveToStorage(STORAGE_KEYS.APPOINTMENTS, appointments);
+    const clean = Array.isArray(appointments) ? appointments.filter(a => a && a.id && !MOCK_APPOINTMENT_IDS.has(a.id)) : [];
+    saveToStorage(STORAGE_KEYS.APPOINTMENTS, clean);
   }
 
   static getSettings(): CompanySettings {
@@ -98,11 +107,17 @@ export class ClientDataStore {
   }
 
   static getContacts(): ContactMessage[] {
-    return loadFromStorage<ContactMessage[]>(STORAGE_KEYS.CONTACTS, (initialData.contacts as unknown) as ContactMessage[]);
+    const list = loadFromStorage<ContactMessage[]>(STORAGE_KEYS.CONTACTS, (initialData.contacts as unknown) as ContactMessage[]);
+    const clean = Array.isArray(list) ? list.filter(c => c && c.id && !MOCK_CONTACT_IDS.has(c.id)) : [];
+    if (Array.isArray(list) && clean.length !== list.length) {
+      saveToStorage(STORAGE_KEYS.CONTACTS, clean);
+    }
+    return clean;
   }
 
   static saveContacts(contacts: ContactMessage[]): void {
-    saveToStorage(STORAGE_KEYS.CONTACTS, contacts);
+    const clean = Array.isArray(contacts) ? contacts.filter(c => c && c.id && !MOCK_CONTACT_IDS.has(c.id)) : [];
+    saveToStorage(STORAGE_KEYS.CONTACTS, clean);
   }
 }
 
@@ -313,6 +328,7 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
 
       appointments.unshift(newApp);
       ClientDataStore.saveAppointments(appointments);
+      triggerBackgroundServerSync();
       return { 
         status: 201, 
         data: { 
@@ -324,6 +340,25 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
         } 
       };
     }
+  }
+
+  // Appointments Sync: /api/appointments/sync
+  if (path === '/api/appointments/sync' && method === 'POST') {
+    const incoming = body?.appointments;
+    if (Array.isArray(incoming)) {
+      const current = ClientDataStore.getAppointments();
+      for (const item of incoming) {
+        if (!item || !item.id || MOCK_APPOINTMENT_IDS.has(item.id)) continue;
+        const idx = current.findIndex(a => a.id.toLowerCase() === item.id.toLowerCase());
+        if (idx === -1) {
+          current.unshift(item);
+        } else {
+          current[idx] = { ...current[idx], ...item };
+        }
+      }
+      ClientDataStore.saveAppointments(current);
+    }
+    return { status: 200, data: { success: true, appointments: ClientDataStore.getAppointments() } };
   }
 
   // Notifications API
@@ -547,8 +582,26 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
       };
       contacts.unshift(newContact);
       ClientDataStore.saveContacts(contacts);
-      return { status: 201, data: { success: true, message: 'Thank you! Your message has been received.', id: newContact.id } };
+      triggerBackgroundServerSync();
+      return { status: 201, data: { success: true, message: 'Thank you! Your message has been received.', contact: newContact, id: newContact.id } };
     }
+  }
+
+  // Contact Sync: /api/contact/sync
+  if (path === '/api/contact/sync' && method === 'POST') {
+    const incoming = body?.contacts;
+    if (Array.isArray(incoming)) {
+      const current = ClientDataStore.getContacts();
+      for (const item of incoming) {
+        if (!item || !item.id || MOCK_CONTACT_IDS.has(item.id)) continue;
+        const idx = current.findIndex(c => c.id.toLowerCase() === item.id.toLowerCase());
+        if (idx === -1) {
+          current.unshift(item);
+        }
+      }
+      ClientDataStore.saveContacts(current);
+    }
+    return { status: 200, data: { success: true, contacts: ClientDataStore.getContacts() } };
   }
 
   // Mark contact read: /api/contact/:id/read
@@ -603,6 +656,113 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
   return { status: 404, data: { error: `Endpoint not found: ${method} ${path}` } };
 }
 
+function syncServerResponseWithClient(urlString: string, method: string, bodyData: any, json: any) {
+  if (!json || typeof json !== 'object') return;
+  const path = urlString.replace(/^https?:\/\/[^/]+/, '').replace(/\?.*$/, '').replace(/\/$/, '');
+
+  // APPOINTMENTS SYNC
+  if (path === '/api/appointments' || path === '/appointments') {
+    if (method === 'GET' && Array.isArray(json.appointments)) {
+      const clean = json.appointments.filter((a: any) => a && a.id && !MOCK_APPOINTMENT_IDS.has(a.id));
+      ClientDataStore.saveAppointments(clean);
+    } else if (method === 'POST' && json.appointment) {
+      const list = ClientDataStore.getAppointments();
+      const exists = list.some(a => a.id.toLowerCase() === json.appointment.id.toLowerCase());
+      if (!exists) {
+        list.unshift(json.appointment);
+        ClientDataStore.saveAppointments(list);
+      }
+    }
+  }
+
+  // APPOINTMENT STATUS OR UPDATE
+  const statusMatch = path.match(/^\/api\/appointments\/([^/]+)\/status$/);
+  if (statusMatch && method === 'PATCH' && json.appointment) {
+    const list = ClientDataStore.getAppointments();
+    const idx = list.findIndex(a => a.id.toLowerCase() === statusMatch[1].toLowerCase());
+    if (idx !== -1) {
+      list[idx] = { ...list[idx], ...json.appointment };
+      ClientDataStore.saveAppointments(list);
+    }
+  }
+
+  const appSingleMatch = path.match(/^\/api\/appointments\/([^/]+)$/);
+  if (appSingleMatch) {
+    const id = appSingleMatch[1];
+    if (method === 'DELETE') {
+      const list = ClientDataStore.getAppointments().filter(a => a.id.toLowerCase() !== id.toLowerCase());
+      ClientDataStore.saveAppointments(list);
+    } else if ((method === 'PUT' || method === 'PATCH') && json.appointment) {
+      const list = ClientDataStore.getAppointments();
+      const idx = list.findIndex(a => a.id.toLowerCase() === id.toLowerCase());
+      if (idx !== -1) {
+        list[idx] = { ...list[idx], ...json.appointment };
+        ClientDataStore.saveAppointments(list);
+      }
+    }
+  }
+
+  // CONTACTS / INQUIRIES SYNC
+  if (path === '/api/contact' || path === '/contact') {
+    if (method === 'GET' && Array.isArray(json.contacts)) {
+      const clean = json.contacts.filter((c: any) => c && c.id && !MOCK_CONTACT_IDS.has(c.id));
+      ClientDataStore.saveContacts(clean);
+    } else if (method === 'POST' && json.contact) {
+      const list = ClientDataStore.getContacts();
+      const exists = list.some(c => c.id.toLowerCase() === json.contact.id.toLowerCase());
+      if (!exists) {
+        list.unshift(json.contact);
+        ClientDataStore.saveContacts(list);
+      }
+    }
+  }
+
+  const contactReadMatch = path.match(/^\/api\/contact\/([^/]+)\/read$/);
+  if (contactReadMatch && method === 'PATCH') {
+    const list = ClientDataStore.getContacts();
+    const c = list.find(item => item.id === contactReadMatch[1]);
+    if (c) {
+      c.isRead = true;
+      ClientDataStore.saveContacts(list);
+    }
+  }
+
+  const contactDeleteMatch = path.match(/^\/api\/contact\/([^/]+)$/);
+  if (contactDeleteMatch && method === 'DELETE') {
+    const list = ClientDataStore.getContacts().filter(item => item.id !== contactDeleteMatch[1]);
+    ClientDataStore.saveContacts(list);
+  }
+}
+
+let syncTimeout: any = null;
+export function triggerBackgroundServerSync(): void {
+  if (typeof window === 'undefined') return;
+  if (syncTimeout) clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(async () => {
+    try {
+      const nativeFetch = window.fetch ? window.fetch.bind(window) : fetch;
+      const apps = ClientDataStore.getAppointments();
+      if (apps.length > 0) {
+        await nativeFetch('/api/appointments/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ appointments: apps })
+        }).catch(() => {});
+      }
+      const contacts = ClientDataStore.getContacts();
+      if (contacts.length > 0) {
+        await nativeFetch('/api/contact/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contacts })
+        }).catch(() => {});
+      }
+    } catch {
+      // Background sync fail-safe
+    }
+  }, 300);
+}
+
 /**
  * Unified API fetch function with automatic fallback to client-side store
  * when running in pure static mode or offline.
@@ -635,6 +795,12 @@ export async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Pr
     const response = await originalFetch(input, init);
     const contentType = response.headers.get('content-type') || '';
     if (response.ok && contentType.includes('application/json')) {
+      try {
+        const cloned = response.clone();
+        cloned.json().then(jsonData => {
+          syncServerResponseWithClient(urlString, method, bodyData, jsonData);
+        }).catch(() => {});
+      } catch {}
       return response;
     }
 
@@ -663,6 +829,11 @@ export async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Pr
 export function initApiFallback(): void {
   if (typeof window === 'undefined' || (window as any).__rm_api_fallback_initialized) return;
   (window as any).__rm_api_fallback_initialized = true;
+
+  // Background sync any local appointments / inquiries to server
+  setTimeout(() => {
+    triggerBackgroundServerSync();
+  }, 1000);
 
   try {
     // Check if fetch is configurable or has a setter
@@ -701,6 +872,12 @@ export function initApiFallback(): void {
         const response = await nativeFetch(input, init);
         const contentType = response.headers.get('content-type') || '';
         if (response.ok && contentType.includes('application/json')) {
+          try {
+            const cloned = response.clone();
+            cloned.json().then(jsonData => {
+              syncServerResponseWithClient(urlString, method, bodyData, jsonData);
+            }).catch(() => {});
+          } catch {}
           return response;
         }
 

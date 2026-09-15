@@ -32,6 +32,16 @@ contactRouter.post('/', (req, res) => {
   });
 });
 
+// POST /api/contact/sync (Bidirectional synchronization for permanent storage)
+contactRouter.post('/sync', (req, res) => {
+  const incoming = req.body.contacts;
+  if (Array.isArray(incoming) && incoming.length > 0) {
+    db.syncContacts(incoming);
+  }
+  const contacts = db.getContacts();
+  res.json({ success: true, count: contacts.length, contacts });
+});
+
 // GET /api/contact (Admin list messages)
 contactRouter.get('/', requireAuth, (req, res) => {
   const contacts = db.getContacts();

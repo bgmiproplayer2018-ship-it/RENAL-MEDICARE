@@ -380,77 +380,21 @@ const initialTestimonials: Testimonial[] = [
 
 const initialAppointments: Appointment[] = [
   {
-    id: 'RM-2026-8941',
-    fullName: 'Rajesh Kumar Verma',
+    id: 'RM-2026-4413',
+    fullName: 'Rajesh Verma',
     mobileNumber: '9069645840',
-    email: 'rajesh.verma@example.com',
-    age: 58,
+    email: '9069645840@patient.renalmedicare.com',
+    age: 45,
     gender: 'Male',
-    hospitalLocation: 'Renal Medicare Super Specialty Kidney Center - South Delhi',
-    serviceType: 'Hemodialysis',
-    preferredDate: '2026-09-14',
-    preferredTime: '08:00 AM - 12:00 PM',
-    address: 'B-42, Greater Kailash-I, New Delhi',
-    additionalNotes: 'Left arm AV Fistula, requires high-flux dialyzer',
-    status: 'Accepted',
-    adminNotes: 'Station #4 assigned. Nurse Priya in charge. Pre-dialysis vitals normal.',
-    createdAt: '2026-09-11T09:30:00.000Z',
-    updatedAt: '2026-09-11T10:15:00.000Z'
-  },
-  {
-    id: 'RM-2026-6219',
-    fullName: 'Kavita Sharma',
-    mobileNumber: '9811234567',
-    email: 'kavita.sharma@example.com',
-    age: 46,
-    gender: 'Female',
-    hospitalLocation: 'Renal Medicare Dialysis & Critical Care - Gurugram',
-    serviceType: 'Nephrologist Consultation',
-    preferredDate: '2026-09-13',
-    preferredTime: '11:00 AM - 01:00 PM',
-    address: 'Tower C, DLF Phase 5, Gurugram',
-    additionalNotes: 'Second opinion on kidney biopsy report and proteinuria',
+    hospitalLocation: 'Renal Medicare Super Specialty Kidney Center, New Delhi',
+    serviceType: 'In-Center Hemodialysis',
+    preferredDate: '2026-09-25',
+    preferredTime: 'Morning (07:00 AM - 11:00 AM)',
+    address: 'Address provided during intake',
+    additionalNotes: '',
     status: 'Pending',
-    createdAt: '2026-09-12T04:10:00.000Z',
-    updatedAt: '2026-09-12T04:10:00.000Z'
-  },
-  {
-    id: 'RM-2026-4712',
-    fullName: 'Mohammad Tariq',
-    mobileNumber: '7522805397',
-    email: 'tariq.m@example.com',
-    age: 62,
-    gender: 'Male',
-    hospitalLocation: 'At-Home Service (Noida & NCR)',
-    serviceType: 'Home Dialysis',
-    preferredDate: '2026-09-15',
-    preferredTime: '02:00 PM - 06:00 PM',
-    address: 'Flat 902, Sector 137, Noida, UP',
-    additionalNotes: 'Patient has limited mobility. Requires certified technician with mobile RO station.',
-    status: 'Accepted',
-    adminNotes: 'Tech team dispatched for prior water TDS testing. Session confirmed.',
-    createdAt: '2026-09-10T14:20:00.000Z',
-    updatedAt: '2026-09-10T16:00:00.000Z'
-  },
-  {
-    id: 'RM-2026-1033',
-    fullName: 'Ananya Deshmukh',
-    mobileNumber: '9820011223',
-    email: 'ananya.d@example.com',
-    age: 39,
-    gender: 'Female',
-    hospitalLocation: 'Renal Medicare Regional Kidney Institute - Mumbai',
-    serviceType: 'Kidney Consultation',
-    preferredDate: '2026-09-16',
-    preferredTime: '04:00 PM - 06:00 PM',
-    address: 'Bandra West, Mumbai',
-    additionalNotes: 'Routine 3-month CKD stage 3 follow up.',
-    status: 'Rescheduled',
-    rescheduleDate: '2026-09-18',
-    rescheduleTime: '10:00 AM - 12:00 PM',
-    adminNotes: 'Doctor on emergency surgical duty on 16th. Rescheduled with patient consent.',
-    createdAt: '2026-09-09T11:00:00.000Z',
-    updatedAt: '2026-09-10T08:30:00.000Z'
+    createdAt: '2026-09-12T13:34:07.332Z',
+    updatedAt: '2026-09-12T13:34:07.333Z'
   }
 ];
 
@@ -476,32 +420,7 @@ const initialSettings: CompanySettings = {
   accentColor: '#0EA5E9'
 };
 
-const initialContacts: ContactMessage[] = [
-  {
-    id: 'cnt-1',
-    name: 'Suresh Singhania',
-    email: 'suresh.s@example.com',
-    phone: '9876543210',
-    subject: 'Inquiry about At-Home Dialysis machine setup',
-    message: 'We are looking to set up home dialysis for my mother in Gurugram. Please let us know the technician schedule and RO water requirements.',
-    type: 'general',
-    createdAt: '2026-09-11T12:30:00.000Z',
-    isRead: false
-  },
-  {
-    id: 'cnt-2',
-    name: 'Pooja Bhattacharya',
-    email: 'pooja.b@example.com',
-    phone: '9069645840',
-    subject: 'Home Visit Request',
-    message: 'Need urgent home visit assessment for a bedridden kidney patient in South Delhi.',
-    type: 'home-dialysis-request',
-    address: 'D-14, Hauz Khas, New Delhi',
-    preferredDate: '2026-09-15',
-    createdAt: '2026-09-12T02:15:00.000Z',
-    isRead: true
-  }
-];
+const initialContacts: ContactMessage[] = [];
 
 export interface DatabaseState {
   services: ServiceItem[];
@@ -539,7 +458,24 @@ class Store {
       if (fs.existsSync(DB_FILE)) {
         const raw = fs.readFileSync(DB_FILE, 'utf-8');
         const parsed = JSON.parse(raw);
-        this.state = { ...this.state, ...parsed };
+        
+        // Remove legacy mock data
+        const mockAppIds = new Set(['RM-2026-8941', 'RM-2026-6219', 'RM-2026-4712', 'RM-2026-1033']);
+        const mockContactIds = new Set(['cnt-1', 'cnt-2']);
+
+        const existingApps = Array.isArray(parsed.appointments) ? parsed.appointments : [];
+        const cleanApps = existingApps.filter((a: any) => a && a.id && !mockAppIds.has(a.id));
+
+        const existingContacts = Array.isArray(parsed.contacts) ? parsed.contacts : [];
+        const cleanContacts = existingContacts.filter((c: any) => c && c.id && !mockContactIds.has(c.id));
+
+        this.state = { 
+          ...this.state, 
+          ...parsed,
+          appointments: cleanApps.length > 0 ? cleanApps : this.state.appointments,
+          contacts: cleanContacts
+        };
+        this.save();
       } else {
         this.save();
       }
@@ -568,6 +504,46 @@ class Store {
   getAppointments() { return this.state.appointments; }
   getSettings() { return this.state.settings; }
   getContacts() { return this.state.contacts; }
+
+  // Sync helpers to ensure permanent storage
+  syncAppointments(incoming: Appointment[]): Appointment[] {
+    const mockAppIds = new Set(['RM-2026-8941', 'RM-2026-6219', 'RM-2026-4712', 'RM-2026-1033']);
+    let changed = false;
+    for (const item of incoming) {
+      if (!item || !item.id || mockAppIds.has(item.id)) continue;
+      const idx = this.state.appointments.findIndex(a => a.id.toLowerCase() === item.id.toLowerCase());
+      if (idx === -1) {
+        this.state.appointments.unshift(item);
+        changed = true;
+      } else {
+        if (item.updatedAt && (!this.state.appointments[idx].updatedAt || item.updatedAt > this.state.appointments[idx].updatedAt)) {
+          this.state.appointments[idx] = { ...this.state.appointments[idx], ...item };
+          changed = true;
+        }
+      }
+    }
+    if (changed) {
+      this.save();
+    }
+    return this.state.appointments;
+  }
+
+  syncContacts(incoming: ContactMessage[]): ContactMessage[] {
+    const mockContactIds = new Set(['cnt-1', 'cnt-2']);
+    let changed = false;
+    for (const item of incoming) {
+      if (!item || !item.id || mockContactIds.has(item.id)) continue;
+      const idx = this.state.contacts.findIndex(c => c.id.toLowerCase() === item.id.toLowerCase());
+      if (idx === -1) {
+        this.state.contacts.unshift(item);
+        changed = true;
+      }
+    }
+    if (changed) {
+      this.save();
+    }
+    return this.state.contacts;
+  }
 
   // Appointments
   createAppointment(data: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt' | 'status'> & { status?: Appointment['status'] }): Appointment {

@@ -12,6 +12,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { ServiceItem, CompanySettings } from '../../types.ts';
+import { ScrollAnimatedImage } from '../common/ScrollAnimatedImage.tsx';
 
 interface ServicesPageProps {
   services: ServiceItem[];
@@ -75,23 +76,26 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
       {/* Services Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {filtered.map(srv => (
+          {filtered.map((srv, idx) => (
             <div
               key={srv.id}
               className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
             >
               <div>
                 <div className="relative h-48 sm:h-52 bg-slate-100 overflow-hidden">
-                  <img
+                  <ScrollAnimatedImage
                     src={srv.image}
                     alt={srv.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    containerClassName="w-full h-full"
+                    animation="fade-up"
+                    delay={(idx % 3) * 0.08}
                   />
-                  <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-xs">
+                  <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-xs z-10">
                     <span className="font-extrabold text-[#005BBD] text-xs sm:text-sm">{srv.price}</span>
                   </div>
                   {srv.isPopular && (
-                    <div className="absolute top-3 left-3 bg-emerald-600 text-white px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold shadow-xs">
+                    <div className="absolute top-3 left-3 bg-emerald-600 text-white px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold shadow-xs z-10">
                       Popular Choice
                     </div>
                   )}

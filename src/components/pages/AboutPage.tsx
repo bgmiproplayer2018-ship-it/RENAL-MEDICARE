@@ -14,6 +14,7 @@ import {
   Compass
 } from 'lucide-react';
 import { RenalLogo } from '../common/RenalLogo.tsx';
+import { ScrollAnimatedImage } from '../common/ScrollAnimatedImage.tsx';
 
 interface AboutPageProps {
   onNavigate: (tab: string) => void;
@@ -155,10 +156,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, phone = '90696
 
           <div className="lg:col-span-6">
             <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-200">
-              <img
+              <ScrollAnimatedImage
                 src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=1000&q=80"
                 alt="Nephrologist Doctor Team"
                 className="w-full h-96 object-cover"
+                containerClassName="w-full h-96"
+                animation="scale-in"
+                duration={0.8}
               />
               <div className="p-4 sm:p-6 bg-white space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

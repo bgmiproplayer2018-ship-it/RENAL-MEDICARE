@@ -27,6 +27,7 @@ import {
 import { ServiceItem, Hospital, BlogPost, FAQItem, Testimonial, CompanySettings } from '../../types.ts';
 import { RenalLogo } from '../common/RenalLogo.tsx';
 import { apiFetch } from '../../lib/apiFallback.ts';
+import { ScrollAnimatedImage } from '../common/ScrollAnimatedImage.tsx';
 
 interface HomePageProps {
   onNavigate: (tab: string, param?: string) => void;
@@ -167,10 +168,13 @@ export const HomePage: React.FC<HomePageProps> = ({
             {/* Right Column: Hero Visual Graphic + Instant Appointment Card */}
             <div className="lg:col-span-5 relative">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-white">
-                <img
+                <ScrollAnimatedImage
                   src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000&q=80"
                   alt="Renal Medicare Dialysis Suite"
                   className="w-full h-80 object-cover"
+                  animation="scale-in"
+                  priority={true}
+                  duration={0.85}
                 />
                 
                 {/* Floating Brand Stamp */}
@@ -338,10 +342,13 @@ export const HomePage: React.FC<HomePageProps> = ({
           <div className="lg:col-span-6 grid grid-cols-2 gap-4">
             <div className="space-y-4">
               <div className="rounded-2xl overflow-hidden shadow-md h-52">
-                <img
+                <ScrollAnimatedImage
                   src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=600&q=80"
                   alt="Nephrologist reviewing chart"
                   className="w-full h-full object-cover"
+                  containerClassName="w-full h-full"
+                  animation="slide-right"
+                  delay={0.1}
                 />
               </div>
               <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100 space-y-2">
@@ -358,10 +365,13 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <p className="text-[11px] text-slate-600">Immediate clinical escalation for vascular access issues, fluid overload, or arrhythmias.</p>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-md h-52">
-                <img
+                <ScrollAnimatedImage
                   src="https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80"
                   alt="Modern dialysis equipment"
                   className="w-full h-full object-cover"
+                  containerClassName="w-full h-full"
+                  animation="slide-left"
+                  delay={0.2}
                 />
               </div>
             </div>
@@ -396,22 +406,25 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           {/* Service Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.slice(0, 6).map((srv) => (
+            {services.slice(0, 6).map((srv, idx) => (
               <div 
                 key={srv.id}
                 className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
               >
                 <div className="relative h-48 overflow-hidden bg-slate-100">
-                  <img
+                  <ScrollAnimatedImage
                     src={srv.image}
                     alt={srv.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    containerClassName="w-full h-full"
+                    animation="fade-up"
+                    delay={(idx % 3) * 0.09}
                   />
-                  <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-[#005BBD] shadow-xs">
+                  <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-[#005BBD] shadow-xs z-10">
                     {srv.price}
                   </div>
                   {srv.isPopular && (
-                    <div className="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-0.5 rounded-full text-[11px] font-bold shadow-xs">
+                    <div className="absolute top-3 left-3 bg-emerald-600 text-white px-3 py-0.5 rounded-full text-[11px] font-bold shadow-xs z-10">
                       Most In Demand
                     </div>
                   )}
@@ -516,12 +529,15 @@ export const HomePage: React.FC<HomePageProps> = ({
 
             <div className="lg:col-span-5">
               <div className="relative rounded-2xl overflow-hidden border-2 border-emerald-500/30 shadow-2xl">
-                <img
+                <ScrollAnimatedImage
                   src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80"
                   alt="Home Dialysis Patient Care"
                   className="w-full h-80 sm:h-96 object-cover"
+                  containerClassName="w-full h-full"
+                  animation="scale-in"
+                  duration={0.8}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 z-10 pointer-events-none">
                   <span className="text-emerald-400 font-bold text-xs uppercase">Certified Quality</span>
                   <p className="text-white font-bold text-sm">
                     "My father has had 120+ home dialysis sessions with Renal Medicare. His health and happiness are better than ever."
@@ -559,18 +575,21 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {hospitals.slice(0, 3).map((hosp) => (
+          {hospitals.slice(0, 3).map((hosp, idx) => (
             <div
               key={hosp.id}
-              className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col"
+              className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col group"
             >
-              <div className="h-44 relative bg-slate-100">
-                <img
+              <div className="h-44 relative bg-slate-100 overflow-hidden">
+                <ScrollAnimatedImage
                   src={hosp.image}
                   alt={hosp.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  containerClassName="w-full h-full"
+                  animation="fade-up"
+                  delay={(idx % 3) * 0.1}
                 />
-                <div className="absolute top-3 left-3 bg-white/95 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 shadow-xs">
+                <div className="absolute top-3 left-3 bg-white/95 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 shadow-xs z-10">
                   {hosp.city}, {hosp.state}
                 </div>
               </div>
@@ -699,10 +718,13 @@ export const HomePage: React.FC<HomePageProps> = ({
               </div>
 
               <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                <img
+                <ScrollAnimatedImage
                   src={t.image}
                   alt={t.patientName}
                   className="w-11 h-11 rounded-full object-cover border-2 border-blue-100"
+                  containerClassName="w-11 h-11 rounded-full shrink-0"
+                  animation="pop"
+                  delay={0.1}
                 />
                 <div>
                   <h4 className="font-bold text-slate-900 text-sm">{t.patientName}</h4>
@@ -799,17 +821,20 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {blogs.slice(0, 3).map((b) => (
+          {blogs.slice(0, 3).map((b, idx) => (
             <article
               key={b.id}
               onClick={() => onNavigate('blog', b.id)}
               className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col group"
             >
-              <div className="h-48 overflow-hidden bg-slate-100">
-                <img
+              <div className="h-48 overflow-hidden bg-slate-100 relative">
+                <ScrollAnimatedImage
                   src={b.featuredImage}
                   alt={b.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  containerClassName="w-full h-full"
+                  animation="scale-in"
+                  delay={(idx % 3) * 0.1}
                 />
               </div>
 

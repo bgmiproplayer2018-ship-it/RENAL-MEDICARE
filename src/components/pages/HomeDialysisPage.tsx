@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { CompanySettings } from '../../types.ts';
 import { apiFetch } from '../../lib/apiFallback.ts';
+import { ScrollAnimatedImage } from '../common/ScrollAnimatedImage.tsx';
 
 interface HomeDialysisPageProps {
   onNavigate: (tab: string) => void;
@@ -118,10 +119,13 @@ export const HomeDialysisPage: React.FC<HomeDialysisPageProps> = ({ onNavigate, 
 
             <div className="lg:col-span-5">
               <div className="relative rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl">
-                <img
+                <ScrollAnimatedImage
                   src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80"
                   alt="Home Dialysis Setup"
                   className="w-full h-64 sm:h-80 object-cover"
+                  containerClassName="w-full h-64 sm:h-80"
+                  animation="scale-in"
+                  duration={0.8}
                 />
               </div>
             </div>

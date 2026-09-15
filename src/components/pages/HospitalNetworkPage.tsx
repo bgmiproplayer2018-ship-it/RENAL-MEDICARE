@@ -12,6 +12,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Hospital, CompanySettings } from '../../types.ts';
+import { ScrollAnimatedImage } from '../common/ScrollAnimatedImage.tsx';
 
 interface HospitalNetworkPageProps {
   hospitals: Hospital[];
@@ -129,22 +130,25 @@ export const HospitalNetworkPage: React.FC<HospitalNetworkPageProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {filteredHospitals.map(hosp => (
+            {filteredHospitals.map((hosp, idx) => (
               <div
                 key={hosp.id}
                 className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-xl transition-all flex flex-col justify-between group"
               >
                 <div>
                   <div className="h-44 sm:h-48 relative bg-slate-100 overflow-hidden">
-                    <img
+                    <ScrollAnimatedImage
                       src={hosp.image}
                       alt={hosp.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      containerClassName="w-full h-full"
+                      animation="fade-up"
+                      delay={(idx % 3) * 0.08}
                     />
-                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-slate-800 shadow-xs">
+                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-slate-800 shadow-xs z-10">
                       {hosp.city}, {hosp.state}
                     </div>
-                    <div className="absolute top-3 right-3 bg-[#005BBD] text-white px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold shadow-xs">
+                    <div className="absolute top-3 right-3 bg-[#005BBD] text-white px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold shadow-xs z-10">
                       {hosp.bedsCount} Stations
                     </div>
                   </div>

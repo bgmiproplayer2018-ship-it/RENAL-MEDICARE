@@ -470,20 +470,44 @@ async function handleApiRequest(url: string, method: string, body?: any): Promis
 
   // Update appointment status: /api/appointments/:id/status
   const statusMatch = path.match(/^\/api\/appointments\/([^/]+)\/status$/);
-  if (statusMatch && method === 'PATCH') {
+  if (statusMatch && (method === 'PATCH' || method === 'PUT' || method === 'POST')) {
     const id = statusMatch[1];
     const appointments = ClientDataStore.getAppointments();
-    const app = appointments.find(a => a.id === id);
-    if (!app) return { status: 404, data: { error: 'Appointment not found' } };
-
-    if (body.status) app.status = body.status;
-    if (body.adminNotes !== undefined) app.adminNotes = body.adminNotes;
-    if (body.rescheduleDate !== undefined) app.rescheduleDate = body.rescheduleDate;
-    if (body.rescheduleTime !== undefined) app.rescheduleTime = body.rescheduleTime;
-    app.updatedAt = new Date().toISOString();
+    let app = appointments.find(a => a.id.toLowerCase() === id.toLowerCase());
+    
+    if (!app) {
+      app = {
+        id,
+        fullName: body.fullName || body.patientName || 'Patient',
+        patientName: body.patientName || body.fullName || 'Patient',
+        phone: body.phone || body.mobileNumber || '9069645840',
+        mobileNumber: body.mobileNumber || body.phone || '9069645840',
+        email: body.email || '',
+        age: body.age || 45,
+        gender: body.gender || 'Not Specified',
+        hospitalId: body.hospitalId || body.hospitalLocation || 'Renal Medicare Main Hub',
+        hospitalLocation: body.hospitalLocation || body.hospitalId || 'Renal Medicare Main Hub',
+        serviceType: body.serviceType || 'Hemodialysis',
+        preferredDate: body.preferredDate || new Date().toISOString().split('T')[0],
+        preferredTime: body.preferredTime || body.timeSlot || 'Morning',
+        timeSlot: body.timeSlot || body.preferredTime || 'Morning',
+        address: body.address || '',
+        notes: body.notes || '',
+        status: body.status || 'Accepted',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      appointments.unshift(app);
+    } else {
+      if (body.status) app.status = body.status;
+      if (body.adminNotes !== undefined) app.adminNotes = body.adminNotes;
+      if (body.rescheduleDate !== undefined) app.rescheduleDate = body.rescheduleDate;
+      if (body.rescheduleTime !== undefined) app.rescheduleTime = body.rescheduleTime;
+      app.updatedAt = new Date().toISOString();
+    }
 
     ClientDataStore.saveAppointments(appointments);
-    return { status: 200, data: { success: true, message: 'Appointment status updated', appointment: app } };
+    return { status: 200, data: { success: true, message: `Appointment status updated to ${app.status}`, appointment: app } };
   }
 
   // Reschedule / update appointment: /api/appointments/:id

@@ -171,6 +171,40 @@ appointmentRouter.post('/', (req, res) => {
   });
 });
 
+// PATCH or PUT /api/appointments/:id/status (Explicit status update for Accept, Reject, Reschedule)
+appointmentRouter.all('/:id/status', requireAuth, (req, res) => {
+  if (req.method !== 'PATCH' && req.method !== 'PUT' && req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { id } = req.params;
+  const { status, adminNotes, rescheduleDate, rescheduleTime, timeSlot, preferredDate, preferredTime } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ error: 'Status is required' });
+  }
+
+  const updates: any = { status };
+  if (adminNotes !== undefined) updates.adminNotes = adminNotes;
+  if (rescheduleDate !== undefined) updates.rescheduleDate = rescheduleDate;
+  if (rescheduleTime !== undefined) updates.rescheduleTime = rescheduleTime;
+  if (timeSlot !== undefined) updates.preferredTime = timeSlot;
+  if (preferredTime !== undefined) updates.preferredTime = preferredTime;
+  if (preferredDate !== undefined) updates.preferredDate = preferredDate;
+
+  const updated = db.updateAppointment(id, updates);
+  if (!updated) {
+    return res.status(404).json({ error: 'Appointment not found' });
+  }
+
+  const formatted = formatApp(updated);
+  res.json({
+    success: true,
+    message: `Appointment status updated to ${status}`,
+    appointment: formatted
+  });
+});
+
 // PATCH /api/appointments/:id (Admin update status, reschedule, or notes)
 appointmentRouter.patch('/:id', requireAuth, (req, res) => {
   const { id } = req.params;
@@ -181,7 +215,7 @@ appointmentRouter.patch('/:id', requireAuth, (req, res) => {
     return res.status(404).json({ error: 'Appointment not found' });
   }
 
-  res.json({ success: true, message: 'Appointment updated successfully', appointment: updated });
+  res.json({ success: true, message: 'Appointment updated successfully', appointment: formatApp(updated) });
 });
 
 // DELETE /api/appointments/:id (Admin delete)

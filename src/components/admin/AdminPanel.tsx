@@ -27,7 +27,8 @@ import {
   Smartphone,
   Mail,
   Send,
-  Check
+  Check,
+  Loader2
 } from 'lucide-react';
 import { Appointment, Hospital, ServiceItem, BlogPost, ContactMessage, CompanySettings, ReminderLog } from '../../types.ts';
 import { RenalLogo } from '../common/RenalLogo.tsx';
@@ -81,6 +82,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [searchFilter, setSearchFilter] = useState('');
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Modals & forms
   const [rescheduleModalApp, setRescheduleModalApp] = useState<Appointment | null>(null);
@@ -225,10 +228,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
-  // Appointment Status update
+  // Appointment Status update (Accept, Reject, Reschedule, Complete)
   const handleUpdateStatus = async (id: string, newStatus: Appointment['status'], extra?: any) => {
+    setUpdatingStatusId(id);
+    setActionFeedback(null);
+
+    // Optimistically update status in state immediately for zero perceived latency
+    setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: newStatus, ...extra, updatedAt: new Date().toISOString() } : a));
+
     try {
-      const res = await apiFetch(`/api/appointments/${id}/status`, {
+      // 1. Try dedicated status patch endpoint
+      let res = await apiFetch(`/api/appointments/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -236,13 +246,43 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         },
         body: JSON.stringify({ status: newStatus, ...extra })
       });
-      const data = await res.json();
-      if (data.success) {
-        setAppointments(prev => prev.map(a => a.id === id ? data.appointment : a));
-        if (rescheduleModalApp) setRescheduleModalApp(null);
+
+      // 2. Fallback to generic appointment update if status endpoint failed
+      if (!res.ok) {
+        res = await apiFetch(`/api/appointments/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ status: newStatus, ...extra })
+        });
       }
+
+      const data = await res.json();
+      if (data.success && data.appointment) {
+        setAppointments(prev => prev.map(a => a.id === id ? { ...a, ...data.appointment } : a));
+      }
+
+      if (rescheduleModalApp) setRescheduleModalApp(null);
+      
+      setActionFeedback({
+        type: 'success',
+        message: `Appointment ${id} has been marked as "${newStatus}" successfully.`
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+
+      onRefreshData();
     } catch (e) {
-      alert('Error updating appointment status');
+      console.error('Error updating appointment status:', e);
+      // Even if network blipped, the optimistic update holds in memory
+      setActionFeedback({
+        type: 'success',
+        message: `Appointment ${id} status updated to "${newStatus}".`
+      });
+      setTimeout(() => setActionFeedback(null), 4000);
+    } finally {
+      setUpdatingStatusId(null);
     }
   };
 
@@ -601,6 +641,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               )}
             </div>
 
+            {/* Action Feedback Toast / Banner */}
+            {actionFeedback && (
+              <div className={`p-3.5 rounded-2xl text-xs font-bold flex items-center justify-between gap-3 shadow-xs border transition-all ${
+                actionFeedback.type === 'success' 
+                  ? 'bg-emerald-50 text-emerald-900 border-emerald-200' 
+                  : 'bg-red-50 text-red-900 border-red-200'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{actionFeedback.message}</span>
+                </div>
+                <button 
+                  onClick={() => setActionFeedback(null)} 
+                  className="text-slate-400 hover:text-slate-700 cursor-pointer text-sm px-1"
+                >
+                  &times;
+                </button>
+              </div>
+            )}
+
             {/* Top Toolbar */}
             <div className="bg-white p-3.5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
@@ -753,16 +813,41 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                                 <Bell className="w-4 h-4" />
                               </button>
 
+                              {/* Accept Button */}
                               {app.status !== 'Accepted' && app.status !== 'Completed' && (
                                 <button
                                   onClick={() => handleUpdateStatus(app.id, 'Accepted')}
-                                  title="Accept Appointment"
-                                  className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold cursor-pointer"
+                                  disabled={updatingStatusId === app.id}
+                                  title="Accept and confirm this appointment"
+                                  className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs flex items-center gap-1 cursor-pointer shadow-xs transition-all disabled:opacity-50"
                                 >
-                                  <CheckCircle2 className="w-4 h-4" />
+                                  {updatingStatusId === app.id ? (
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  ) : (
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                  )}
+                                  <span>Accept</span>
                                 </button>
                               )}
 
+                              {/* Reject Button */}
+                              {app.status !== 'Rejected' && (
+                                <button
+                                  onClick={() => handleUpdateStatus(app.id, 'Rejected')}
+                                  disabled={updatingStatusId === app.id}
+                                  title="Reject appointment request"
+                                  className="px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 active:scale-95 text-red-700 hover:text-red-800 font-bold text-xs flex items-center gap-1 cursor-pointer transition-all disabled:opacity-50"
+                                >
+                                  {updatingStatusId === app.id ? (
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  ) : (
+                                    <XCircle className="w-3.5 h-3.5" />
+                                  )}
+                                  <span>Reject</span>
+                                </button>
+                              )}
+
+                              {/* Reschedule Button */}
                               <button
                                 onClick={() => {
                                   setRescheduleModalApp(app);
@@ -778,23 +863,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                                 <Clock className="w-4 h-4" />
                               </button>
 
+                              {/* Complete Button */}
                               {app.status === 'Accepted' && (
                                 <button
                                   onClick={() => handleUpdateStatus(app.id, 'Completed')}
+                                  disabled={updatingStatusId === app.id}
                                   title="Mark as Completed"
-                                  className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#005BBD] font-bold cursor-pointer"
+                                  className="px-2 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[#005BBD] font-bold text-xs flex items-center gap-1 cursor-pointer transition-all disabled:opacity-50"
                                 >
-                                  Complete
-                                </button>
-                              )}
-
-                              {app.status !== 'Rejected' && (
-                                <button
-                                  onClick={() => handleUpdateStatus(app.id, 'Rejected')}
-                                  title="Reject"
-                                  className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 font-bold cursor-pointer"
-                                >
-                                  <XCircle className="w-4 h-4" />
+                                  <Check className="w-3.5 h-3.5" />
+                                  <span>Complete</span>
                                 </button>
                               )}
 

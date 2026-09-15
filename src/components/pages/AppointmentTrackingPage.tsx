@@ -45,6 +45,17 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const phone = settings?.phone || '9069645840';
+  const [isAdmin, setIsAdmin] = useState(() => {
+    return typeof window !== 'undefined' && Boolean(localStorage.getItem('rm_admin_token'));
+  });
+
+  useEffect(() => {
+    const checkAdmin = () => {
+      setIsAdmin(typeof window !== 'undefined' && Boolean(localStorage.getItem('rm_admin_token')));
+    };
+    window.addEventListener('storage', checkAdmin);
+    return () => window.removeEventListener('storage', checkAdmin);
+  }, []);
 
   useEffect(() => {
     if (initialTrackingId) {
@@ -281,8 +292,8 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
                 </div>
               </div>
 
-              {/* Automated 24-Hour Dialysis Reminder Block */}
-              {(() => {
+              {/* Automated 24-Hour Dialysis Reminder Block - Only visible to authenticated Staff/Admin sessions, hidden for normal users */}
+              {isAdmin && (() => {
                 const reminderContent = generate24HourReminderContent(app, phone);
                 const scheduledDate = app.reminderScheduledFor 
                   ? new Date(app.reminderScheduledFor)
@@ -292,6 +303,11 @@ export const AppointmentTrackingPage: React.FC<AppointmentTrackingPageProps> = (
 
                 return (
                   <div className="bg-gradient-to-br from-emerald-50/60 to-blue-50/60 border border-emerald-200/80 rounded-2xl p-4 text-xs space-y-3">
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-800 uppercase tracking-wider bg-emerald-100/70 w-fit px-2.5 py-0.5 rounded-full mb-1">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Admin &amp; Staff Diagnostic View</span>
+                    </div>
+
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-100 pb-2">
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center">

@@ -38,6 +38,24 @@ import {
   isAppointmentDueForReminder, 
   calculateReminderScheduledTime 
 } from '../../lib/notificationEngine.ts';
+import { ImageUploadField, PresetImage } from './ImageUploadField.tsx';
+
+const serviceImagePresets: PresetImage[] = [
+  { label: 'Hemodialysis Suite', url: '/images/patient-dialysis-hospital-room.jpg' },
+  { label: 'Clinical Dialyzer Machine', url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80' },
+  { label: 'Home Dialysis Setup', url: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80' },
+  { label: 'ICU Acute Dialysis', url: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=800&q=80' },
+  { label: 'Nephrologist Consultation', url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=800&q=80' },
+  { label: 'Diagnostic Clinic', url: 'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?auto=format&fit=crop&w=800&q=80' }
+];
+
+const hospitalImagePresets: PresetImage[] = [
+  { label: 'Main Dialysis Center', url: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80' },
+  { label: 'Super Specialty Center', url: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=800&q=80' },
+  { label: 'Hospital Dialysis Ward', url: 'https://images.unsplash.com/photo-1512678080530-7760d81faba6?auto=format&fit=crop&w=800&q=80' },
+  { label: 'Nephrology Building', url: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=800&q=80' },
+  { label: 'Modern Healthcare Wing', url: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&w=800&q=80' }
+];
 
 interface AdminPanelProps {
   token: string;
@@ -967,25 +985,56 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {(hospitals || []).filter(Boolean).map(h => (
-                <div key={h.id} className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 shadow-2xs flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#005BBD]">{h.city}, {h.state}</span>
-                      <span className="text-[11px] font-bold bg-blue-50 text-blue-800 px-2 py-0.5 rounded-full">{h.bedsCount} Stations</span>
+                <div key={h.id} id={`admin-hospital-card-${h.id}`} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-shadow flex flex-col justify-between">
+                  <div>
+                    <div className="relative h-40 w-full bg-slate-100 overflow-hidden group">
+                      <img
+                        src={h.image || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80'}
+                        alt={h.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute top-2.5 left-2.5">
+                        <span className="text-[11px] font-bold bg-white/95 backdrop-blur-xs text-[#005BBD] px-2.5 py-1 rounded-full shadow-xs">
+                          {h.city}, {h.state}
+                        </span>
+                      </div>
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-white text-xs font-semibold">
+                        <span className="bg-[#005BBD]/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                          {h.bedsCount || h.dialysisUnits || 10} Stations
+                        </span>
+                        {h.image?.startsWith('data:image/') ? (
+                          <span className="bg-emerald-600/90 backdrop-blur-xs px-2 py-0.5 rounded-full text-[10px] font-bold">
+                            Device Upload
+                          </span>
+                        ) : (
+                          <span className="bg-slate-900/60 backdrop-blur-xs px-2 py-0.5 rounded-full text-[10px]">
+                            Photo Set
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <h4 className="font-bold text-slate-900 text-base">{h.name}</h4>
-                    <p className="text-xs text-slate-500">{h.address}</p>
-                    <p className="text-xs font-semibold text-slate-700">Phone: {h.contactNumber}</p>
+
+                    <div className="p-5 space-y-2">
+                      <h4 className="font-bold text-slate-900 text-base leading-tight">{h.name}</h4>
+                      <p className="text-xs text-slate-500 line-clamp-2">{h.address}</p>
+                      <p className="text-xs font-semibold text-slate-700">Phone: {h.contactNumber}</p>
+                    </div>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <div className="p-5 pt-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <button
+                      id={`edit-hospital-btn-${h.id}`}
                       onClick={() => setHospitalModal({ open: true, editId: h.id, data: h })}
                       className="text-xs text-[#005BBD] font-bold hover:underline flex items-center gap-1 cursor-pointer"
                     >
-                      <Edit3 className="w-3.5 h-3.5" /> Edit
+                      <Edit3 className="w-3.5 h-3.5" /> Edit Center &amp; Image
                     </button>
                     <button
+                      id={`delete-hospital-btn-${h.id}`}
                       onClick={() => handleDeleteHospital(h.id)}
                       className="text-xs text-red-600 font-bold hover:underline flex items-center gap-1 cursor-pointer"
                     >
@@ -1004,9 +1053,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-slate-900">Services &amp; Pricing Management</h3>
-                <p className="text-xs text-slate-500">Edit pricing tags, session benefits, and descriptions instantly without code changes.</p>
+                <p className="text-xs text-slate-500">Edit pricing tags, session benefits, cover photos, and clinical descriptions.</p>
               </div>
               <button
+                id="admin-add-service-btn"
                 onClick={() => setServiceModal({
                   open: true,
                   data: {
@@ -1017,7 +1067,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     description: '',
                     category: 'dialysis',
                     benefits: ['High-Flux biocompatible dialyzer', 'Ultrapure RO water'],
-                    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80'
+                    image: '/images/patient-dialysis-hospital-room.jpg'
                   }
                 })}
                 className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#005BBD] text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
@@ -1029,25 +1079,56 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {(services || []).filter(Boolean).map(s => (
-                <div key={s.id} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-2xs flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs uppercase font-bold text-slate-400">{s.category}</span>
-                      <span className="font-black text-lg text-[#005BBD]">{s.price}</span>
+                <div key={s.id} id={`admin-service-card-${s.id}`} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-shadow flex flex-col justify-between">
+                  <div>
+                    <div className="relative h-40 w-full bg-slate-100 overflow-hidden group">
+                      <img
+                        src={s.image || '/images/patient-dialysis-hospital-room.jpg'}
+                        alt={s.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/images/patient-dialysis-hospital-room.jpg';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute top-2.5 left-2.5">
+                        <span className="text-[11px] uppercase font-bold bg-white/95 backdrop-blur-xs text-slate-800 px-2.5 py-1 rounded-md shadow-xs">
+                          {s.category}
+                        </span>
+                      </div>
+                      <div className="absolute top-2.5 right-2.5">
+                        <span className="font-black text-xs bg-[#005BBD] text-white px-2.5 py-1 rounded-lg shadow-xs">
+                          {s.price}
+                        </span>
+                      </div>
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-white text-xs">
+                        <span className="text-[11px] font-medium text-slate-200 drop-shadow-xs">
+                          {s.priceNote || 'Per session'}
+                        </span>
+                        {s.image?.startsWith('data:image/') && (
+                          <span className="bg-emerald-600/90 backdrop-blur-xs px-2 py-0.5 rounded-full text-[10px] font-bold">
+                            Device Upload
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <h4 className="font-bold text-slate-900 text-base">{s.title}</h4>
-                    <p className="text-xs text-slate-600 line-clamp-3">{s.shortDescription || s.description}</p>
-                    <span className="text-[11px] text-slate-400 block">{s.priceNote}</span>
+
+                    <div className="p-5 space-y-2">
+                      <h4 className="font-bold text-slate-900 text-base">{s.title}</h4>
+                      <p className="text-xs text-slate-600 line-clamp-2">{s.shortDescription || s.description}</p>
+                    </div>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <div className="p-5 pt-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <button
+                      id={`edit-service-btn-${s.id}`}
                       onClick={() => setServiceModal({ open: true, editId: s.id, data: s })}
                       className="text-xs text-[#005BBD] font-bold hover:underline flex items-center gap-1 cursor-pointer"
                     >
-                      <Edit3 className="w-3.5 h-3.5" /> Edit Pricing &amp; Details
+                      <Edit3 className="w-3.5 h-3.5" /> Edit Details &amp; Image
                     </button>
                     <button
+                      id={`delete-service-btn-${s.id}`}
                       onClick={() => handleDeleteService(s.id)}
                       className="text-xs text-red-600 font-bold hover:underline flex items-center gap-1 cursor-pointer"
                     >
@@ -1474,13 +1555,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   type="text"
                   value={hospitalModal.data.mapLink || ''}
                   onChange={e => setHospitalModal({ ...hospitalModal, data: { ...hospitalModal.data, mapLink: e.target.value } })}
+                  placeholder="https://maps.google.com/?q=..."
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                />
+              </div>
+
+              {/* HOSPITAL IMAGE UPLOAD & PREVIEW */}
+              <div className="pt-2 border-t border-slate-100">
+                <ImageUploadField
+                  id="hospital-image-uploader"
+                  label="Center / Facility Photo"
+                  value={hospitalModal.data.image || ''}
+                  onChange={imgUrl => setHospitalModal({
+                    ...hospitalModal,
+                    data: { ...hospitalModal.data, image: imgUrl }
+                  })}
+                  helperText="Upload a photo from your device (drag & drop or click), paste an image URL, or pick from samples."
+                  presets={hospitalImagePresets}
                 />
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-3">
                 <button
                   type="button"
+                  id="cancel-hospital-btn"
                   onClick={() => setHospitalModal({ open: false, data: {} })}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
                 >
@@ -1488,6 +1586,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 </button>
                 <button
                   type="submit"
+                  id="save-hospital-btn"
                   className="px-4 py-2 rounded-xl bg-[#005BBD] text-white font-bold text-xs shadow"
                 >
                   Save Hospital
@@ -1564,9 +1663,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 ></textarea>
               </div>
 
+              {/* SERVICE IMAGE UPLOAD & PREVIEW */}
+              <div className="pt-2 border-t border-slate-100">
+                <ImageUploadField
+                  id="service-image-uploader"
+                  label="Service Cover Photo / Treatment Image"
+                  value={serviceModal.data.image || ''}
+                  onChange={imgUrl => setServiceModal({
+                    ...serviceModal,
+                    data: { ...serviceModal.data, image: imgUrl }
+                  })}
+                  helperText="Upload a clinical treatment photo from your device (drag & drop or click), enter a URL, or pick from clinical presets."
+                  presets={serviceImagePresets}
+                />
+              </div>
+
               <div className="flex items-center justify-end gap-2 pt-3">
                 <button
                   type="button"
+                  id="cancel-service-btn"
                   onClick={() => setServiceModal({ open: false, data: {} })}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
                 >
@@ -1574,6 +1689,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 </button>
                 <button
                   type="submit"
+                  id="save-service-btn"
                   className="px-4 py-2 rounded-xl bg-[#005BBD] text-white font-bold text-xs shadow"
                 >
                   Save Service

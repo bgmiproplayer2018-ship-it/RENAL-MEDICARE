@@ -347,38 +347,95 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           <div className="lg:col-span-6 grid grid-cols-2 gap-4">
             <div className="space-y-4">
-              <div className="rounded-2xl overflow-hidden shadow-md h-52">
+              <div className="rounded-2xl overflow-hidden shadow-md h-48 sm:h-52 relative group border border-slate-200/80 bg-slate-100">
                 <ScrollAnimatedImage
-                  src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=600&q=80"
-                  alt="Nephrologist reviewing chart"
-                  className="w-full h-full object-cover"
+                  src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80"
+                  alt="Senior Nephrologist consultation and kidney health review"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   containerClassName="w-full h-full"
                   animation="slide-right"
                   delay={0.1}
-                />
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent flex items-end p-3.5 pointer-events-none">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-full bg-[#005BBD] text-white text-[10px] font-bold uppercase tracking-wider shadow-xs">
+                        Nephrology
+                      </span>
+                      <span className="text-xs font-bold text-white drop-shadow-xs">
+                        Doctor Consultation
+                      </span>
+                    </div>
+                  </div>
+                </ScrollAnimatedImage>
               </div>
               <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100 space-y-2">
                 <span className="font-black text-[#005BBD] text-2xl">100%</span>
                 <h5 className="font-bold text-slate-900 text-xs">Ultrapure Dialysis Water</h5>
                 <p className="text-[11px] text-slate-600">Double-pass Reverse Osmosis with continuous endotoxin testing for peak vitality.</p>
               </div>
+              <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#16A34A] flex items-center justify-center shrink-0 border border-emerald-100">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h6 className="font-bold text-slate-900 text-xs">Zero Cross-Infection</h6>
+                  <span className="text-[11px] text-slate-500">Dedicated equipment clusters &amp; strict protocol</span>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-4 pt-8">
+            <div className="space-y-4 pt-6 sm:pt-8">
               <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-100 space-y-2">
                 <span className="font-black text-[#16A34A] text-2xl">24/7</span>
                 <h5 className="font-bold text-slate-900 text-xs">Nephrologist On-Call</h5>
                 <p className="text-[11px] text-slate-600">Immediate clinical escalation for vascular access issues, fluid overload, or arrhythmias.</p>
               </div>
-              <div className="rounded-2xl overflow-hidden shadow-md h-52">
+              
+              {/* Changed Primary Dialysis System Image (Selected Element) */}
+              <div className="rounded-2xl overflow-hidden shadow-md h-48 sm:h-52 relative group border border-slate-200/80 bg-slate-100">
                 <ScrollAnimatedImage
-                  src="https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80"
-                  alt="Modern dialysis equipment"
-                  className="w-full h-full object-cover"
+                  src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80"
+                  alt="Advanced high-flux hemodialysis filtration system and clinical monitor"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   containerClassName="w-full h-full"
                   animation="slide-left"
                   delay={0.2}
-                />
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent flex items-end p-3.5 pointer-events-none">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                        Precision
+                      </span>
+                      <span className="text-xs font-bold text-white drop-shadow-xs">
+                        High-Flux Dialyzer Suite
+                      </span>
+                    </div>
+                  </div>
+                </ScrollAnimatedImage>
+              </div>
+
+              {/* Added Related Image: Patient Dialysis Care & Monitoring */}
+              <div className="rounded-2xl overflow-hidden shadow-md h-44 sm:h-48 relative group border border-slate-200/80 bg-slate-100">
+                <ScrollAnimatedImage
+                  src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=80"
+                  alt="Compassionate nephrology care and sterile dialysis suite"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  containerClassName="w-full h-full"
+                  animation="fade-up"
+                  delay={0.3}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent flex items-end p-3.5 pointer-events-none">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-full bg-[#005BBD] text-white text-[10px] font-bold uppercase tracking-wider shadow-xs">
+                        Patient First
+                      </span>
+                      <span className="text-xs font-bold text-white drop-shadow-xs">
+                        In-Center Care Suite
+                      </span>
+                    </div>
+                  </div>
+                </ScrollAnimatedImage>
               </div>
             </div>
           </div>

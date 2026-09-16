@@ -28,7 +28,10 @@ import {
   Mail,
   Send,
   Check,
-  Loader2
+  Loader2,
+  Database,
+  ShieldAlert,
+  Copy
 } from 'lucide-react';
 import { Appointment, Hospital, ServiceItem, BlogPost, ContactMessage, CompanySettings, ReminderLog } from '../../types.ts';
 import { RenalLogo } from '../common/RenalLogo.tsx';
@@ -76,7 +79,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   services: initialServices,
   settings: initialSettings,
 }) => {
-  const [activeTab, setActiveTab] = useState<'appointments' | 'hospitals' | 'services' | 'inquiries' | 'settings' | 'deployment'>('appointments');
+  const [activeTab, setActiveTab] = useState<'appointments' | 'hospitals' | 'services' | 'inquiries' | 'settings' | 'deployment' | 'database'>('appointments');
   
   // Data states - initialized with fallback storage so refreshes never revert or flash empty
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -150,6 +153,33 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [showAuditLogsModal, setShowAuditLogsModal] = useState(false);
   const [auditLogs, setAuditLogs] = useState<ReminderLog[]>([]);
 
+  // MongoDB integration states
+  const [mongoStatus, setMongoStatus] = useState<{
+    isConnected: boolean;
+    uriConfigured: boolean;
+    maskedUri: string | null;
+    dbName: string;
+    message: string;
+    pingMs: number | null;
+    lastChecked?: string;
+    isIpBlocked?: boolean;
+    containerIp?: string | null;
+    counts: {
+      appointments: number;
+      hospitals: number;
+      services: number;
+      settings: number;
+      contacts: number;
+      blogs: number;
+      faqs: number;
+      testimonials: number;
+    };
+  } | null>(null);
+  const [isLoadingMongo, setIsLoadingMongo] = useState(false);
+  const [mongoSyncStatus, setMongoSyncStatus] = useState<string | null>(null);
+  const [testMongoUri, setTestMongoUri] = useState('');
+  const [isTestingMongo, setIsTestingMongo] = useState(false);
+
   // Fetch appointments, inquiries, settings, hospitals, services & notification status on load
   useEffect(() => {
     fetchAppointments();
@@ -158,6 +188,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     fetchHospitals();
     fetchServices();
     fetchNotificationStatus();
+    fetchMongoStatus();
   }, []);
 
   // Synchronize when initial props change from parent loadAllData
@@ -255,6 +286,108 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       alert('Network error dispatching notification');
     } finally {
       setIsSendingReminder(false);
+    }
+  };
+
+  const fetchMongoStatus = async () => {
+    try {
+      setIsLoadingMongo(true);
+      const res = await apiFetch('/api/database/status');
+      const data = await res.json();
+      if (data.success && data.status) {
+        setMongoStatus(data.status);
+      }
+    } catch (e) {
+      console.warn('Could not fetch MongoDB status:', e);
+    } finally {
+      setIsLoadingMongo(false);
+    }
+  };
+
+  const handleSyncToMongo = async () => {
+    try {
+      setIsLoadingMongo(true);
+      setMongoSyncStatus('Synchronizing all collections to MongoDB cluster...');
+      const res = await apiFetch('/api/database/sync', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMongoSyncStatus(data.message || 'All records pushed to MongoDB!');
+        await fetchMongoStatus();
+      } else {
+        setMongoSyncStatus(`Sync issue: ${data.message || data.error || 'Check cluster connection'}`);
+      }
+      setTimeout(() => setMongoSyncStatus(null), 6000);
+    } catch {
+      setMongoSyncStatus('Failed to send sync request to MongoDB');
+      setTimeout(() => setMongoSyncStatus(null), 6000);
+    } finally {
+      setIsLoadingMongo(false);
+    }
+  };
+
+  const handlePullFromMongo = async () => {
+    try {
+      setIsLoadingMongo(true);
+      setMongoSyncStatus('Pulling authoritative records from MongoDB...');
+      const res = await apiFetch('/api/database/pull', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMongoSyncStatus(data.message || 'State updated from MongoDB!');
+        await fetchAppointments();
+        await fetchHospitals();
+        await fetchServices();
+        await fetchSettings();
+        await fetchInquiries();
+        await fetchMongoStatus();
+        onRefreshData();
+      } else {
+        setMongoSyncStatus(`Pull issue: ${data.message || 'Check cluster connection'}`);
+      }
+      setTimeout(() => setMongoSyncStatus(null), 6000);
+    } catch {
+      setMongoSyncStatus('Failed to pull records from MongoDB');
+      setTimeout(() => setMongoSyncStatus(null), 6000);
+    } finally {
+      setIsLoadingMongo(false);
+    }
+  };
+
+  const handleTestMongoConnection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setIsTestingMongo(true);
+      setMongoSyncStatus('Testing connection string & cluster credentials...');
+      const res = await apiFetch('/api/database/test', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ uri: testMongoUri ? testMongoUri.trim() : undefined })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMongoSyncStatus(`Connected: ${data.message}`);
+        if (data.status) setMongoStatus(data.status);
+        await fetchAppointments();
+        await fetchHospitals();
+        await fetchServices();
+        await fetchSettings();
+        onRefreshData();
+      } else {
+        setMongoSyncStatus(`Failed: ${data.message}`);
+        if (data.status) setMongoStatus(data.status);
+      }
+    } catch {
+      setMongoSyncStatus('Network error testing MongoDB connection');
+    } finally {
+      setIsTestingMongo(false);
     }
   };
 
@@ -665,12 +798,47 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
 
         <div className="flex items-center justify-end gap-2">
+          {/* MongoDB Live Status Pill */}
           <button
-            onClick={() => { fetchAppointments(); fetchInquiries(); fetchSettings(); }}
+            type="button"
+            onClick={() => setActiveTab('database')}
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
+              mongoStatus?.isConnected 
+                ? 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-400/30' 
+                : mongoStatus?.isIpBlocked
+                ? 'bg-amber-500/25 text-amber-200 hover:bg-amber-500/35 border border-amber-400/40'
+                : 'bg-slate-700/50 text-slate-200 hover:bg-slate-700 border border-slate-600/40'
+            }`}
+            title={
+              mongoStatus?.isConnected 
+                ? `Connected to MongoDB (${mongoStatus.dbName})` 
+                : mongoStatus?.isIpBlocked 
+                ? 'Atlas IP Access Whitelist required (Click to view)'
+                : 'MongoDB Storage Config'
+            }
+          >
+            <Database className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">MongoDB:</span>
+            <span>
+              {mongoStatus?.isConnected 
+                ? 'Connected' 
+                : mongoStatus?.isIpBlocked 
+                ? 'Atlas IP Needed' 
+                : 'Local Mode'}
+            </span>
+            {mongoStatus?.isConnected ? (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            ) : mongoStatus?.isIpBlocked ? (
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+            ) : null}
+          </button>
+
+          <button
+            onClick={() => { fetchAppointments(); fetchInquiries(); fetchSettings(); fetchHospitals(); fetchServices(); fetchMongoStatus(); }}
             className="px-2.5 py-1.5 rounded-lg bg-blue-900/60 hover:bg-blue-800 text-blue-100 text-xs flex items-center gap-1 cursor-pointer"
             title="Refresh Registry"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoadingMongo ? 'animate-spin' : ''}`} />
             <span className="text-xs">Refresh</span>
           </button>
           <button
@@ -693,6 +861,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             { id: 'hospitals', label: `Hospitals (${(hospitals || []).filter(Boolean).length})`, icon: <Building className="w-4 h-4 shrink-0" /> },
             { id: 'services', label: `Services (${(services || []).filter(Boolean).length})`, icon: <Briefcase className="w-4 h-4 shrink-0" /> },
             { id: 'inquiries', label: `Inquiries (${(inquiries || []).filter(Boolean).length})`, icon: <MessageSquare className="w-4 h-4 shrink-0" /> },
+            { 
+              id: 'database', 
+              label: mongoStatus?.isConnected ? 'MongoDB (Connected)' : 'MongoDB Database', 
+              icon: <Database className="w-4 h-4 shrink-0" />,
+              badge: mongoStatus?.isConnected ? 'LIVE' : undefined
+            },
             { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4 shrink-0" /> },
             { id: 'deployment', label: 'Deployment Guides', icon: <Server className="w-4 h-4 shrink-0" /> },
           ].map(tab => (
@@ -707,6 +881,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             >
               {tab.icon}
               <span>{tab.label}</span>
+              {tab.badge && (
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-emerald-500 text-white font-extrabold ml-1">
+                  {tab.badge}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -1506,6 +1685,361 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <div className="pt-2 text-[11px] text-teal-800 bg-teal-50 p-2.5 rounded-xl border border-teal-100">
                   ✨ <strong>Zero-Configuration:</strong> Includes auto-resilient client storage fallback, so appointments, inquiries, tracking, and admin logins work whether deployed with Netlify Functions or static Netlify Drop.
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 7: MONGODB DATABASE MANAGEMENT */}
+        {activeTab === 'database' && (
+          <div className="space-y-6">
+            {/* Header Banner */}
+            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-[#002B5C] text-white p-6 sm:p-8 rounded-3xl shadow-sm space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                      Cloud Database Engine
+                    </span>
+                    {mongoStatus?.isConnected ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Connected ({mongoStatus.pingMs ? `${mongoStatus.pingMs}ms` : 'Active'})
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        Local Fallback Mode
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white">
+                    MongoDB Database Management
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                    Connect your Renal Medicare admin service to MongoDB Atlas or any MongoDB cluster. When connected, all hospital edits, service pricing changes, appointments, inquiries, and company configurations are stored directly in MongoDB.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={isLoadingMongo}
+                    onClick={fetchMongoStatus}
+                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 border border-white/10 cursor-pointer transition-all disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingMongo ? 'animate-spin' : ''}`} />
+                    <span>Check Status</span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isLoadingMongo}
+                    onClick={handleSyncToMongo}
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer transition-all disabled:opacity-50"
+                  >
+                    <Database className="w-3.5 h-3.5" />
+                    <span>Push to MongoDB</span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isLoadingMongo}
+                    onClick={handlePullFromMongo}
+                    className="px-4 py-2 rounded-xl bg-[#005BBD] hover:bg-blue-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer transition-all disabled:opacity-50"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Pull from MongoDB</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Real-time Status Alert / Sync Toast */}
+              {mongoSyncStatus && (
+                <div className="p-3 bg-white/10 backdrop-blur-xs rounded-xl border border-white/20 text-xs text-blue-100 flex items-center gap-2 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>{mongoSyncStatus}</span>
+                </div>
+              )}
+            </div>
+
+            {/* ATLAS IP WHITELIST ALERT (SSL ALERT 80 DIAGNOSIS) */}
+            {mongoStatus?.isIpBlocked && (
+              <div className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-white p-6 rounded-3xl border-2 border-amber-400 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <ShieldAlert className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-slate-900 text-base">
+                        MongoDB Atlas Action Required: Whitelist Network Access
+                      </h4>
+                      <p className="text-xs text-amber-900 font-medium">
+                        Atlas rejected the TLS handshake with <span className="font-mono font-bold">SSL Alert 80</span> because this cloud container's IP is not on your cluster's IP Access List.
+                      </p>
+                    </div>
+                  </div>
+
+                  <a
+                    href="https://cloud.mongodb.com/v2#/security/network/accessList"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 transition-all"
+                  >
+                    <span>Open Atlas Console</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-amber-200 space-y-3">
+                  <div className="text-xs text-slate-700 leading-relaxed">
+                    By default, new MongoDB Atlas clusters block all incoming cloud traffic. To allow this web service to store appointments and data, add network access in your Atlas project:
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                          Option 1 (Recommended for Cloud):
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText('0.0.0.0/0');
+                            alert('Copied 0.0.0.0/0 to clipboard! Paste this in MongoDB Atlas -> Network Access -> Add IP Address.');
+                          }}
+                          className="text-[11px] font-bold text-[#005BBD] hover:underline cursor-pointer flex items-center gap-1"
+                        >
+                          <Copy className="w-3 h-3" />
+                          <span>Copy 0.0.0.0/0</span>
+                        </button>
+                      </div>
+                      <div className="font-mono text-xs font-bold text-slate-900 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200">
+                        0.0.0.0/0 (Allow Access from Anywhere)
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Ensures container restarts &amp; Cloud Run instances can always connect without manual IP tracking.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                          Option 2 (Current Container IP):
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(mongoStatus.containerIp || '34.34.254.132');
+                            alert(`Copied container IP (${mongoStatus.containerIp || '34.34.254.132'}) to clipboard!`);
+                          }}
+                          className="text-[11px] font-bold text-[#005BBD] hover:underline cursor-pointer flex items-center gap-1"
+                        >
+                          <Copy className="w-3 h-3" />
+                          <span>Copy IP</span>
+                        </button>
+                      </div>
+                      <div className="font-mono text-xs font-bold text-slate-900 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200">
+                        {mongoStatus.containerIp || '34.34.254.132'}
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Whitelists this specific container IP address in Atlas Network Access.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                    <span className="text-xs text-slate-500 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      <span>The app is running safely in persistent local storage. No user appointments will be lost.</span>
+                    </span>
+
+                    <button
+                      type="button"
+                      disabled={isTestingMongo}
+                      onClick={() => handleTestMongoConnection({ preventDefault: () => {} } as any)}
+                      className="px-4 py-2 rounded-xl bg-[#005BBD] hover:bg-blue-600 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all shadow-xs"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isTestingMongo ? 'animate-spin' : ''}`} />
+                      <span>{isTestingMongo ? 'Testing Connection...' : 'Retry Connection After Whitelisting'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Live Cluster Metrics & Connection Parameters */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Cluster State</span>
+                  <div className={`w-2.5 h-2.5 rounded-full ${mongoStatus?.isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></div>
+                </div>
+                <div className="text-lg font-black text-slate-900 flex items-center gap-2">
+                  {mongoStatus?.isConnected ? 'Online & Linked' : 'Offline / Standby'}
+                </div>
+                <p className="text-xs text-slate-500">
+                  {mongoStatus?.isConnected 
+                    ? `Active connection to database: "${mongoStatus.dbName}"` 
+                    : 'System is running in persistent local file mode until MongoDB URI is provided.'}
+                </p>
+              </div>
+
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Masked Connection URI</span>
+                  <Database className="w-4 h-4 text-slate-400" />
+                </div>
+                <div className="text-xs font-mono text-slate-800 bg-slate-50 p-2 rounded-lg border border-slate-200 truncate">
+                  {mongoStatus?.maskedUri || 'MONGODB_URI not set'}
+                </div>
+                <p className="text-xs text-slate-500">
+                  Configured via environment variable <code className="text-[#005BBD] font-bold">MONGODB_URI</code>.
+                </p>
+              </div>
+
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Driver &amp; Ping</span>
+                  <Clock className="w-4 h-4 text-slate-400" />
+                </div>
+                <div className="text-lg font-black text-slate-900">
+                  {mongoStatus?.pingMs !== null && mongoStatus?.pingMs !== undefined ? `${mongoStatus.pingMs} ms` : 'N/A'}
+                </div>
+                <p className="text-xs text-slate-500">
+                  Using official MongoDB Node driver v6 with automated reconnection pool.
+                </p>
+              </div>
+            </div>
+
+            {/* Collection Document Counts */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-base font-bold text-slate-900">Synchronized MongoDB Collections</h4>
+                  <p className="text-xs text-slate-500">Documents registered in the database collections</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={fetchMongoStatus}
+                  className="text-xs font-bold text-[#005BBD] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  <span>Refresh Counts</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { label: 'Hospitals', count: mongoStatus?.counts?.hospitals ?? hospitals.length, desc: 'Dialysis centers & ICUs', icon: <Building className="w-4 h-4 text-blue-600" /> },
+                  { label: 'Services', count: mongoStatus?.counts?.services ?? services.length, desc: 'Dialysis packages & pricing', icon: <Briefcase className="w-4 h-4 text-sky-600" /> },
+                  { label: 'Appointments', count: mongoStatus?.counts?.appointments ?? appointments.length, desc: 'Patient dialysis bookings', icon: <Calendar className="w-4 h-4 text-indigo-600" /> },
+                  { label: 'Inquiries', count: mongoStatus?.counts?.contacts ?? inquiries.length, desc: 'Contact & consultation leads', icon: <MessageSquare className="w-4 h-4 text-emerald-600" /> },
+                  { label: 'Company Settings', count: mongoStatus?.counts?.settings ?? 1, desc: 'Phones, colors, addresses', icon: <Settings className="w-4 h-4 text-amber-600" /> },
+                  { label: 'Clinical Blogs', count: mongoStatus?.counts?.blogs ?? 4, desc: 'Nephrology health guides', icon: <FileText className="w-4 h-4 text-purple-600" /> },
+                  { label: 'FAQs', count: mongoStatus?.counts?.faqs ?? 6, desc: 'Patient knowledge base', icon: <BookOpen className="w-4 h-4 text-teal-600" /> },
+                  { label: 'Testimonials', count: mongoStatus?.counts?.testimonials ?? 3, desc: 'Patient reviews & ratings', icon: <CheckCircle2 className="w-4 h-4 text-green-600" /> },
+                ].map((item, i) => (
+                  <div key={i} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-700">{item.label}</span>
+                      {item.icon}
+                    </div>
+                    <div>
+                      <div className="text-2xl font-black text-slate-900">{item.count}</div>
+                      <div className="text-[10px] text-slate-500 truncate">{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Test Connection / Configure URI */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+              <h4 className="text-base font-bold text-slate-900">Test or Connect MongoDB URI</h4>
+              <p className="text-xs text-slate-600">
+                You can test a connection string on demand or verify your existing cluster credentials. The server will attempt a real handshake with the cluster.
+              </p>
+
+              <form onSubmit={handleTestMongoConnection} className="space-y-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">
+                    MongoDB Connection String (URI)
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={testMongoUri}
+                      onChange={e => setTestMongoUri(e.target.value)}
+                      placeholder={mongoStatus?.maskedUri || 'mongodb+srv://<username>:<password>@cluster0.mongodb.net/renal_medicare?retryWrites=true&w=majority'}
+                      className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:border-[#005BBD] focus:ring-1 focus:ring-[#005BBD] outline-hidden"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isTestingMongo}
+                      className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all shrink-0"
+                    >
+                      {isTestingMongo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Database className="w-3.5 h-3.5" />}
+                      <span>{isTestingMongo ? 'Testing Connection...' : 'Test Connection'}</span>
+                    </button>
+                  </div>
+                  <span className="text-[11px] text-slate-400 block">
+                    Leave blank to test the current server environment variable <code className="text-slate-600 font-bold">MONGODB_URI</code>.
+                  </span>
+                </div>
+              </form>
+            </div>
+
+            {/* Quick MongoDB Atlas Step-by-Step Setup Guide */}
+            <div className="bg-gradient-to-br from-emerald-50/50 via-teal-50/30 to-white p-6 rounded-3xl border border-emerald-200 space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">
+                  M
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 text-sm sm:text-base">
+                    How to Connect MongoDB Atlas (Free Cluster)
+                  </h4>
+                  <span className="text-[11px] text-emerald-800 font-semibold">
+                    Takes 2 minutes &bull; 512MB free tier is permanent
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700">
+                <div className="p-3.5 rounded-2xl bg-white border border-emerald-100 space-y-1">
+                  <div className="font-bold text-slate-900">Step 1: Create Free Cluster</div>
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    Go to <a href="https://www.mongodb.com/atlas" target="_blank" rel="noreferrer" className="text-emerald-700 font-bold underline">mongodb.com/atlas</a> and register a free account. Choose the M0 Free Shared Tier.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white border border-emerald-100 space-y-1">
+                  <div className="font-bold text-slate-900">Step 2: Database User &amp; Password</div>
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    Under <strong>Database Access</strong>, create a database user (e.g. <code>renal_admin</code>) and set a secure password.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white border border-emerald-100 space-y-1">
+                  <div className="font-bold text-slate-900">Step 3: Network Access (IP Whitelist)</div>
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    Under <strong>Network Access</strong>, click <em>&ldquo;Add IP Address&rdquo;</em> and select <strong>Allow Access from Anywhere (0.0.0.0/0)</strong> so cloud containers can connect.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white border border-emerald-100 space-y-1">
+                  <div className="font-bold text-slate-900">Step 4: Copy Connection String</div>
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    Click <strong>Connect &rarr; Drivers &rarr; Node.js</strong>, copy the URI string, and set it as <code className="text-[#005BBD] font-bold">MONGODB_URI</code> in your <code>.env</code> file or container settings.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-emerald-100/60 text-emerald-900 text-xs flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-700 shrink-0" />
+                <span>
+                  Once connected, all administrator edits across hospitals, services, appointments, and company settings automatically persist in MongoDB and will never be lost on page refreshes or container redeployments!
+                </span>
               </div>
             </div>
           </div>

@@ -10,7 +10,6 @@ import {
   ContactMessage, 
   CompanySettings 
 } from '../../src/types.ts';
-import { mongoService, MongoStatus } from './mongo.ts';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'database.json');
@@ -522,39 +521,8 @@ class Store {
       } else {
         this.save();
       }
-      // Initialize MongoDB connection and synchronization in the background
-      this.initMongo();
     } catch (err) {
       console.warn('Could not read persistent database file, using in-memory state:', err);
-    }
-  }
-
-  private async initMongo() {
-    if (!mongoService.isConfigured()) {
-      return;
-    }
-    try {
-      const { db } = await mongoService.connect();
-      if (!db) return;
-
-      const mongoData = await mongoService.loadFromMongo();
-      if (mongoData && (mongoData.services?.length || mongoData.hospitals?.length || mongoData.appointments?.length)) {
-        console.log('[Store] Hydrating store state from MongoDB...');
-        if (mongoData.services && mongoData.services.length > 0) this.state.services = mongoData.services;
-        if (mongoData.hospitals && mongoData.hospitals.length > 0) this.state.hospitals = mongoData.hospitals;
-        if (mongoData.appointments && mongoData.appointments.length > 0) this.state.appointments = mongoData.appointments;
-        if (mongoData.settings) this.state.settings = { ...this.state.settings, ...mongoData.settings };
-        if (mongoData.contacts && mongoData.contacts.length > 0) this.state.contacts = mongoData.contacts;
-        if (mongoData.blogs && mongoData.blogs.length > 0) this.state.blogs = mongoData.blogs;
-        if (mongoData.faqs && mongoData.faqs.length > 0) this.state.faqs = mongoData.faqs;
-        if (mongoData.testimonials && mongoData.testimonials.length > 0) this.state.testimonials = mongoData.testimonials;
-        this.save();
-      } else {
-        console.log('[Store] MongoDB is empty. Seeding local state into MongoDB...');
-        await mongoService.syncAllToMongo(this.state);
-      }
-    } catch (err) {
-      console.warn('[Store] Mongo initial connect/sync notice:', err);
     }
   }
 
@@ -588,12 +556,10 @@ class Store {
       const idx = this.state.appointments.findIndex(a => a.id.toLowerCase() === item.id.toLowerCase());
       if (idx === -1) {
         this.state.appointments.unshift(item);
-        mongoService.upsertAppointment(item);
         changed = true;
       } else {
         if (item.updatedAt && (!this.state.appointments[idx].updatedAt || item.updatedAt > this.state.appointments[idx].updatedAt)) {
           this.state.appointments[idx] = { ...this.state.appointments[idx], ...item };
-          mongoService.upsertAppointment(this.state.appointments[idx]);
           changed = true;
         }
       }
@@ -612,7 +578,6 @@ class Store {
       const idx = this.state.contacts.findIndex(c => c.id.toLowerCase() === item.id.toLowerCase());
       if (idx === -1) {
         this.state.contacts.unshift(item);
-        mongoService.upsertContact(item);
         changed = true;
       }
     }
@@ -634,7 +599,6 @@ class Store {
     };
     this.state.appointments.unshift(newAppointment);
     this.save();
-    mongoService.upsertAppointment(newAppointment);
     return newAppointment;
   }
 
@@ -647,7 +611,6 @@ class Store {
       updatedAt: new Date().toISOString()
     };
     this.save();
-    mongoService.upsertAppointment(this.state.appointments[idx]);
     return this.state.appointments[idx];
   }
 
@@ -656,7 +619,6 @@ class Store {
     this.state.appointments = this.state.appointments.filter(a => a.id.toLowerCase() !== id.toLowerCase());
     if (this.state.appointments.length !== len) {
       this.save();
-      mongoService.deleteAppointment(id);
       return true;
     }
     return false;
@@ -679,7 +641,6 @@ class Store {
     };
     this.state.hospitals.push(newHosp);
     this.save();
-    mongoService.upsertHospital(newHosp);
     return newHosp;
   }
 
@@ -688,7 +649,6 @@ class Store {
     if (idx === -1) return null;
     this.state.hospitals[idx] = { ...this.state.hospitals[idx], ...updates };
     this.save();
-    mongoService.upsertHospital(this.state.hospitals[idx]);
     return this.state.hospitals[idx];
   }
 
@@ -697,7 +657,6 @@ class Store {
     this.state.hospitals = this.state.hospitals.filter(h => h.id !== id);
     if (this.state.hospitals.length !== len) {
       this.save();
-      mongoService.deleteHospital(id);
       return true;
     }
     return false;
@@ -711,7 +670,6 @@ class Store {
     };
     this.state.services.push(newSrv);
     this.save();
-    mongoService.upsertService(newSrv);
     return newSrv;
   }
 
@@ -720,7 +678,6 @@ class Store {
     if (idx === -1) return null;
     this.state.services[idx] = { ...this.state.services[idx], ...updates };
     this.save();
-    mongoService.upsertService(this.state.services[idx]);
     return this.state.services[idx];
   }
 
@@ -729,7 +686,6 @@ class Store {
     this.state.services = this.state.services.filter(s => s.id !== id);
     if (this.state.services.length !== len) {
       this.save();
-      mongoService.deleteService(id);
       return true;
     }
     return false;
@@ -744,7 +700,6 @@ class Store {
     };
     this.state.blogs.unshift(newBlog);
     this.save();
-    mongoService.upsertBlog(newBlog);
     return newBlog;
   }
 
@@ -753,7 +708,6 @@ class Store {
     if (idx === -1) return null;
     this.state.blogs[idx] = { ...this.state.blogs[idx], ...updates };
     this.save();
-    mongoService.upsertBlog(this.state.blogs[idx]);
     return this.state.blogs[idx];
   }
 
@@ -762,7 +716,6 @@ class Store {
     this.state.blogs = this.state.blogs.filter(b => b.id !== id);
     if (this.state.blogs.length !== len) {
       this.save();
-      mongoService.deleteBlog(id);
       return true;
     }
     return false;
@@ -777,7 +730,6 @@ class Store {
     };
     this.state.testimonials.unshift(newTest);
     this.save();
-    mongoService.upsertTestimonial(newTest);
     return newTest;
   }
 
@@ -786,7 +738,6 @@ class Store {
     if (idx === -1) return null;
     this.state.testimonials[idx] = { ...this.state.testimonials[idx], ...updates };
     this.save();
-    mongoService.upsertTestimonial(this.state.testimonials[idx]);
     return this.state.testimonials[idx];
   }
 
@@ -795,7 +746,6 @@ class Store {
     this.state.testimonials = this.state.testimonials.filter(t => t.id !== id);
     if (this.state.testimonials.length !== len) {
       this.save();
-      mongoService.deleteTestimonial(id);
       return true;
     }
     return false;
@@ -809,7 +759,6 @@ class Store {
     };
     this.state.faqs.push(newFaq);
     this.save();
-    mongoService.upsertFaq(newFaq);
     return newFaq;
   }
 
@@ -818,7 +767,6 @@ class Store {
     if (idx === -1) return null;
     this.state.faqs[idx] = { ...this.state.faqs[idx], ...updates };
     this.save();
-    mongoService.upsertFaq(this.state.faqs[idx]);
     return this.state.faqs[idx];
   }
 
@@ -827,7 +775,6 @@ class Store {
     this.state.faqs = this.state.faqs.filter(f => f.id !== id);
     if (this.state.faqs.length !== len) {
       this.save();
-      mongoService.deleteFaq(id);
       return true;
     }
     return false;
@@ -843,7 +790,6 @@ class Store {
     };
     this.state.contacts.unshift(newMsg);
     this.save();
-    mongoService.upsertContact(newMsg);
     return newMsg;
   }
 
@@ -852,7 +798,6 @@ class Store {
     if (msg) {
       msg.isRead = true;
       this.save();
-      mongoService.upsertContact(msg);
       return true;
     }
     return false;
@@ -863,7 +808,6 @@ class Store {
     this.state.contacts = this.state.contacts.filter(c => c.id !== id);
     if (this.state.contacts.length !== len) {
       this.save();
-      mongoService.deleteContact(id);
       return true;
     }
     return false;
@@ -873,34 +817,7 @@ class Store {
   updateSettings(updates: Partial<CompanySettings>): CompanySettings {
     this.state.settings = { ...this.state.settings, ...updates };
     this.save();
-    mongoService.upsertSettings(this.state.settings);
     return this.state.settings;
-  }
-
-  // MongoDB status & controls
-  async getMongoStatus(): Promise<MongoStatus> {
-    return mongoService.getStatus();
-  }
-
-  async syncToMongo(): Promise<{ success: boolean; message: string; counts?: any }> {
-    return mongoService.syncAllToMongo(this.state);
-  }
-
-  async pullFromMongo(): Promise<{ success: boolean; message: string }> {
-    const data = await mongoService.loadFromMongo();
-    if (data) {
-      if (data.services && data.services.length > 0) this.state.services = data.services;
-      if (data.hospitals && data.hospitals.length > 0) this.state.hospitals = data.hospitals;
-      if (data.appointments && data.appointments.length > 0) this.state.appointments = data.appointments;
-      if (data.settings) this.state.settings = { ...this.state.settings, ...data.settings };
-      if (data.contacts && data.contacts.length > 0) this.state.contacts = data.contacts;
-      if (data.blogs && data.blogs.length > 0) this.state.blogs = data.blogs;
-      if (data.faqs && data.faqs.length > 0) this.state.faqs = data.faqs;
-      if (data.testimonials && data.testimonials.length > 0) this.state.testimonials = data.testimonials;
-      this.save();
-      return { success: true, message: 'Hydrated successfully from MongoDB cluster.' };
-    }
-    return { success: false, message: 'No records found in MongoDB to pull.' };
   }
 }
 

@@ -76,7 +76,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     secondaryColor: '#4FA9FF',
     accentColor: '#0EA5E9',
     backgroundColor: '#FFFFFF',
-    address: 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049'
+    address: 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089'
   });
 
   const [isLoading, setIsLoading] = useState(false);

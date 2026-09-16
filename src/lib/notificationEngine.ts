@@ -231,7 +231,7 @@ For any emergencies, acute respiratory distress, or rescheduling requests, call 
 
 Warm regards,
 Renal Medicare Clinical Nephrology Team
-Institutional Medical Area, New Delhi
+Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089
 Website: https://renalmedicare.com`;
 
   const emailHtml = `
@@ -288,7 +288,7 @@ Website: https://renalmedicare.com`;
       </div>
     </div>
     <div class="footer">
-      Renal Medicare Kidney Care Hub &bull; 24x7 Emergency Line: +91 ${supportPhone}<br>
+      Renal medicare (kidney care &amp; dialysis centre) &bull; 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089 &bull; +91 ${supportPhone}<br>
       Automated Patient Communication Engine
     </div>
   </div>

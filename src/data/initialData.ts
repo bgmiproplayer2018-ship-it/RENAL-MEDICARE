@@ -6,7 +6,7 @@ export const initialData = {
       "slug": "hemodialysis",
       "description": "Gold-standard blood filtration using advanced high-flux biocompatible dialyzers and ultra-pure RO water systems. Monitored continuously by licensed dialysis nurses and senior nephrologists.",
       "shortDescription": "High-flux hemodialysis in state-of-the-art sterile suites with online clearance monitoring.",
-      "image": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80",
+      "image": "/images/patient-dialysis-hospital-room.jpg",
       "price": "₹2,200",
       "priceNote": "Per session (includes consumable dialyzer tubing & medication)",
       "benefits": [
@@ -24,30 +24,6 @@ export const initialData = {
       ],
       "category": "dialysis",
       "isPopular": true
-    },
-    {
-      "id": "srv-2",
-      "title": "Peritoneal Dialysis",
-      "slug": "peritoneal-dialysis",
-      "description": "Gentle, continuous filtration through your own peritoneal membrane. We provide complete training, automated peritoneal dialysis (APD) cyclers, and sterile continuous ambulatory (CAPD) solutions.",
-      "shortDescription": "Flexible at-home or automated peritoneal dialysis giving you freedom and continuous clearance.",
-      "image": "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80",
-      "price": "₹18,500",
-      "priceNote": "Monthly package (includes machine rental & delivery of supplies)",
-      "benefits": [
-        "Freedom to perform dialysis overnight while sleeping",
-        "Fewer dietary restrictions compared to conventional hemodialysis",
-        "Preserves residual renal function longer",
-        "Comprehensive caregiver training and 24/7 tele-nurse support",
-        "Doorstep delivery of pre-warmed sterile dialysate bags"
-      ],
-      "features": [
-        "Automated cycler machine",
-        "Monthly home visit",
-        "Catheter site care",
-        "24/7 hotline"
-      ],
-      "category": "dialysis"
     },
     {
       "id": "srv-3",
@@ -151,9 +127,9 @@ export const initialData = {
   "hospitals": [
     {
       "id": "hosp-1",
-      "name": "Renal Medicare Super Specialty Kidney Center",
-      "address": "B-16 rohini sector-16 delhi 110089",
-      "city": "New Delhi",
+      "name": "Renal medicare (kidney care & dialysis centre)",
+      "address": "63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089",
+      "city": "Delhi",
       "state": "Delhi",
       "contactNumber": "9069645840",
       "facilities": [
@@ -163,7 +139,7 @@ export const initialData = {
         "Emergency Ambulance",
         "Dialysis Recliners with TV"
       ],
-      "googleMap": "https://maps.google.com/?q=South+Extension+New+Delhi",
+      "googleMap": "https://maps.google.com/?q=63+64+65+Pocket+4+Sector+16A+Rohini+Delhi+110089",
       "image": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80",
       "dialysisUnits": 32,
       "emergencyAvailable": true
@@ -194,7 +170,7 @@ export const initialData = {
       "state": "Uttar Pradesh",
       "contactNumber": "9069645840",
       "facilities": [
-        "Peritoneal Dialysis Clinic",
+        "Kidney Preventive Care Clinic",
         "Vascular Access Center (Fistula Care)",
         "24x7 Emergency Helpdesk",
         "Cafeteria & Patient Lounge"
@@ -230,8 +206,8 @@ export const initialData = {
       "state": "Karnataka",
       "contactNumber": "7522805397",
       "facilities": [
-        "Automated Peritoneal Dialysis Training",
-        "Online HDF Hemodiafiltration",
+        "Specialized Hemodiafiltration Unit",
+        "Online HDF Blood Purification",
         "Home Visit Dispatch Unit"
       ],
       "googleMap": "https://maps.google.com/?q=Indiranagar+Bengaluru",
@@ -337,7 +313,7 @@ export const initialData = {
     {
       "id": "faq-3",
       "question": "What is the cost of dialysis at Renal Medicare?",
-      "answer": "Our hospital center hemodialysis begins at ₹2,200 per session including consumables. Comprehensive Home Dialysis with a dedicated technician is ₹3,800 per session. Monthly automated peritoneal packages start from ₹18,500. We also accept major insurance policies and cashless TPA partnerships.",
+      "answer": "Our hospital center hemodialysis begins at ₹2,200 per session including consumables. Comprehensive Home Dialysis with a dedicated technician is ₹3,800 per session. We also accept major insurance policies and cashless TPA partnerships.",
       "category": "general"
     },
     {
@@ -383,8 +359,8 @@ export const initialData = {
     {
       "id": "test-3",
       "patientName": "Gurpreet Singh Anand",
-      "treatment": "Peritoneal Dialysis & Nephrology Consultation",
-      "quote": "Dr. Sharma and the entire nephrology department provided clear guidance when my creatinine crossed 6.0. They helped me start Automated PD which allows me to manage my business smoothly during the day.",
+      "treatment": "Senior Nephrology Consultation & Dialysis Access",
+      "quote": "Dr. Sharma and the entire nephrology department provided clear guidance when my creatinine crossed 6.0. They helped me start optimal medical therapy and schedule which allows me to manage my business smoothly.",
       "rating": 5,
       "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
       "location": "Chandigarh",
@@ -417,7 +393,7 @@ export const initialData = {
     "alternatePhone": "7522805397",
     "email": "renalhealthcare01@gmail.com",
     "whatsapp": "9069645840",
-    "address": "Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049, India",
+    "address": "Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089",
     "workingHours": "24 Hours Emergency Dialysis | OPD: 8:00 AM - 8:00 PM",
     "emergencyLine": "+91-9069645840",
     "socialLinks": {

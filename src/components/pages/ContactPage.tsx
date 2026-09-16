@@ -43,7 +43,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
         if (p?.address) return p.address;
       }
     } catch {}
-    return 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049';
+    return 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
   })();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -324,10 +324,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="font-bold text-slate-900 text-base">Find Our Main Center</h3>
-              <p className="text-xs text-slate-500">Renal Medicare Institutional Hub &bull; New Delhi</p>
+              <p className="text-xs text-slate-500">Renal medicare (kidney care &amp; dialysis centre) &bull; 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089</p>
             </div>
             <a
-              href="https://maps.google.com/?q=New+Delhi+India"
+              href="https://maps.google.com/?q=63+64+65+Pocket+4+Sector+16A+Rohini+Delhi+110089"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-blue-50 text-[#005BBD] font-bold text-xs hover:bg-blue-100 transition-colors text-center"
@@ -344,7 +344,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
               height="100%"
               style={{ border: 0 }}
               loading="lazy"
-              src="https://maps.google.com/maps?q=New%20Delhi&t=&z=12&ie=UTF8&iwloc=&output=embed"
+              src="https://maps.google.com/maps?q=Pocket%204%20Sector%2016A%20Rohini%20Delhi%20110089&t=&z=15&ie=UTF8&iwloc=&output=embed"
             ></iframe>
           </div>
         </div>

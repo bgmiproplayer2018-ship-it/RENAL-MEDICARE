@@ -57,11 +57,25 @@ const MOCK_CONTACT_IDS = new Set(['cnt-1', 'cnt-2']);
 
 export class ClientDataStore {
   static getServices(): ServiceItem[] {
-    return loadFromStorage<ServiceItem[]>(STORAGE_KEYS.SERVICES, (initialData.services as unknown) as ServiceItem[]);
+    const list = loadFromStorage<ServiceItem[]>(STORAGE_KEYS.SERVICES, (initialData.services as unknown) as ServiceItem[]);
+    const withoutSrv2 = (list || []).filter(srv => srv && srv.id !== 'srv-2' && srv.slug !== 'peritoneal-dialysis');
+    let updated = withoutSrv2.length !== (list || []).length;
+    const fixed = withoutSrv2.map(srv => {
+      if (srv.id === 'srv-1' && srv.image.includes('photo-1579684385127-1ef15d508118')) {
+        updated = true;
+        return { ...srv, image: '/images/patient-dialysis-hospital-room.jpg' };
+      }
+      return srv;
+    });
+    if (updated) {
+      saveToStorage(STORAGE_KEYS.SERVICES, fixed);
+    }
+    return fixed;
   }
 
   static saveServices(services: ServiceItem[]): void {
-    saveToStorage(STORAGE_KEYS.SERVICES, services);
+    const clean = (services || []).filter(srv => srv && srv.id !== 'srv-2' && srv.slug !== 'peritoneal-dialysis');
+    saveToStorage(STORAGE_KEYS.SERVICES, clean);
   }
 
   static getHospitals(): Hospital[] {
@@ -99,7 +113,12 @@ export class ClientDataStore {
   }
 
   static getSettings(): CompanySettings {
-    return loadFromStorage<CompanySettings>(STORAGE_KEYS.SETTINGS, (initialData.settings as unknown) as CompanySettings);
+    const s = loadFromStorage<CompanySettings>(STORAGE_KEYS.SETTINGS, (initialData.settings as unknown) as CompanySettings);
+    if (s && (s.address?.includes('110049') || s.address?.includes('Institutional Medical Area'))) {
+      s.address = 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
+      saveToStorage(STORAGE_KEYS.SETTINGS, s);
+    }
+    return s;
   }
 
   static saveSettings(settings: CompanySettings): void {

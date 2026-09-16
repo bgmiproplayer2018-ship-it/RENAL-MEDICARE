@@ -76,7 +76,12 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
       {/* Services Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {filtered.map((srv, idx) => (
+          {filtered.map((srv, idx) => {
+            const serviceImg = srv.id === 'srv-1' && (srv.image.includes('1579684385127') || !srv.image || srv.image === '/images/dialysis-hero-suite.jpg')
+              ? '/images/patient-dialysis-hospital-room.jpg'
+              : srv.image;
+
+            return (
             <div
               key={srv.id}
               className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
@@ -84,12 +89,13 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
               <div>
                 <div className="relative h-48 sm:h-52 bg-slate-100 overflow-hidden">
                   <ScrollAnimatedImage
-                    src={srv.image}
+                    src={serviceImg}
                     alt={srv.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover object-center brightness-[0.99] contrast-[1.03] transition-transform duration-700 ease-out group-hover:scale-108"
                     containerClassName="w-full h-full"
                     animation="fade-up"
                     delay={(idx % 3) * 0.08}
+                    hoverZoom={true}
                   />
                   <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-xs z-10">
                     <span className="font-extrabold text-[#005BBD] text-xs sm:text-sm">{srv.price}</span>
@@ -151,7 +157,8 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

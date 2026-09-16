@@ -31,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, settings }) => {
         if (p?.address) return p.address;
       }
     } catch {}
-    return 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049';
+    return 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
   })();
 
   return (
@@ -141,7 +141,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, settings }) => {
             <ul className="space-y-2 text-sm text-slate-300">
               {[
                 'Hemodialysis (High-Flux)',
-                'Peritoneal Dialysis (CAPD/APD)',
                 'Personalized Home Dialysis',
                 'Emergency 24x7 Dialysis',
                 'Nephrologist Consultation',

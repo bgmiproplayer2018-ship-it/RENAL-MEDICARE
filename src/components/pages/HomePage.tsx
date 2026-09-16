@@ -169,13 +169,20 @@ export const HomePage: React.FC<HomePageProps> = ({
             <div className="lg:col-span-5 relative">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-white">
                 <ScrollAnimatedImage
-                  src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000&q=80"
-                  alt="Renal Medicare Dialysis Suite"
-                  className="w-full h-80 object-cover"
+                  src="/images/dialysis-hero-suite.jpg"
+                  alt="Renal Medicare Advanced Hemodialysis Suite & Clinical Station"
+                  className="w-full h-80 sm:h-96 object-cover object-center brightness-[0.98] contrast-[1.03] transition-transform duration-700 hover:scale-105"
                   animation="scale-in"
                   priority={true}
                   duration={0.85}
-                />
+                  hoverZoom={true}
+                >
+                  {/* Dialysis Facility Badge */}
+                  <div className="absolute bottom-3 right-3 bg-slate-900/80 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm border border-white/20 pointer-events-none">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Modern Hemodialysis Station</span>
+                  </div>
+                </ScrollAnimatedImage>
                 
                 {/* Floating Brand Stamp */}
                 <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-md border border-slate-100 flex items-center gap-2">
@@ -227,7 +234,6 @@ export const HomePage: React.FC<HomePageProps> = ({
                       >
                         <option value="Hemodialysis">Hemodialysis (Center-Based)</option>
                         <option value="Home Dialysis">At-Home Dialysis (Personal Technician)</option>
-                        <option value="Peritoneal Dialysis">Peritoneal Dialysis (CAPD/APD)</option>
                         <option value="Nephrologist Consultation">Nephrologist Consultation</option>
                         <option value="Emergency Dialysis">Emergency Acute Dialysis</option>
                       </select>
@@ -399,27 +405,40 @@ export const HomePage: React.FC<HomePageProps> = ({
               onClick={() => onNavigate('services')}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-800 font-bold text-sm shadow-xs hover:border-[#005BBD] hover:text-[#005BBD] transition-all cursor-pointer"
             >
-              <span>View All 6 Services</span>
+              <span>View All {services.length} Services</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
           {/* Service Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.slice(0, 6).map((srv, idx) => (
+            {services.slice(0, 6).map((srv, idx) => {
+              const serviceImg = srv.id === 'srv-1' && (srv.image.includes('1579684385127') || !srv.image || srv.image === '/images/dialysis-hero-suite.jpg')
+                ? '/images/patient-dialysis-hospital-room.jpg'
+                : srv.image;
+
+              return (
               <div 
                 key={srv.id}
                 className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
               >
                 <div className="relative h-48 overflow-hidden bg-slate-100">
                   <ScrollAnimatedImage
-                    src={srv.image}
+                    src={serviceImg}
                     alt={srv.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover object-center brightness-[0.99] contrast-[1.03] transition-transform duration-700 ease-out group-hover:scale-108"
                     containerClassName="w-full h-full"
                     animation="fade-up"
                     delay={(idx % 3) * 0.09}
-                  />
+                    hoverZoom={true}
+                  >
+                    {srv.id === 'srv-1' && (
+                      <div className="absolute bottom-2.5 left-2.5 bg-slate-950/75 backdrop-blur-md text-white text-[10px] font-medium px-2 py-0.5 rounded-md flex items-center gap-1.5 shadow-xs border border-white/15 pointer-events-none z-10">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>Clinical Dialysis Unit &amp; Bed</span>
+                      </div>
+                    )}
+                  </ScrollAnimatedImage>
                   <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-[#005BBD] shadow-xs z-10">
                     {srv.price}
                   </div>
@@ -467,7 +486,8 @@ export const HomePage: React.FC<HomePageProps> = ({
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

@@ -137,7 +137,7 @@ export const MongoDBSchemas = {
       alternatePhone: { type: String, default: '7522805397' },
       email: { type: String, default: 'renalhealthcare01@gmail.com' },
       whatsapp: { type: String, default: '9069645840' },
-      address: { type: String, default: 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi, India' },
+      address: { type: String, default: 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089' },
       workingHours: { type: String, default: '24x7 Dialysis & Emergency Care' },
       emergencyLine: { type: String, default: '+91-9069645840' },
       socialLinks: {

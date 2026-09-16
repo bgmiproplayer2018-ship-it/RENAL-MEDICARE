@@ -33,7 +33,13 @@ export default function App() {
       const cached = localStorage.getItem('rm_settings');
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (parsed && parsed.address) return parsed;
+        if (parsed && parsed.address) {
+          if (parsed.address.includes('110049') || parsed.address.includes('Institutional Medical Area')) {
+            parsed.address = 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
+            try { localStorage.setItem('rm_settings', JSON.stringify(parsed)); } catch {}
+          }
+          return parsed;
+        }
       }
     } catch {}
     return {
@@ -47,7 +53,7 @@ export default function App() {
       secondaryColor: '#4FA9FF',
       accentColor: '#0EA5E9',
       backgroundColor: '#FFFFFF',
-      address: 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049'
+      address: 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089'
     };
   });
 
@@ -69,15 +75,21 @@ export default function App() {
         apiFetch('/api/settings').then(r => r.json()),
       ]);
 
-      if (srvRes.success) setServices(srvRes.services);
+      if (srvRes.success && Array.isArray(srvRes.services)) {
+        setServices(srvRes.services.filter((s: any) => s && s.id !== 'srv-2' && s.slug !== 'peritoneal-dialysis'));
+      }
       if (hospRes.success) setHospitals(hospRes.hospitals);
       if (blogRes.success) setBlogs(blogRes.blogs);
       if (faqRes.success) setFaqs(faqRes.faqs);
       if (testRes.success) setTestimonials(testRes.testimonials);
       if (setRes.success && setRes.settings) {
-        setSettings(setRes.settings);
+        const fetchedSettings = { ...setRes.settings };
+        if (fetchedSettings.address?.includes('110049') || fetchedSettings.address?.includes('Institutional Medical Area')) {
+          fetchedSettings.address = 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
+        }
+        setSettings(fetchedSettings);
         try {
-          localStorage.setItem('rm_settings', JSON.stringify(setRes.settings));
+          localStorage.setItem('rm_settings', JSON.stringify(fetchedSettings));
         } catch {}
       }
     } catch (err) {

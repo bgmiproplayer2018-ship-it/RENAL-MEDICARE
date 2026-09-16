@@ -22,7 +22,7 @@ const initialServices: ServiceItem[] = [
     slug: 'hemodialysis',
     description: 'Gold-standard blood filtration using advanced high-flux biocompatible dialyzers and ultra-pure RO water systems. Monitored continuously by licensed dialysis nurses and senior nephrologists.',
     shortDescription: 'High-flux hemodialysis in state-of-the-art sterile suites with online clearance monitoring.',
-    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80',
+    image: '/images/patient-dialysis-hospital-room.jpg',
     price: '₹2,200',
     priceNote: 'Per session (includes consumable dialyzer tubing & medication)',
     benefits: [
@@ -35,25 +35,6 @@ const initialServices: ServiceItem[] = [
     features: ['4-hour session', 'Dietitian consultation', 'Free Wi-Fi', 'Vascular access check'],
     category: 'dialysis',
     isPopular: true
-  },
-  {
-    id: 'srv-2',
-    title: 'Peritoneal Dialysis',
-    slug: 'peritoneal-dialysis',
-    description: 'Gentle, continuous filtration through your own peritoneal membrane. We provide complete training, automated peritoneal dialysis (APD) cyclers, and sterile continuous ambulatory (CAPD) solutions.',
-    shortDescription: 'Flexible at-home or automated peritoneal dialysis giving you freedom and continuous clearance.',
-    image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80',
-    price: '₹18,500',
-    priceNote: 'Monthly package (includes machine rental & delivery of supplies)',
-    benefits: [
-      'Freedom to perform dialysis overnight while sleeping',
-      'Fewer dietary restrictions compared to conventional hemodialysis',
-      'Preserves residual renal function longer',
-      'Comprehensive caregiver training and 24/7 tele-nurse support',
-      'Doorstep delivery of pre-warmed sterile dialysate bags'
-    ],
-    features: ['Automated cycler machine', 'Monthly home visit', 'Catheter site care', '24/7 hotline'],
-    category: 'dialysis'
   },
   {
     id: 'srv-3',
@@ -138,13 +119,13 @@ const initialServices: ServiceItem[] = [
 const initialHospitals: Hospital[] = [
   {
     id: 'hosp-1',
-    name: 'Renal Medicare Super Specialty Kidney Center',
-    address: 'Plot 14, Ring Road Institutional Area, South Extension Part-II',
-    city: 'New Delhi',
+    name: 'Renal medicare (kidney care & dialysis centre)',
+    address: '63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089',
+    city: 'Delhi',
     state: 'Delhi',
     contactNumber: '9069645840',
     facilities: ['24/7 Dialysis Wing', 'ICU CRRT Bedside', 'Modular RO Unit', 'Emergency Ambulance', 'Dialysis Recliners with TV'],
-    googleMap: 'https://maps.google.com/?q=South+Extension+New+Delhi',
+    googleMap: 'https://maps.google.com/?q=63+64+65+Pocket+4+Sector+16A+Rohini+Delhi+110089',
     image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80',
     dialysisUnits: 32,
     emergencyAvailable: true
@@ -169,7 +150,7 @@ const initialHospitals: Hospital[] = [
     city: 'Noida',
     state: 'Uttar Pradesh',
     contactNumber: '9069645840',
-    facilities: ['Peritoneal Dialysis Clinic', 'Vascular Access Center (Fistula Care)', '24x7 Emergency Helpdesk', 'Cafeteria & Patient Lounge'],
+    facilities: ['Kidney Preventive Care Clinic', 'Vascular Access Center (Fistula Care)', '24x7 Emergency Helpdesk', 'Cafeteria & Patient Lounge'],
     googleMap: 'https://maps.google.com/?q=Sector+132+Noida',
     image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=800&q=80',
     dialysisUnits: 20,
@@ -195,7 +176,7 @@ const initialHospitals: Hospital[] = [
     city: 'Bengaluru',
     state: 'Karnataka',
     contactNumber: '7522805397',
-    facilities: ['Automated Peritoneal Dialysis Training', 'Online HDF Hemodiafiltration', 'Home Visit Dispatch Unit'],
+    facilities: ['Specialized Hemodiafiltration Unit', 'Online HDF Blood Purification', 'Home Visit Dispatch Unit'],
     googleMap: 'https://maps.google.com/?q=Indiranagar+Bengaluru',
     image: 'https://images.unsplash.com/photo-1512678080530-7760d81faba6?auto=format&fit=crop&w=800&q=80',
     dialysisUnits: 22,
@@ -322,7 +303,7 @@ const initialFaqs: FAQItem[] = [
   {
     id: 'faq-3',
     question: 'What is the cost of dialysis at Renal Medicare?',
-    answer: 'Our hospital center hemodialysis begins at ₹2,200 per session including consumables. Comprehensive Home Dialysis with a dedicated technician is ₹3,800 per session. Monthly automated peritoneal packages start from ₹18,500. We also accept major insurance policies and cashless TPA partnerships.',
+    answer: 'Our hospital center hemodialysis begins at ₹2,200 per session including consumables. Comprehensive Home Dialysis with a dedicated technician is ₹3,800 per session. We also accept major insurance policies and cashless TPA partnerships.',
     category: 'general'
   },
   {
@@ -369,8 +350,8 @@ const initialTestimonials: Testimonial[] = [
   {
     id: 'test-3',
     patientName: 'Gurpreet Singh Anand',
-    treatment: 'Peritoneal Dialysis & Nephrology Consultation',
-    quote: 'Dr. Sharma and the entire nephrology department provided clear guidance when my creatinine crossed 6.0. They helped me start Automated PD which allows me to manage my business smoothly during the day.',
+    treatment: 'Senior Nephrology Consultation & Dialysis Access',
+    quote: 'Dr. Sharma and the entire nephrology department provided clear guidance when my creatinine crossed 6.0. They helped me start optimal medical therapy and schedule which allows me to manage my business smoothly.',
     rating: 5,
     image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
     location: 'Chandigarh',
@@ -405,7 +386,7 @@ const initialSettings: CompanySettings = {
   alternatePhone: '7522805397',
   email: 'renalhealthcare01@gmail.com',
   whatsapp: '9069645840',
-  address: 'Renal Medicare Kidney Care Hub, Institutional Medical Area, New Delhi - 110049, India',
+  address: 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089',
   workingHours: '24 Hours Emergency Dialysis | OPD: 8:00 AM - 8:00 PM',
   emergencyLine: '+91-9069645840',
   socialLinks: {
@@ -469,9 +450,72 @@ class Store {
         const existingContacts = Array.isArray(parsed.contacts) ? parsed.contacts : [];
         const cleanContacts = existingContacts.filter((c: any) => c && c.id && !mockContactIds.has(c.id));
 
+        const loadedServices = Array.isArray(parsed.services) 
+          ? parsed.services.filter((s: any) => s && s.id !== 'srv-2' && s.slug !== 'peritoneal-dialysis')
+          : initialServices;
+
+        const loadedSettings = parsed.settings 
+          ? {
+              ...parsed.settings,
+              address: 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089'
+            }
+          : initialSettings;
+
+        const loadedHospitals = Array.isArray(parsed.hospitals)
+          ? parsed.hospitals.map((h: any) => {
+              if (h.id === 'hosp-1') {
+                return {
+                  ...h,
+                  name: 'Renal medicare (kidney care & dialysis centre)',
+                  address: '63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089',
+                  city: 'Delhi',
+                  googleMap: 'https://maps.google.com/?q=63+64+65+Pocket+4+Sector+16A+Rohini+Delhi+110089'
+                };
+              }
+              if (h.facilities && Array.isArray(h.facilities)) {
+                h.facilities = h.facilities.map((f: string) => {
+                  if (f.includes('Peritoneal Dialysis Clinic')) return 'Kidney Preventive Care Clinic';
+                  if (f.includes('Automated Peritoneal Dialysis Training')) return 'Specialized Hemodiafiltration Unit';
+                  return f;
+                });
+              }
+              return h;
+            })
+          : initialHospitals;
+
+        const loadedFaqs = Array.isArray(parsed.faqs)
+          ? parsed.faqs.map((f: any) => {
+              if (f.id === 'faq-3' && f.answer?.includes('peritoneal')) {
+                return {
+                  ...f,
+                  answer: 'Our hospital center hemodialysis begins at ₹2,200 per session including consumables. Comprehensive Home Dialysis with a dedicated technician is ₹3,800 per session. We also accept major insurance policies and cashless TPA partnerships.'
+                };
+              }
+              return f;
+            })
+          : initialFaqs;
+
+        const loadedTestimonials = Array.isArray(parsed.testimonials)
+          ? parsed.testimonials.map((t: any) => {
+              if (t.id === 'test-3' && (t.treatment?.includes('Peritoneal') || t.quote?.includes('PD'))) {
+                return {
+                  ...t,
+                  treatment: 'Senior Nephrology Consultation & Dialysis Access',
+                  quote: 'Dr. Sharma and the entire nephrology department provided clear guidance when my creatinine crossed 6.0. They helped me start optimal medical therapy and schedule which allows me to manage my business smoothly.'
+                };
+              }
+              return t;
+            })
+          : initialTestimonials;
+
         this.state = { 
           ...this.state, 
           ...parsed,
+          services: loadedServices,
+          settings: loadedSettings,
+          hospitals: loadedHospitals,
+          faqs: loadedFaqs,
+          testimonials: loadedTestimonials,
           appointments: cleanApps.length > 0 ? cleanApps : this.state.appointments,
           contacts: cleanContacts
         };

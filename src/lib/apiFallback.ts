@@ -90,12 +90,24 @@ export class ClientDataStore {
     return loadFromStorage<BlogPost[]>(STORAGE_KEYS.BLOGS, (initialData.blogs as unknown) as BlogPost[]);
   }
 
+  static saveBlogs(blogs: BlogPost[]): void {
+    saveToStorage(STORAGE_KEYS.BLOGS, blogs);
+  }
+
   static getFaqs(): FAQItem[] {
     return loadFromStorage<FAQItem[]>(STORAGE_KEYS.FAQS, (initialData.faqs as unknown) as FAQItem[]);
   }
 
+  static saveFaqs(faqs: FAQItem[]): void {
+    saveToStorage(STORAGE_KEYS.FAQS, faqs);
+  }
+
   static getTestimonials(): Testimonial[] {
     return loadFromStorage<Testimonial[]>(STORAGE_KEYS.TESTIMONIALS, (initialData.testimonials as unknown) as Testimonial[]);
+  }
+
+  static saveTestimonials(testimonials: Testimonial[]): void {
+    saveToStorage(STORAGE_KEYS.TESTIMONIALS, testimonials);
   }
 
   static getAppointments(): Appointment[] {
@@ -114,7 +126,7 @@ export class ClientDataStore {
 
   static getSettings(): CompanySettings {
     const s = loadFromStorage<CompanySettings>(STORAGE_KEYS.SETTINGS, (initialData.settings as unknown) as CompanySettings);
-    if (s && (s.address?.includes('110049') || s.address?.includes('Institutional Medical Area'))) {
+    if (s && (s.address?.includes('South Extension') || s.address?.includes('Institutional Medical Area'))) {
       s.address = 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
       saveToStorage(STORAGE_KEYS.SETTINGS, s);
     }
@@ -684,7 +696,87 @@ function syncServerResponseWithClient(urlString: string, method: string, bodyDat
   if (path === '/api/settings' || path === '/settings') {
     if (json.settings && typeof json.settings === 'object') {
       ClientDataStore.saveSettings(json.settings);
+      try {
+        localStorage.setItem('rm_settings', JSON.stringify(json.settings));
+      } catch {}
     }
+  }
+
+  // SERVICES SYNC
+  if (path === '/api/services' || path === '/services') {
+    if (method === 'GET' && Array.isArray(json.services)) {
+      const clean = json.services.filter((s: any) => s && s.id !== 'srv-2' && s.slug !== 'peritoneal-dialysis');
+      ClientDataStore.saveServices(clean);
+    } else if (method === 'POST' && json.service) {
+      const list = ClientDataStore.getServices();
+      const exists = list.some(s => s.id === json.service.id);
+      if (!exists) {
+        list.unshift(json.service);
+        ClientDataStore.saveServices(list);
+      }
+    }
+  }
+
+  const serviceSingleMatch = path.match(/^\/api\/services\/([^/]+)$/);
+  if (serviceSingleMatch) {
+    const id = serviceSingleMatch[1];
+    if (method === 'DELETE') {
+      const list = ClientDataStore.getServices().filter(s => s.id !== id);
+      ClientDataStore.saveServices(list);
+    } else if ((method === 'PUT' || method === 'PATCH') && json.service) {
+      const list = ClientDataStore.getServices();
+      const idx = list.findIndex(s => s.id === id);
+      if (idx !== -1) {
+        list[idx] = { ...list[idx], ...json.service };
+        ClientDataStore.saveServices(list);
+      } else {
+        list.unshift(json.service);
+        ClientDataStore.saveServices(list);
+      }
+    }
+  }
+
+  // HOSPITALS SYNC
+  if (path === '/api/hospitals' || path === '/hospitals') {
+    if (method === 'GET' && Array.isArray(json.hospitals)) {
+      ClientDataStore.saveHospitals(json.hospitals);
+    } else if (method === 'POST' && json.hospital) {
+      const list = ClientDataStore.getHospitals();
+      const exists = list.some(h => h.id === json.hospital.id);
+      if (!exists) {
+        list.unshift(json.hospital);
+        ClientDataStore.saveHospitals(list);
+      }
+    }
+  }
+
+  const hospSingleMatch = path.match(/^\/api\/hospitals\/([^/]+)$/);
+  if (hospSingleMatch) {
+    const id = hospSingleMatch[1];
+    if (method === 'DELETE') {
+      const list = ClientDataStore.getHospitals().filter(h => h.id !== id);
+      ClientDataStore.saveHospitals(list);
+    } else if ((method === 'PUT' || method === 'PATCH') && json.hospital) {
+      const list = ClientDataStore.getHospitals();
+      const idx = list.findIndex(h => h.id === id);
+      if (idx !== -1) {
+        list[idx] = { ...list[idx], ...json.hospital };
+        ClientDataStore.saveHospitals(list);
+      } else {
+        list.unshift(json.hospital);
+        ClientDataStore.saveHospitals(list);
+      }
+    }
+  }
+
+  // BLOGS SYNC
+  if ((path === '/api/blogs' || path === '/blogs') && method === 'GET' && Array.isArray(json.blogs)) {
+    ClientDataStore.saveBlogs(json.blogs);
+  }
+
+  // FAQS SYNC
+  if ((path === '/api/faqs' || path === '/faqs') && method === 'GET' && Array.isArray(json.faqs)) {
+    ClientDataStore.saveFaqs(json.faqs);
   }
 
   // APPOINTMENTS SYNC
@@ -782,14 +874,6 @@ export function triggerBackgroundServerSync(): void {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contacts })
-        }).catch(() => {});
-      }
-      const settings = ClientDataStore.getSettings();
-      if (settings && settings.address) {
-        await nativeFetch('/api/settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer demo-token' },
-          body: JSON.stringify(settings)
         }).catch(() => {});
       }
     } catch {

@@ -16,25 +16,55 @@ import { AdminLogin } from './components/admin/AdminLogin.tsx';
 import { AdminPanel } from './components/admin/AdminPanel.tsx';
 
 import { ServiceItem, Hospital, BlogPost, FAQItem, Testimonial, CompanySettings } from './types.ts';
-import { apiFetch } from './lib/apiFallback.ts';
+import { apiFetch, ClientDataStore } from './lib/apiFallback.ts';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<string>('home');
   const [navParam, setNavParam] = useState<string | undefined>(undefined);
 
-  // Dynamic Data States
-  const [services, setServices] = useState<ServiceItem[]>([]);
-  const [hospitals, setHospitals] = useState<Hospital[]>([]);
-  const [blogs, setBlogs] = useState<BlogPost[]>([]);
-  const [faqs, setFaqs] = useState<FAQItem[]>([]);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  // Dynamic Data States initialized from ClientDataStore for instant zero-flash render
+  const [services, setServices] = useState<ServiceItem[]>(() => {
+    try {
+      return ClientDataStore.getServices();
+    } catch {
+      return [];
+    }
+  });
+  const [hospitals, setHospitals] = useState<Hospital[]>(() => {
+    try {
+      return ClientDataStore.getHospitals();
+    } catch {
+      return [];
+    }
+  });
+  const [blogs, setBlogs] = useState<BlogPost[]>(() => {
+    try {
+      return ClientDataStore.getBlogs();
+    } catch {
+      return [];
+    }
+  });
+  const [faqs, setFaqs] = useState<FAQItem[]>(() => {
+    try {
+      return ClientDataStore.getFaqs();
+    } catch {
+      return [];
+    }
+  });
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(() => {
+    try {
+      return ClientDataStore.getTestimonials();
+    } catch {
+      return [];
+    }
+  });
   const [settings, setSettings] = useState<CompanySettings>(() => {
     try {
       const cached = localStorage.getItem('rm_settings');
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && parsed.address) {
-          if (parsed.address.includes('110049') || parsed.address.includes('Institutional Medical Area')) {
+          if (parsed.address.includes('South Extension') || parsed.address.includes('Institutional Medical Area')) {
             parsed.address = 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
             try { localStorage.setItem('rm_settings', JSON.stringify(parsed)); } catch {}
           }
@@ -67,30 +97,45 @@ export default function App() {
   const loadAllData = async () => {
     try {
       const [srvRes, hospRes, blogRes, faqRes, testRes, setRes] = await Promise.all([
-        apiFetch('/api/services').then(r => r.json()),
-        apiFetch('/api/hospitals').then(r => r.json()),
-        apiFetch('/api/blogs').then(r => r.json()),
-        apiFetch('/api/faqs').then(r => r.json()),
-        apiFetch('/api/testimonials').then(r => r.json()),
-        apiFetch('/api/settings').then(r => r.json()),
+        apiFetch('/api/services').then(r => r.json()).catch(() => ({})),
+        apiFetch('/api/hospitals').then(r => r.json()).catch(() => ({})),
+        apiFetch('/api/blogs').then(r => r.json()).catch(() => ({})),
+        apiFetch('/api/faqs').then(r => r.json()).catch(() => ({})),
+        apiFetch('/api/testimonials').then(r => r.json()).catch(() => ({})),
+        apiFetch('/api/settings').then(r => r.json()).catch(() => ({})),
       ]);
 
       if (srvRes.success && Array.isArray(srvRes.services)) {
-        setServices(srvRes.services.filter((s: any) => s && s.id !== 'srv-2' && s.slug !== 'peritoneal-dialysis'));
+        const clean = srvRes.services.filter((s: any) => s && s.id !== 'srv-2' && s.slug !== 'peritoneal-dialysis');
+        setServices(clean);
+        ClientDataStore.saveServices(clean);
       }
-      if (hospRes.success) setHospitals(hospRes.hospitals);
-      if (blogRes.success) setBlogs(blogRes.blogs);
-      if (faqRes.success) setFaqs(faqRes.faqs);
-      if (testRes.success) setTestimonials(testRes.testimonials);
+      if (hospRes.success && Array.isArray(hospRes.hospitals)) {
+        setHospitals(hospRes.hospitals);
+        ClientDataStore.saveHospitals(hospRes.hospitals);
+      }
+      if (blogRes.success && Array.isArray(blogRes.blogs)) {
+        setBlogs(blogRes.blogs);
+        ClientDataStore.saveBlogs(blogRes.blogs);
+      }
+      if (faqRes.success && Array.isArray(faqRes.faqs)) {
+        setFaqs(faqRes.faqs);
+        ClientDataStore.saveFaqs(faqRes.faqs);
+      }
+      if (testRes.success && Array.isArray(testRes.testimonials)) {
+        setTestimonials(testRes.testimonials);
+        ClientDataStore.saveTestimonials(testRes.testimonials);
+      }
       if (setRes.success && setRes.settings) {
         const fetchedSettings = { ...setRes.settings };
-        if (fetchedSettings.address?.includes('110049') || fetchedSettings.address?.includes('Institutional Medical Area')) {
+        if (fetchedSettings.address && (fetchedSettings.address.includes('South Extension') || fetchedSettings.address.includes('Institutional Medical Area'))) {
           fetchedSettings.address = 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
         }
         setSettings(fetchedSettings);
         try {
           localStorage.setItem('rm_settings', JSON.stringify(fetchedSettings));
         } catch {}
+        ClientDataStore.saveSettings(fetchedSettings);
       }
     } catch (err) {
       console.warn('Initial fetch using fallback or local default states:', err);

@@ -28,7 +28,7 @@ hospitalRouter.get('/', (req, res) => {
 
 // POST /api/hospitals (Admin add hospital)
 hospitalRouter.post('/', requireAuth, (req, res) => {
-  const { name, address, city, state, contactNumber, facilities, googleMap, image, dialysisUnits, emergencyAvailable } = req.body;
+  const { name, address, city, state, contactNumber, facilities, googleMap, mapLink, image, dialysisUnits, bedsCount, emergencyAvailable } = req.body;
 
   if (!name || !address || !city || !state || !contactNumber) {
     return res.status(400).json({ error: 'Name, address, city, state, and contact number are required.' });
@@ -41,9 +41,9 @@ hospitalRouter.post('/', requireAuth, (req, res) => {
     state,
     contactNumber,
     facilities: Array.isArray(facilities) ? facilities : (typeof facilities === 'string' ? facilities.split(',').map(s => s.trim()).filter(Boolean) : []),
-    googleMap: googleMap || '',
+    googleMap: googleMap || mapLink || '',
     image: image || 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=800&q=80',
-    dialysisUnits: Number(dialysisUnits) || 12,
+    dialysisUnits: Number(dialysisUnits ?? bedsCount) || 12,
     emergencyAvailable: emergencyAvailable !== undefined ? Boolean(emergencyAvailable) : true
   });
 
@@ -53,10 +53,16 @@ hospitalRouter.post('/', requireAuth, (req, res) => {
 // PUT /api/hospitals/:id (Admin update hospital)
 hospitalRouter.put('/:id', requireAuth, (req, res) => {
   const { id } = req.params;
-  const updates = req.body;
+  const updates = { ...req.body };
 
   if (updates.facilities && typeof updates.facilities === 'string') {
     updates.facilities = updates.facilities.split(',').map((s: string) => s.trim()).filter(Boolean);
+  }
+  if (updates.dialysisUnits === undefined && updates.bedsCount !== undefined) {
+    updates.dialysisUnits = Number(updates.bedsCount) || 12;
+  }
+  if (!updates.googleMap && updates.mapLink) {
+    updates.googleMap = updates.mapLink;
   }
 
   const updated = db.updateHospital(id, updates);

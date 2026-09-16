@@ -32,7 +32,7 @@ import {
 } from 'lucide-react';
 import { Appointment, Hospital, ServiceItem, BlogPost, ContactMessage, CompanySettings, ReminderLog } from '../../types.ts';
 import { RenalLogo } from '../common/RenalLogo.tsx';
-import { apiFetch } from '../../lib/apiFallback.ts';
+import { apiFetch, ClientDataStore } from '../../lib/apiFallback.ts';
 import { 
   generate24HourReminderContent, 
   isAppointmentDueForReminder, 
@@ -78,23 +78,44 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'appointments' | 'hospitals' | 'services' | 'inquiries' | 'settings' | 'deployment'>('appointments');
   
-  // Data states
+  // Data states - initialized with fallback storage so refreshes never revert or flash empty
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [hospitals, setHospitals] = useState<Hospital[]>(initialHospitals);
-  const [services, setServices] = useState<ServiceItem[]>(initialServices);
+  const [hospitals, setHospitals] = useState<Hospital[]>(() => {
+    if (initialHospitals && initialHospitals.length > 0) return initialHospitals;
+    try {
+      return ClientDataStore.getHospitals();
+    } catch {
+      return [];
+    }
+  });
+  const [services, setServices] = useState<ServiceItem[]>(() => {
+    if (initialServices && initialServices.length > 0) return initialServices;
+    try {
+      return ClientDataStore.getServices();
+    } catch {
+      return [];
+    }
+  });
   const [inquiries, setInquiries] = useState<ContactMessage[]>([]);
-  const [settings, setSettings] = useState<CompanySettings>(initialSettings || {
-    companyName: 'Renal Medicare',
-    tagline: 'Caring For Kidney Health',
-    phone: '9069645840',
-    alternatePhone: '7522805397',
-    email: 'renalhealthcare01@gmail.com',
-    whatsapp: '9069645840',
-    primaryColor: '#005BBD',
-    secondaryColor: '#4FA9FF',
-    accentColor: '#0EA5E9',
-    backgroundColor: '#FFFFFF',
-    address: 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089'
+  const [settings, setSettings] = useState<CompanySettings>(() => {
+    if (initialSettings && initialSettings.address) return initialSettings;
+    try {
+      return ClientDataStore.getSettings();
+    } catch {
+      return {
+        companyName: 'Renal Medicare',
+        tagline: 'Caring For Kidney Health',
+        phone: '9069645840',
+        alternatePhone: '7522805397',
+        email: 'renalhealthcare01@gmail.com',
+        whatsapp: '9069645840',
+        primaryColor: '#005BBD',
+        secondaryColor: '#4FA9FF',
+        accentColor: '#0EA5E9',
+        backgroundColor: '#FFFFFF',
+        address: 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089'
+      };
+    }
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -129,15 +150,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [showAuditLogsModal, setShowAuditLogsModal] = useState(false);
   const [auditLogs, setAuditLogs] = useState<ReminderLog[]>([]);
 
-  // Fetch appointments, inquiries, settings & notification status on load
+  // Fetch appointments, inquiries, settings, hospitals, services & notification status on load
   useEffect(() => {
     fetchAppointments();
     fetchInquiries();
     fetchSettings();
+    fetchHospitals();
+    fetchServices();
     fetchNotificationStatus();
   }, []);
 
-  // Synchronize when initialSettings prop changes from parent loadAllData
+  // Synchronize when initial props change from parent loadAllData
+  useEffect(() => {
+    if (initialHospitals && initialHospitals.length > 0) {
+      setHospitals(initialHospitals);
+    }
+  }, [initialHospitals]);
+
+  useEffect(() => {
+    if (initialServices && initialServices.length > 0) {
+      setServices(initialServices);
+    }
+  }, [initialServices]);
+
   useEffect(() => {
     if (initialSettings && initialSettings.address) {
       setSettings(initialSettings);
@@ -267,9 +302,37 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         try {
           localStorage.setItem('rm_settings', JSON.stringify(data.settings));
         } catch {}
+        ClientDataStore.saveSettings(data.settings);
       }
     } catch (e) {
       console.error('Failed to fetch settings:', e);
+    }
+  };
+
+  const fetchHospitals = async () => {
+    try {
+      const res = await apiFetch('/api/hospitals');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.hospitals)) {
+        setHospitals(data.hospitals);
+        ClientDataStore.saveHospitals(data.hospitals);
+      }
+    } catch (e) {
+      console.error('Failed to fetch hospitals:', e);
+    }
+  };
+
+  const fetchServices = async () => {
+    try {
+      const res = await apiFetch('/api/services');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.services)) {
+        const clean = data.services.filter((s: any) => s && s.id !== 'srv-2' && s.slug !== 'peritoneal-dialysis');
+        setServices(clean);
+        ClientDataStore.saveServices(clean);
+      }
+    } catch (e) {
+      console.error('Failed to fetch services:', e);
     }
   };
 
@@ -279,7 +342,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setActionFeedback(null);
 
     // Optimistically update status in state immediately for zero perceived latency
-    setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: newStatus, ...extra, updatedAt: new Date().toISOString() } : a));
+    const updatedApps = appointments.map(a => a.id === id ? { ...a, status: newStatus, ...extra, updatedAt: new Date().toISOString() } : a);
+    setAppointments(updatedApps);
+    ClientDataStore.saveAppointments(updatedApps);
 
     try {
       // 1. Try dedicated status patch endpoint
@@ -306,7 +371,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
       const data = await res.json();
       if (data.success && data.appointment) {
-        setAppointments(prev => prev.map(a => a.id === id ? { ...a, ...data.appointment } : a));
+        const finalApps = appointments.map(a => a.id === id ? { ...a, ...data.appointment } : a);
+        setAppointments(finalApps);
+        ClientDataStore.saveAppointments(finalApps);
       }
 
       if (rescheduleModalApp) setRescheduleModalApp(null);
@@ -340,7 +407,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       });
       const data = await res.json();
       if (data.success) {
-        setAppointments(prev => prev.filter(a => a.id !== id));
+        const remaining = appointments.filter(a => a.id !== id);
+        setAppointments(remaining);
+        ClientDataStore.saveAppointments(remaining);
       }
     } catch (e) {
       alert('Error deleting appointment');
@@ -381,19 +450,31 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const url = isEdit ? `/api/hospitals/${hospitalModal.editId}` : '/api/hospitals';
     const method = isEdit ? 'PUT' : 'POST';
 
+    // Normalize beds and map coordinates
+    const payload = {
+      ...hospitalModal.data,
+      bedsCount: Number(hospitalModal.data.bedsCount || hospitalModal.data.dialysisUnits) || 10,
+      dialysisUnits: Number(hospitalModal.data.dialysisUnits || hospitalModal.data.bedsCount) || 10,
+      googleMap: hospitalModal.data.googleMap || hospitalModal.data.mapLink || '',
+      mapLink: hospitalModal.data.mapLink || hospitalModal.data.googleMap || ''
+    };
+
     try {
       const res = await apiFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(hospitalModal.data)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.hospital) {
+        let updatedList: Hospital[];
         if (isEdit) {
-          setHospitals(prev => prev.map(h => h.id === hospitalModal.editId ? data.hospital : h));
+          updatedList = hospitals.map(h => h.id === hospitalModal.editId ? { ...h, ...data.hospital } : h);
         } else {
-          setHospitals(prev => [data.hospital, ...prev]);
+          updatedList = [data.hospital, ...hospitals];
         }
+        setHospitals(updatedList);
+        ClientDataStore.saveHospitals(updatedList);
         setHospitalModal({ open: false, data: {} });
         onRefreshData();
       }
@@ -411,7 +492,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       });
       const data = await res.json();
       if (data.success) {
-        setHospitals(prev => prev.filter(h => h.id !== id));
+        const updated = hospitals.filter(h => h.id !== id);
+        setHospitals(updated);
+        ClientDataStore.saveHospitals(updated);
         onRefreshData();
       }
     } catch {
@@ -433,12 +516,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         body: JSON.stringify(serviceModal.data)
       });
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.service) {
+        let updatedList: ServiceItem[];
         if (isEdit) {
-          setServices(prev => prev.map(s => s.id === serviceModal.editId ? data.service : s));
+          updatedList = services.map(s => s.id === serviceModal.editId ? { ...s, ...data.service } : s);
         } else {
-          setServices(prev => [data.service, ...prev]);
+          updatedList = [data.service, ...services];
         }
+        setServices(updatedList);
+        ClientDataStore.saveServices(updatedList);
         setServiceModal({ open: false, data: {} });
         onRefreshData();
       }
@@ -456,7 +542,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       });
       const data = await res.json();
       if (data.success) {
-        setServices(prev => prev.filter(s => s.id !== id));
+        const updated = services.filter(s => s.id !== id);
+        setServices(updated);
+        ClientDataStore.saveServices(updated);
         onRefreshData();
       }
     } catch {
@@ -472,6 +560,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       try {
         localStorage.setItem('rm_settings', JSON.stringify(settings));
       } catch {}
+      ClientDataStore.saveSettings(settings);
 
       // 2. Persist to server / fallback API
       const res = await apiFetch('/api/settings', {
@@ -486,6 +575,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         try {
           localStorage.setItem('rm_settings', JSON.stringify(savedSettings));
         } catch {}
+        ClientDataStore.saveSettings(savedSettings);
         setSettingsStatus('Settings updated successfully!');
         setTimeout(() => setSettingsStatus(null), 3500);
         onRefreshData();
@@ -506,13 +596,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       });
       const data = await res.json();
       if (data.success) {
-        setInquiries(prev => (prev || []).map(i => {
+        const updated = (inquiries || []).map(i => {
           if (!i) return i;
           if (i.id === id) {
             return data.contact || { ...i, isRead: true };
           }
           return i;
-        }).filter(Boolean));
+        }).filter(Boolean);
+        setInquiries(updated);
+        ClientDataStore.saveContacts(updated);
       }
     } catch {
       alert('Error updating inquiry status');
@@ -528,7 +620,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       });
       const data = await res.json();
       if (data.success) {
-        setInquiries(prev => (prev || []).filter(i => i && i.id !== id));
+        const updated = (inquiries || []).filter(i => i && i.id !== id);
+        setInquiries(updated);
+        ClientDataStore.saveContacts(updated);
       }
     } catch {
       alert('Error deleting inquiry');
@@ -1028,7 +1122,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   <div className="p-5 pt-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <button
                       id={`edit-hospital-btn-${h.id}`}
-                      onClick={() => setHospitalModal({ open: true, editId: h.id, data: h })}
+                      onClick={() => setHospitalModal({
+                        open: true,
+                        editId: h.id,
+                        data: {
+                          ...h,
+                          bedsCount: h.dialysisUnits || (h as any).bedsCount || 10,
+                          dialysisUnits: h.dialysisUnits || (h as any).bedsCount || 10,
+                          mapLink: h.googleMap || (h as any).mapLink || '',
+                          googleMap: h.googleMap || (h as any).mapLink || ''
+                        }
+                      })}
                       className="text-xs text-[#005BBD] font-bold hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <Edit3 className="w-3.5 h-3.5" /> Edit Center &amp; Image

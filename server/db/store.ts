@@ -454,19 +454,17 @@ class Store {
           ? parsed.services.filter((s: any) => s && s.id !== 'srv-2' && s.slug !== 'peritoneal-dialysis')
           : initialServices;
 
-        const loadedSettings = parsed.settings 
-          ? {
-              ...parsed.settings,
-              address: 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089'
-            }
-          : initialSettings;
+        let loadedSettings = parsed.settings ? { ...parsed.settings } : initialSettings;
+        if (!loadedSettings.address || loadedSettings.address.includes('South Extension') || loadedSettings.address.includes('Institutional Medical Area')) {
+          loadedSettings.address = 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
+        }
 
         const loadedHospitals = Array.isArray(parsed.hospitals)
           ? parsed.hospitals.map((h: any) => {
-              if (h.id === 'hosp-1') {
+              if (h.id === 'hosp-1' && (!h.address || h.address.includes('Plot 14') || h.address.includes('South Extension') || h.address.includes('Institutional Area'))) {
                 return {
                   ...h,
-                  name: 'Renal medicare (kidney care & dialysis centre)',
+                  name: h.name || 'Renal medicare (kidney care & dialysis centre)',
                   address: '63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089',
                   city: 'Delhi',
                   googleMap: 'https://maps.google.com/?q=63+64+65+Pocket+4+Sector+16A+Rohini+Delhi+110089'

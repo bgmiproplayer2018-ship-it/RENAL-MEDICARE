@@ -3,13 +3,15 @@ import { authRouter } from './routes/auth.ts';
 import { appointmentRouter } from './routes/appointments.ts';
 import { serviceRouter } from './routes/services.ts';
 import { hospitalRouter } from './routes/hospitals.ts';
-import { blogRouter } from './routes/blogs.ts';
+import { inquiryRouter } from './routes/inquiries.ts';
 import { contactRouter } from './routes/contact.ts';
+import { blogRouter } from './routes/blogs.ts';
 import { faqRouter } from './routes/faqs.ts';
 import { testimonialRouter } from './routes/testimonials.ts';
 import { settingsRouter } from './routes/settings.ts';
 import { notificationRouter } from './routes/notifications.ts';
 import { db } from './db/store.ts';
+import { isMongoConnected, DB_NAME, getAtlasState } from './db/connection.ts';
 
 export function createApp() {
   const app = express();
@@ -41,27 +43,38 @@ export function createApp() {
     next();
   });
 
-  // Health check
+  // Health check with MongoDB Atlas connection status
   app.get(['/api/health', '/health'], (req, res) => {
+    const connected = isMongoConnected();
+    const atlasState = getAtlasState();
     res.json({
       status: 'ok',
-      service: 'Renal Medicare Healthcare API (Netlify & Container Ready)',
+      service: 'Renal Medicare Healthcare API (MongoDB Atlas Enabled)',
+      mongoConnected: connected,
+      atlasState,
+      database: DB_NAME,
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'production',
+      note: connected
+        ? 'Connected directly to MongoDB Atlas cluster'
+        : atlasState === 'awaiting_credentials'
+        ? 'Cluster reachable. In MongoDB Atlas (Security -> Database Access), verify Database User credentials match MONGODB_URI. Operating with server-side persistent store.'
+        : 'Operating with server-side persistent store.',
     });
   });
 
-  // API Routes mounted on both /api/... and root /... for flexible serverless path resolution
+  // API Routes mounted on both /api/... and root /... for flexible path resolution
   const routers: [string, express.Router][] = [
     ['/auth', authRouter],
     ['/appointments', appointmentRouter],
     ['/services', serviceRouter],
     ['/hospitals', hospitalRouter],
-    ['/blogs', blogRouter],
+    ['/inquiries', inquiryRouter],
     ['/contact', contactRouter],
+    ['/settings', settingsRouter],
+    ['/blogs', blogRouter],
     ['/faqs', faqRouter],
     ['/testimonials', testimonialRouter],
-    ['/settings', settingsRouter],
     ['/notifications', notificationRouter],
   ];
 
@@ -71,22 +84,34 @@ export function createApp() {
   }
 
   // Quick stats endpoint for administrative summary
-  const getStatsHandler = (req: express.Request, res: express.Response) => {
-    const apps = db.getAppointments();
-    res.json({
-      success: true,
-      stats: {
-        totalAppointments: apps.length,
-        pendingAppointments: apps.filter(a => a.status === 'Pending').length,
-        acceptedAppointments: apps.filter(a => a.status === 'Accepted').length,
-        completedAppointments: apps.filter(a => a.status === 'Completed').length,
-        rescheduledAppointments: apps.filter(a => a.status === 'Rescheduled').length,
-        hospitalsCount: db.getHospitals().length,
-        servicesCount: db.getServices().length,
-        blogsCount: db.getBlogs().length,
-        unreadMessagesCount: db.getContacts().filter(c => !c.isRead).length
-      }
-    });
+  const getStatsHandler = async (req: express.Request, res: express.Response) => {
+    try {
+      const [apps, hospitals, services, blogs, inquiries] = await Promise.all([
+        db.getAppointments(),
+        db.getHospitals(),
+        db.getServices(),
+        db.getBlogs(),
+        db.getInquiries()
+      ]);
+
+      res.json({
+        success: true,
+        stats: {
+          totalAppointments: apps.length,
+          pendingAppointments: apps.filter(a => a.status === 'Pending').length,
+          acceptedAppointments: apps.filter(a => a.status === 'Accepted').length,
+          completedAppointments: apps.filter(a => a.status === 'Completed').length,
+          rescheduledAppointments: apps.filter(a => a.status === 'Rescheduled').length,
+          hospitalsCount: hospitals.length,
+          servicesCount: services.length,
+          blogsCount: blogs.length,
+          unreadMessagesCount: inquiries.filter(c => !c.isRead).length,
+          databaseStatus: isMongoConnected() ? 'MongoDB Atlas Connected' : 'Local Fallback'
+        }
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err?.message || 'Failed to fetch stats' });
+    }
   };
 
   app.get('/api/stats', getStatsHandler);

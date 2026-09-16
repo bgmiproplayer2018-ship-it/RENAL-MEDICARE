@@ -10,6 +10,13 @@ import {
   ContactMessage, 
   CompanySettings 
 } from '../../src/types.ts';
+import { 
+  connectToMongoDB, 
+  getDb, 
+  logCollectionUpdated, 
+  logSaveFailed,
+  isMongoConnected 
+} from './connection.ts';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'database.json');
@@ -246,116 +253,53 @@ Kidneys normally excrete potassium. When kidney function declines, high potassiu
 ### 3. Keep Phosphorus Under Control
 High phosphorus pulls calcium out of bones, making them brittle and causing severe itching and vascular calcification.
 - Avoid dark colas, processed meats, and condensed milk.
-- Take prescribed phosphate binders with meals as directed by your nephrologist.
-
-### 4. Understand Protein Needs
-Before dialysis (CKD Stages 1-4), a lower protein diet slows disease progression. Once on maintenance dialysis, protein requirements increase to replace amino acids lost during filtration. High-biological-value proteins like egg whites and lean proteins are recommended.
-
-### 5. Monitor Fluid Allowances
-Work with your renal dietitian to determine your exact daily fluid target based on your 24-hour urine output and interdialytic weight gain.`,
+- Take prescribed phosphate binders with meals as directed by your nephrologist.`,
     category: 'Nutrition & Diet',
-    tags: ['Kidney Diet', 'Nutrition', 'Sodium', 'Potassium', 'Renal Care'],
-    featuredImage: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80',
-    author: 'Ms. Anita Mehra, Chief Renal Dietitian',
-    publishedDate: 'September 04, 2026',
+    tags: ['Renal Diet', 'Nutrition', 'Potassium', 'Phosphorus'],
+    featuredImage: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=800&q=80',
+    author: 'Pooja Kashyap, Lead Clinical Renal Dietitian',
+    publishedDate: 'September 05, 2026',
     readTime: '5 min read',
-    metaTitle: 'Renal Diet Guide: Sodium, Potassium & Phosphorus Management',
-    metaDescription: 'Expert nutrition advice for chronic kidney disease and dialysis patients from Renal Medicare.'
-  },
-  {
-    id: 'blog-3',
-    title: 'Why Home Dialysis is Becoming the Gold Standard in Kidney Care',
-    slug: 'why-home-dialysis-is-becoming-gold-standard',
-    excerpt: 'Discover why thousands of patients are choosing comfortable, infection-free at-home hemodialysis with certified technicians.',
-    content: `Historically, kidney dialysis required frequent, exhausting commutes to crowded hospital wards three times a week. Today, advances in compact dialyzer technology, certified technician home delivery, and ultrapure mobile water purification are transforming dialysis at home.
-
-### Benefits of Receiving Dialysis at Home
-1. **Zero Infection Risk:** Eliminates hospital-acquired infections (nosocomial pathogens) and exposure to respiratory viruses.
-2. **Personal Dignity & Comfort:** Patients rest in their own bed, watch their favorite shows, or spend time with family while undergoing treatment.
-3. **No Commute Stress:** Eliminates travel fatigue, traffic delays, and dependence on hospital transport.
-4. **Improved Clinical Outcomes:** Studies show that patients receiving relaxed home treatments experience more stable blood pressure and faster post-dialysis recovery time (washout).
-
-At Renal Medicare, our Home Dialysis Program includes a pre-installation water quality audit, dual RO installation, emergency backups, and an experienced certified technician dedicated exclusively to your care during every minute of the session.`,
-    category: 'Home Dialysis',
-    tags: ['Home Dialysis', 'Patient Comfort', 'Safety', 'Technology'],
-    featuredImage: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80',
-    author: 'Dr. Ramesh Nair, Director of Clinical Services',
-    publishedDate: 'August 28, 2026',
-    readTime: '4 min read',
-    metaTitle: 'Home Dialysis Benefits: Safety and Freedom for Patients',
-    metaDescription: 'How Renal Medicare delivers hospital-grade home dialysis with certified technicians.'
+    metaTitle: 'Renal Nutrition: 5 Crucial Dietary Rules for Kidney Health',
+    metaDescription: 'Expert clinical diet guidelines for patients with Chronic Kidney Disease and those on Hemodialysis.'
   }
 ];
 
 const initialFaqs: FAQItem[] = [
   {
     id: 'faq-1',
-    question: 'How often does a patient need hemodialysis?',
-    answer: 'Standard maintenance hemodialysis is typically conducted 3 times per week, with each session lasting between 3.5 to 4 hours. The exact frequency and duration are determined by your nephrologist based on your residual kidney function, body surface area, and fluid clearance requirements.',
+    question: 'How often do I need to undergo Hemodialysis?',
+    answer: 'Standard in-center hemodialysis is typically prescribed 3 times per week, with each clinical session lasting approximately 4 hours. The exact frequency is determined by your nephrologist based on your residual renal function, fluid retention, serum urea/creatinine, and Kt/V clearance metrics.',
     category: 'dialysis'
   },
   {
     id: 'faq-2',
-    question: 'Is home dialysis safe compared to hospital dialysis?',
-    answer: 'Yes, absolutely. In fact, home dialysis provides superior infection control as it eliminates exposure to hospital-acquired pathogens. At Renal Medicare, every home session is administered in person by a certified, licensed dialysis technician equipped with hospital-grade equipment, ultrapure RO water filtration, and direct real-time telemetry connected to our senior nephrologists.',
+    question: 'What is Home Hemodialysis and is it safe?',
+    answer: 'Yes, Home Hemodialysis is exceptionally safe when administered through Renal Medicare. We install a dedicated hospital-grade compact reverse-osmosis (RO) water purification system and deploy a licensed, certified dialysis technician who stays by your bedside for the entire duration of the procedure under remote nephrologist supervision.',
     category: 'home-dialysis'
-  },
-  {
-    id: 'faq-3',
-    question: 'What is the cost of dialysis at Renal Medicare?',
-    answer: 'Our hospital center hemodialysis begins at ₹2,200 per session including consumables. Comprehensive Home Dialysis with a dedicated technician is ₹3,800 per session. We also accept major insurance policies and cashless TPA partnerships.',
-    category: 'general'
-  },
-  {
-    id: 'faq-4',
-    question: 'How do I book and track my dialysis appointment?',
-    answer: 'You can book an appointment directly through our online appointment system on this website, or call our 24/7 helpline at 9069645840. Once booked, you will receive a unique tracking ID (e.g. RM-2026-XXXX) which lets you view real-time confirmation status on our Patient Tracking page.',
-    category: 'appointments'
-  },
-  {
-    id: 'faq-5',
-    question: 'How do you care for an AV Fistula between dialysis sessions?',
-    answer: 'Keep the fistula arm clean, wash with antimicrobial soap before dialysis, avoid wearing tight clothing or wristwatches on the access arm, and never allow blood pressure checks or blood draws on the fistula arm. Always check for the vibration or buzz (called the "thrill") daily.',
-    category: 'dialysis'
-  },
-  {
-    id: 'faq-6',
-    question: 'What happens during a sudden dialysis emergency or fluid overload?',
-    answer: 'Renal Medicare operates 24x7 emergency dialysis and ICU bedside CRRT across our hospital network. For immediate assistance, dial our emergency numbers 9069645840 or 7522805397 for rapid patient transfer and immediate triage.',
-    category: 'dialysis'
   }
 ];
 
 const initialTestimonials: Testimonial[] = [
   {
     id: 'test-1',
-    patientName: 'Harish Chander Malhotra',
-    treatment: 'Home Hemodialysis Patient (2 Years)',
-    quote: 'Switching to Renal Medicare home dialysis changed our lives. My father no longer has to endure 3-hour traffic journeys to the hospital. The technician is exceptionally gentle, punctual, and maintains complete ICU-level sterilization in our home.',
+    patientName: 'Rameshwar Nath Gupta',
+    treatment: 'In-Center High-Flux Hemodialysis (2 Years)',
+    quote: 'The dialysis suite at Renal Medicare Rohini is immaculate. The nurses are gentle with fistula cannulation, and the Kt/V clearance reports are always shared transparently with my son every month.',
     rating: 5,
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-    location: 'South Delhi',
+    location: 'Rohini, New Delhi',
     date: 'August 2026'
   },
   {
     id: 'test-2',
-    patientName: 'Sunita Rawat',
-    treatment: 'Hospital Center Maintenance Dialysis',
-    quote: 'The nursing staff at Renal Medicare treats every patient like family. The high-flux dialysis machines and ultrapure water system have made a huge difference—I rarely feel nauseous or washed out after my sessions now.',
+    patientName: 'Sunita Mehra',
+    treatment: 'Home Hemodialysis Program',
+    quote: 'Having dialysis at home has completely transformed our routine. My mother no longer has to endure grueling ambulance rides across Delhi traffic thrice a week. The technician is punctual, professional, and compassionate.',
     rating: 5,
-    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
     location: 'Gurugram',
     date: 'July 2026'
-  },
-  {
-    id: 'test-3',
-    patientName: 'Gurpreet Singh Anand',
-    treatment: 'Senior Nephrology Consultation & Dialysis Access',
-    quote: 'Dr. Sharma and the entire nephrology department provided clear guidance when my creatinine crossed 6.0. They helped me start optimal medical therapy and schedule which allows me to manage my business smoothly.',
-    rating: 5,
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-    location: 'Chandigarh',
-    date: 'September 2026'
   }
 ];
 
@@ -367,11 +311,11 @@ const initialAppointments: Appointment[] = [
     email: '9069645840@patient.renalmedicare.com',
     age: 45,
     gender: 'Male',
-    hospitalLocation: 'Renal Medicare Super Specialty Kidney Center, New Delhi',
-    serviceType: 'In-Center Hemodialysis',
+    hospitalLocation: 'Renal medicare (kidney care & dialysis centre)',
+    serviceType: 'Hemodialysis',
     preferredDate: '2026-09-25',
     preferredTime: 'Morning (07:00 AM - 11:00 AM)',
-    address: 'Address provided during intake',
+    address: 'Rohini Sector 16A, Delhi',
     additionalNotes: '',
     status: 'Pending',
     createdAt: '2026-09-12T13:34:07.332Z',
@@ -416,6 +360,7 @@ export interface DatabaseState {
 
 class Store {
   private state: DatabaseState;
+  private isSeededMongo: boolean = false;
 
   constructor() {
     this.state = {
@@ -428,10 +373,19 @@ class Store {
       settings: initialSettings,
       contacts: initialContacts,
     };
-    this.init();
+    this.initLocal();
+    // Connect to MongoDB Atlas
+    this.initMongo();
+
+    // Periodically re-check MongoDB Atlas connection in background (e.g. once IP is added to Atlas)
+    setInterval(() => {
+      if (!this.isSeededMongo) {
+        this.initMongo();
+      }
+    }, 30000);
   }
 
-  private init() {
+  private initLocal() {
     try {
       if (!fs.existsSync(DATA_DIR)) {
         fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -439,156 +393,294 @@ class Store {
       if (fs.existsSync(DB_FILE)) {
         const raw = fs.readFileSync(DB_FILE, 'utf-8');
         const parsed = JSON.parse(raw);
-        
-        // Remove legacy mock data
-        const mockAppIds = new Set(['RM-2026-8941', 'RM-2026-6219', 'RM-2026-4712', 'RM-2026-1033']);
-        const mockContactIds = new Set(['cnt-1', 'cnt-2']);
-
-        const existingApps = Array.isArray(parsed.appointments) ? parsed.appointments : [];
-        const cleanApps = existingApps.filter((a: any) => a && a.id && !mockAppIds.has(a.id));
-
-        const existingContacts = Array.isArray(parsed.contacts) ? parsed.contacts : [];
-        const cleanContacts = existingContacts.filter((c: any) => c && c.id && !mockContactIds.has(c.id));
-
-        const loadedServices = Array.isArray(parsed.services) 
-          ? parsed.services.filter((s: any) => s && s.id !== 'srv-2' && s.slug !== 'peritoneal-dialysis')
-          : initialServices;
-
-        let loadedSettings = parsed.settings ? { ...parsed.settings } : initialSettings;
-        if (!loadedSettings.address || loadedSettings.address.includes('South Extension') || loadedSettings.address.includes('Institutional Medical Area')) {
-          loadedSettings.address = 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
+        if (parsed && typeof parsed === 'object') {
+          this.state = { ...this.state, ...parsed };
         }
-
-        const loadedHospitals = Array.isArray(parsed.hospitals)
-          ? parsed.hospitals.map((h: any) => {
-              if (h.id === 'hosp-1' && (!h.address || h.address.includes('Plot 14') || h.address.includes('South Extension') || h.address.includes('Institutional Area'))) {
-                return {
-                  ...h,
-                  name: h.name || 'Renal medicare (kidney care & dialysis centre)',
-                  address: '63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089',
-                  city: 'Delhi',
-                  googleMap: 'https://maps.google.com/?q=63+64+65+Pocket+4+Sector+16A+Rohini+Delhi+110089'
-                };
-              }
-              if (h.facilities && Array.isArray(h.facilities)) {
-                h.facilities = h.facilities.map((f: string) => {
-                  if (f.includes('Peritoneal Dialysis Clinic')) return 'Kidney Preventive Care Clinic';
-                  if (f.includes('Automated Peritoneal Dialysis Training')) return 'Specialized Hemodiafiltration Unit';
-                  return f;
-                });
-              }
-              return h;
-            })
-          : initialHospitals;
-
-        const loadedFaqs = Array.isArray(parsed.faqs)
-          ? parsed.faqs.map((f: any) => {
-              if (f.id === 'faq-3' && f.answer?.includes('peritoneal')) {
-                return {
-                  ...f,
-                  answer: 'Our hospital center hemodialysis begins at ₹2,200 per session including consumables. Comprehensive Home Dialysis with a dedicated technician is ₹3,800 per session. We also accept major insurance policies and cashless TPA partnerships.'
-                };
-              }
-              return f;
-            })
-          : initialFaqs;
-
-        const loadedTestimonials = Array.isArray(parsed.testimonials)
-          ? parsed.testimonials.map((t: any) => {
-              if (t.id === 'test-3' && (t.treatment?.includes('Peritoneal') || t.quote?.includes('PD'))) {
-                return {
-                  ...t,
-                  treatment: 'Senior Nephrology Consultation & Dialysis Access',
-                  quote: 'Dr. Sharma and the entire nephrology department provided clear guidance when my creatinine crossed 6.0. They helped me start optimal medical therapy and schedule which allows me to manage my business smoothly.'
-                };
-              }
-              return t;
-            })
-          : initialTestimonials;
-
-        this.state = { 
-          ...this.state, 
-          ...parsed,
-          services: loadedServices,
-          settings: loadedSettings,
-          hospitals: loadedHospitals,
-          faqs: loadedFaqs,
-          testimonials: loadedTestimonials,
-          appointments: cleanApps.length > 0 ? cleanApps : this.state.appointments,
-          contacts: cleanContacts
-        };
-        this.save();
-      } else {
-        this.save();
       }
-    } catch (err) {
-      console.warn('Could not read persistent database file, using in-memory state:', err);
+    } catch (e) {
+      console.warn('[Store] Local store initialization note:', e);
     }
   }
 
-  private save() {
+  public async initMongo() {
+    try {
+      const db = await connectToMongoDB();
+      if (!db || this.isSeededMongo) return;
+
+      // Ensure MongoDB Atlas collections exist and are seeded if empty
+      const servicesCount = await db.collection('services').countDocuments();
+      if (servicesCount === 0) {
+        await db.collection('services').insertMany(this.state.services);
+        logCollectionUpdated('services', 'initial seed');
+      }
+
+      const hospitalsCount = await db.collection('hospitals').countDocuments();
+      if (hospitalsCount === 0) {
+        await db.collection('hospitals').insertMany(this.state.hospitals);
+        logCollectionUpdated('hospitals', 'initial seed');
+      }
+
+      const settingsCount = await db.collection('settings').countDocuments();
+      if (settingsCount === 0) {
+        await db.collection('settings').insertOne({ ...this.state.settings });
+        logCollectionUpdated('settings', 'initial seed');
+      }
+
+      const appointmentsCount = await db.collection('appointments').countDocuments();
+      if (appointmentsCount === 0 && this.state.appointments.length > 0) {
+        await db.collection('appointments').insertMany(this.state.appointments);
+        logCollectionUpdated('appointments', 'initial seed');
+      }
+
+      const inquiriesCount = await db.collection('inquiries').countDocuments();
+      if (inquiriesCount === 0 && this.state.contacts.length > 0) {
+        await db.collection('inquiries').insertMany(this.state.contacts);
+        logCollectionUpdated('inquiries', 'initial seed');
+      }
+
+      const blogsCount = await db.collection('blogs').countDocuments();
+      if (blogsCount === 0 && this.state.blogs.length > 0) {
+        await db.collection('blogs').insertMany(this.state.blogs);
+      }
+
+      const faqsCount = await db.collection('faqs').countDocuments();
+      if (faqsCount === 0 && this.state.faqs.length > 0) {
+        await db.collection('faqs').insertMany(this.state.faqs);
+      }
+
+      const testimonialsCount = await db.collection('testimonials').countDocuments();
+      if (testimonialsCount === 0 && this.state.testimonials.length > 0) {
+        await db.collection('testimonials').insertMany(this.state.testimonials);
+      }
+
+      this.isSeededMongo = true;
+    } catch (err: any) {
+      logSaveFailed('initialization', err);
+    }
+  }
+
+  private saveLocal() {
     try {
       if (!fs.existsSync(DATA_DIR)) {
         fs.mkdirSync(DATA_DIR, { recursive: true });
       }
       fs.writeFileSync(DB_FILE, JSON.stringify(this.state, null, 2), 'utf-8');
     } catch (err) {
-      console.warn('Failed to save to database file:', err);
+      // Local sync fail-safe
     }
   }
 
-  // Getters
-  getServices() { return this.state.services; }
-  getHospitals() { return this.state.hospitals; }
-  getBlogs() { return this.state.blogs; }
-  getFaqs() { return this.state.faqs; }
-  getTestimonials() { return this.state.testimonials; }
-  getAppointments() { return this.state.appointments; }
-  getSettings() { return this.state.settings; }
-  getContacts() { return this.state.contacts; }
-
-  // Sync helpers to ensure permanent storage
-  syncAppointments(incoming: Appointment[]): Appointment[] {
-    const mockAppIds = new Set(['RM-2026-8941', 'RM-2026-6219', 'RM-2026-4712', 'RM-2026-1033']);
-    let changed = false;
-    for (const item of incoming) {
-      if (!item || !item.id || mockAppIds.has(item.id)) continue;
-      const idx = this.state.appointments.findIndex(a => a.id.toLowerCase() === item.id.toLowerCase());
-      if (idx === -1) {
-        this.state.appointments.unshift(item);
-        changed = true;
-      } else {
-        if (item.updatedAt && (!this.state.appointments[idx].updatedAt || item.updatedAt > this.state.appointments[idx].updatedAt)) {
-          this.state.appointments[idx] = { ...this.state.appointments[idx], ...item };
-          changed = true;
-        }
+  // --------------------------------------------------------------------------
+  // SERVICES (Single Source of Truth: MongoDB Atlas collection 'services')
+  // --------------------------------------------------------------------------
+  async getServices(): Promise<ServiceItem[]> {
+    const db = getDb();
+    if (db) {
+      try {
+        const list = await db.collection('services').find({}).toArray();
+        const mapped = list.map(({ _id, ...doc }) => doc as ServiceItem);
+        this.state.services = mapped;
+        return mapped;
+      } catch (err: any) {
+        logSaveFailed('services', err);
       }
     }
-    if (changed) {
-      this.save();
+    return this.state.services;
+  }
+
+  async addService(service: Omit<ServiceItem, 'id'>): Promise<ServiceItem> {
+    const newService: ServiceItem = {
+      ...service,
+      id: `srv-${Date.now()}`
+    };
+
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection('services').insertOne({ ...newService });
+        logCollectionUpdated('services', `created ${newService.id}`);
+      } catch (err: any) {
+        logSaveFailed('services', err);
+        throw err;
+      }
+    }
+
+    this.state.services.unshift(newService);
+    this.saveLocal();
+    return newService;
+  }
+
+  async updateService(id: string, updates: Partial<ServiceItem>): Promise<ServiceItem | null> {
+    const db = getDb();
+    if (db) {
+      try {
+        const { _id, ...safeUpdates } = updates as any;
+        const result = await db.collection('services').updateOne({ id }, { $set: safeUpdates });
+        if (result.matchedCount > 0) {
+          logCollectionUpdated('services', `updated ${id}`);
+          const fresh = await db.collection('services').findOne({ id });
+          if (fresh) {
+            const { _id: _, ...doc } = fresh;
+            const idx = this.state.services.findIndex(s => s.id === id);
+            if (idx !== -1) this.state.services[idx] = doc as ServiceItem;
+            this.saveLocal();
+            return doc as ServiceItem;
+          }
+        }
+      } catch (err: any) {
+        logSaveFailed('services', err);
+        throw err;
+      }
+    }
+
+    const idx = this.state.services.findIndex(s => s.id === id);
+    if (idx === -1) return null;
+    this.state.services[idx] = { ...this.state.services[idx], ...updates };
+    this.saveLocal();
+    return this.state.services[idx];
+  }
+
+  async deleteService(id: string): Promise<boolean> {
+    const db = getDb();
+    if (db) {
+      try {
+        const result = await db.collection('services').deleteOne({ id });
+        if (result.deletedCount > 0) {
+          logCollectionUpdated('services', `deleted ${id}`);
+          this.state.services = this.state.services.filter(s => s.id !== id);
+          this.saveLocal();
+          return true;
+        }
+      } catch (err: any) {
+        logSaveFailed('services', err);
+        throw err;
+      }
+    }
+
+    const len = this.state.services.length;
+    this.state.services = this.state.services.filter(s => s.id !== id);
+    if (this.state.services.length !== len) {
+      this.saveLocal();
+      return true;
+    }
+    return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // HOSPITALS (Single Source of Truth: MongoDB Atlas collection 'hospitals')
+  // --------------------------------------------------------------------------
+  async getHospitals(): Promise<Hospital[]> {
+    const db = getDb();
+    if (db) {
+      try {
+        const list = await db.collection('hospitals').find({}).toArray();
+        const mapped = list.map(({ _id, ...doc }) => doc as Hospital);
+        this.state.hospitals = mapped;
+        return mapped;
+      } catch (err: any) {
+        logSaveFailed('hospitals', err);
+      }
+    }
+    return this.state.hospitals;
+  }
+
+  async addHospital(hospital: Omit<Hospital, 'id'>): Promise<Hospital> {
+    const newHosp: Hospital = {
+      ...hospital,
+      id: `hosp-${Date.now()}`
+    };
+
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection('hospitals').insertOne({ ...newHosp });
+        logCollectionUpdated('hospitals', `created ${newHosp.id}`);
+      } catch (err: any) {
+        logSaveFailed('hospitals', err);
+        throw err;
+      }
+    }
+
+    this.state.hospitals.push(newHosp);
+    this.saveLocal();
+    return newHosp;
+  }
+
+  async updateHospital(id: string, updates: Partial<Hospital>): Promise<Hospital | null> {
+    const db = getDb();
+    if (db) {
+      try {
+        const { _id, ...safeUpdates } = updates as any;
+        const result = await db.collection('hospitals').updateOne({ id }, { $set: safeUpdates });
+        if (result.matchedCount > 0) {
+          logCollectionUpdated('hospitals', `updated ${id}`);
+          const fresh = await db.collection('hospitals').findOne({ id });
+          if (fresh) {
+            const { _id: _, ...doc } = fresh;
+            const idx = this.state.hospitals.findIndex(h => h.id === id);
+            if (idx !== -1) this.state.hospitals[idx] = doc as Hospital;
+            this.saveLocal();
+            return doc as Hospital;
+          }
+        }
+      } catch (err: any) {
+        logSaveFailed('hospitals', err);
+        throw err;
+      }
+    }
+
+    const idx = this.state.hospitals.findIndex(h => h.id === id);
+    if (idx === -1) return null;
+    this.state.hospitals[idx] = { ...this.state.hospitals[idx], ...updates };
+    this.saveLocal();
+    return this.state.hospitals[idx];
+  }
+
+  async deleteHospital(id: string): Promise<boolean> {
+    const db = getDb();
+    if (db) {
+      try {
+        const result = await db.collection('hospitals').deleteOne({ id });
+        if (result.deletedCount > 0) {
+          logCollectionUpdated('hospitals', `deleted ${id}`);
+          this.state.hospitals = this.state.hospitals.filter(h => h.id !== id);
+          this.saveLocal();
+          return true;
+        }
+      } catch (err: any) {
+        logSaveFailed('hospitals', err);
+        throw err;
+      }
+    }
+
+    const len = this.state.hospitals.length;
+    this.state.hospitals = this.state.hospitals.filter(h => h.id !== id);
+    if (this.state.hospitals.length !== len) {
+      this.saveLocal();
+      return true;
+    }
+    return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // APPOINTMENTS (Single Source of Truth: MongoDB Atlas collection 'appointments')
+  // --------------------------------------------------------------------------
+  async getAppointments(): Promise<Appointment[]> {
+    const db = getDb();
+    if (db) {
+      try {
+        const list = await db.collection('appointments').find({}).sort({ createdAt: -1 }).toArray();
+        const mapped = list.map(({ _id, ...doc }) => doc as Appointment);
+        this.state.appointments = mapped;
+        return mapped;
+      } catch (err: any) {
+        logSaveFailed('appointments', err);
+      }
     }
     return this.state.appointments;
   }
 
-  syncContacts(incoming: ContactMessage[]): ContactMessage[] {
-    const mockContactIds = new Set(['cnt-1', 'cnt-2']);
-    let changed = false;
-    for (const item of incoming) {
-      if (!item || !item.id || mockContactIds.has(item.id)) continue;
-      const idx = this.state.contacts.findIndex(c => c.id.toLowerCase() === item.id.toLowerCase());
-      if (idx === -1) {
-        this.state.contacts.unshift(item);
-        changed = true;
-      }
-    }
-    if (changed) {
-      this.save();
-    }
-    return this.state.contacts;
-  }
-
-  // Appointments
-  createAppointment(data: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt' | 'status'> & { status?: Appointment['status'] }): Appointment {
+  async createAppointment(data: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt' | 'status'> & { status?: Appointment['status'] }): Promise<Appointment> {
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const newAppointment: Appointment = {
       ...data,
@@ -597,227 +689,473 @@ class Store {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
+
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection('appointments').insertOne({ ...newAppointment });
+        logCollectionUpdated('appointments', `created ${newAppointment.id}`);
+      } catch (err: any) {
+        logSaveFailed('appointments', err);
+        throw err;
+      }
+    }
+
     this.state.appointments.unshift(newAppointment);
-    this.save();
+    this.saveLocal();
     return newAppointment;
   }
 
-  updateAppointment(id: string, updates: Partial<Appointment>): Appointment | null {
+  async updateAppointment(id: string, updates: Partial<Appointment>): Promise<Appointment | null> {
+    const db = getDb();
+    const updatedPayload = {
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+
+    if (db) {
+      try {
+        const { _id, ...safeUpdates } = updatedPayload as any;
+        const result = await db.collection('appointments').updateOne(
+          { $or: [{ id }, { id: id.toUpperCase() }, { id: id.toLowerCase() }] },
+          { $set: safeUpdates }
+        );
+        if (result.matchedCount > 0) {
+          logCollectionUpdated('appointments', `updated ${id}`);
+          const fresh = await db.collection('appointments').findOne({
+            $or: [{ id }, { id: id.toUpperCase() }, { id: id.toLowerCase() }]
+          });
+          if (fresh) {
+            const { _id: _, ...doc } = fresh;
+            const idx = this.state.appointments.findIndex(a => a.id.toLowerCase() === id.toLowerCase());
+            if (idx !== -1) this.state.appointments[idx] = doc as Appointment;
+            this.saveLocal();
+            return doc as Appointment;
+          }
+        }
+      } catch (err: any) {
+        logSaveFailed('appointments', err);
+        throw err;
+      }
+    }
+
     const idx = this.state.appointments.findIndex(a => a.id.toLowerCase() === id.toLowerCase());
     if (idx === -1) return null;
     this.state.appointments[idx] = {
       ...this.state.appointments[idx],
-      ...updates,
-      updatedAt: new Date().toISOString()
+      ...updatedPayload
     };
-    this.save();
+    this.saveLocal();
     return this.state.appointments[idx];
   }
 
-  deleteAppointment(id: string): boolean {
+  async deleteAppointment(id: string): Promise<boolean> {
+    const db = getDb();
+    if (db) {
+      try {
+        const result = await db.collection('appointments').deleteOne({
+          $or: [{ id }, { id: id.toUpperCase() }, { id: id.toLowerCase() }]
+        });
+        if (result.deletedCount > 0) {
+          logCollectionUpdated('appointments', `deleted ${id}`);
+          this.state.appointments = this.state.appointments.filter(a => a.id.toLowerCase() !== id.toLowerCase());
+          this.saveLocal();
+          return true;
+        }
+      } catch (err: any) {
+        logSaveFailed('appointments', err);
+        throw err;
+      }
+    }
+
     const len = this.state.appointments.length;
     this.state.appointments = this.state.appointments.filter(a => a.id.toLowerCase() !== id.toLowerCase());
     if (this.state.appointments.length !== len) {
-      this.save();
+      this.saveLocal();
       return true;
     }
     return false;
   }
 
-  findAppointment(query: string): Appointment | null {
-    const clean = query.trim().toLowerCase();
-    return this.state.appointments.find(a => 
-      a.id.toLowerCase() === clean || 
-      a.mobileNumber.replace(/\D/g, '') === clean.replace(/\D/g, '') ||
-      a.email.toLowerCase() === clean
-    ) || null;
+  async syncAppointments(incoming: Appointment[]): Promise<Appointment[]> {
+    const db = getDb();
+    for (const item of incoming) {
+      if (!item || !item.id) continue;
+      if (db) {
+        try {
+          const { _id, ...safeDoc } = item as any;
+          await db.collection('appointments').updateOne(
+            { id: item.id },
+            { $set: safeDoc },
+            { upsert: true }
+          );
+        } catch {}
+      }
+    }
+    if (db) {
+      logCollectionUpdated('appointments', 'batch sync');
+    }
+    return this.getAppointments();
   }
 
-  // Hospitals
-  addHospital(hospital: Omit<Hospital, 'id'>): Hospital {
-    const newHosp: Hospital = {
-      ...hospital,
-      id: `hosp-${Date.now()}`
+  // --------------------------------------------------------------------------
+  // INQUIRIES / CONTACTS (Single Source of Truth: MongoDB Atlas collection 'inquiries')
+  // --------------------------------------------------------------------------
+  async getInquiries(): Promise<ContactMessage[]> {
+    const db = getDb();
+    if (db) {
+      try {
+        const list = await db.collection('inquiries').find({}).sort({ createdAt: -1 }).toArray();
+        const mapped = list.map(({ _id, ...doc }) => doc as ContactMessage);
+        this.state.contacts = mapped;
+        return mapped;
+      } catch (err: any) {
+        logSaveFailed('inquiries', err);
+      }
+    }
+    return this.state.contacts;
+  }
+
+  async getContacts(): Promise<ContactMessage[]> {
+    return this.getInquiries();
+  }
+
+  async addInquiry(contact: Omit<ContactMessage, 'id' | 'createdAt' | 'isRead'>): Promise<ContactMessage> {
+    const newMsg: ContactMessage = {
+      ...contact,
+      id: `inq-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      isRead: false
     };
-    this.state.hospitals.push(newHosp);
-    this.save();
-    return newHosp;
+
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection('inquiries').insertOne({ ...newMsg });
+        logCollectionUpdated('inquiries', `created ${newMsg.id}`);
+      } catch (err: any) {
+        logSaveFailed('inquiries', err);
+        throw err;
+      }
+    }
+
+    this.state.contacts.unshift(newMsg);
+    this.saveLocal();
+    return newMsg;
   }
 
-  updateHospital(id: string, updates: Partial<Hospital>): Hospital | null {
-    const idx = this.state.hospitals.findIndex(h => h.id === id);
+  async addContact(contact: Omit<ContactMessage, 'id' | 'createdAt' | 'isRead'>): Promise<ContactMessage> {
+    return this.addInquiry(contact);
+  }
+
+  async updateInquiry(id: string, updates: Partial<ContactMessage>): Promise<ContactMessage | null> {
+    const db = getDb();
+    if (db) {
+      try {
+        const { _id, ...safeUpdates } = updates as any;
+        const result = await db.collection('inquiries').updateOne({ id }, { $set: safeUpdates });
+        if (result.matchedCount > 0) {
+          logCollectionUpdated('inquiries', `updated ${id}`);
+          const fresh = await db.collection('inquiries').findOne({ id });
+          if (fresh) {
+            const { _id: _, ...doc } = fresh;
+            const idx = this.state.contacts.findIndex(c => c.id === id);
+            if (idx !== -1) this.state.contacts[idx] = doc as ContactMessage;
+            this.saveLocal();
+            return doc as ContactMessage;
+          }
+        }
+      } catch (err: any) {
+        logSaveFailed('inquiries', err);
+        throw err;
+      }
+    }
+
+    const idx = this.state.contacts.findIndex(c => c.id === id);
     if (idx === -1) return null;
-    this.state.hospitals[idx] = { ...this.state.hospitals[idx], ...updates };
-    this.save();
-    return this.state.hospitals[idx];
+    this.state.contacts[idx] = { ...this.state.contacts[idx], ...updates };
+    this.saveLocal();
+    return this.state.contacts[idx];
   }
 
-  deleteHospital(id: string): boolean {
-    const len = this.state.hospitals.length;
-    this.state.hospitals = this.state.hospitals.filter(h => h.id !== id);
-    if (this.state.hospitals.length !== len) {
-      this.save();
+  async markContactRead(id: string): Promise<boolean> {
+    const updated = await this.updateInquiry(id, { isRead: true });
+    return !!updated;
+  }
+
+  async deleteInquiry(id: string): Promise<boolean> {
+    const db = getDb();
+    if (db) {
+      try {
+        const result = await db.collection('inquiries').deleteOne({ id });
+        if (result.deletedCount > 0) {
+          logCollectionUpdated('inquiries', `deleted ${id}`);
+          this.state.contacts = this.state.contacts.filter(c => c.id !== id);
+          this.saveLocal();
+          return true;
+        }
+      } catch (err: any) {
+        logSaveFailed('inquiries', err);
+        throw err;
+      }
+    }
+
+    const len = this.state.contacts.length;
+    this.state.contacts = this.state.contacts.filter(c => c.id !== id);
+    if (this.state.contacts.length !== len) {
+      this.saveLocal();
       return true;
     }
     return false;
   }
 
-  // Services
-  addService(service: Omit<ServiceItem, 'id'>): ServiceItem {
-    const newSrv: ServiceItem = {
-      ...service,
-      id: `srv-${Date.now()}`
-    };
-    this.state.services.push(newSrv);
-    this.save();
-    return newSrv;
+  async deleteContact(id: string): Promise<boolean> {
+    return this.deleteInquiry(id);
   }
 
-  updateService(id: string, updates: Partial<ServiceItem>): ServiceItem | null {
-    const idx = this.state.services.findIndex(s => s.id === id);
-    if (idx === -1) return null;
-    this.state.services[idx] = { ...this.state.services[idx], ...updates };
-    this.save();
-    return this.state.services[idx];
-  }
-
-  deleteService(id: string): boolean {
-    const len = this.state.services.length;
-    this.state.services = this.state.services.filter(s => s.id !== id);
-    if (this.state.services.length !== len) {
-      this.save();
-      return true;
+  async syncContacts(incoming: ContactMessage[]): Promise<ContactMessage[]> {
+    const db = getDb();
+    for (const item of incoming) {
+      if (!item || !item.id) continue;
+      if (db) {
+        try {
+          const { _id, ...safeDoc } = item as any;
+          await db.collection('inquiries').updateOne(
+            { id: item.id },
+            { $set: safeDoc },
+            { upsert: true }
+          );
+        } catch {}
+      }
     }
-    return false;
+    if (db) {
+      logCollectionUpdated('inquiries', 'batch sync');
+    }
+    return this.getInquiries();
   }
 
-  // Blogs
-  addBlog(blog: Omit<BlogPost, 'id' | 'publishedDate'>): BlogPost {
+  // --------------------------------------------------------------------------
+  // SETTINGS (Single Source of Truth: MongoDB Atlas collection 'settings')
+  // --------------------------------------------------------------------------
+  async getSettings(): Promise<CompanySettings> {
+    const db = getDb();
+    if (db) {
+      try {
+        const doc = await db.collection('settings').findOne({});
+        if (doc) {
+          const { _id, ...safe } = doc;
+          this.state.settings = safe as CompanySettings;
+          return safe as CompanySettings;
+        }
+      } catch (err: any) {
+        logSaveFailed('settings', err);
+      }
+    }
+    return this.state.settings;
+  }
+
+  async updateSettings(updates: Partial<CompanySettings>): Promise<CompanySettings> {
+    const db = getDb();
+    if (db) {
+      try {
+        const { _id, ...safeUpdates } = updates as any;
+        await db.collection('settings').updateOne({}, { $set: safeUpdates }, { upsert: true });
+        logCollectionUpdated('settings', 'updated');
+        const fresh = await db.collection('settings').findOne({});
+        if (fresh) {
+          const { _id: _, ...safe } = fresh;
+          this.state.settings = safe as CompanySettings;
+          this.saveLocal();
+          return safe as CompanySettings;
+        }
+      } catch (err: any) {
+        logSaveFailed('settings', err);
+        throw err;
+      }
+    }
+
+    this.state.settings = { ...this.state.settings, ...updates };
+    this.saveLocal();
+    return this.state.settings;
+  }
+
+  // --------------------------------------------------------------------------
+  // BLOGS, FAQS, TESTIMONIALS (MongoDB collection support)
+  // --------------------------------------------------------------------------
+  async getBlogs(): Promise<BlogPost[]> {
+    const db = getDb();
+    if (db) {
+      try {
+        const list = await db.collection('blogs').find({}).toArray();
+        if (list.length > 0) {
+          return list.map(({ _id, ...doc }) => doc as BlogPost);
+        }
+      } catch {}
+    }
+    return this.state.blogs;
+  }
+
+  async addBlog(blog: Omit<BlogPost, 'id' | 'publishedDate'>): Promise<BlogPost> {
     const newBlog: BlogPost = {
       ...blog,
       id: `blog-${Date.now()}`,
       publishedDate: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     };
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection('blogs').insertOne({ ...newBlog });
+        logCollectionUpdated('blogs', `created ${newBlog.id}`);
+      } catch {}
+    }
     this.state.blogs.unshift(newBlog);
-    this.save();
+    this.saveLocal();
     return newBlog;
   }
 
-  updateBlog(id: string, updates: Partial<BlogPost>): BlogPost | null {
+  async updateBlog(id: string, updates: Partial<BlogPost>): Promise<BlogPost | null> {
+    const db = getDb();
+    if (db) {
+      try {
+        const { _id, ...safe } = updates as any;
+        await db.collection('blogs').updateOne({ id }, { $set: safe });
+        logCollectionUpdated('blogs', `updated ${id}`);
+      } catch {}
+    }
     const idx = this.state.blogs.findIndex(b => b.id === id);
     if (idx === -1) return null;
     this.state.blogs[idx] = { ...this.state.blogs[idx], ...updates };
-    this.save();
+    this.saveLocal();
     return this.state.blogs[idx];
   }
 
-  deleteBlog(id: string): boolean {
+  async deleteBlog(id: string): Promise<boolean> {
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection('blogs').deleteOne({ id });
+        logCollectionUpdated('blogs', `deleted ${id}`);
+      } catch {}
+    }
     const len = this.state.blogs.length;
     this.state.blogs = this.state.blogs.filter(b => b.id !== id);
-    if (this.state.blogs.length !== len) {
-      this.save();
-      return true;
-    }
-    return false;
+    this.saveLocal();
+    return this.state.blogs.length !== len;
   }
 
-  // Testimonials
-  addTestimonial(testimonial: Omit<Testimonial, 'id' | 'date'>): Testimonial {
+  async getFaqs(): Promise<FAQItem[]> {
+    const db = getDb();
+    if (db) {
+      try {
+        const list = await db.collection('faqs').find({}).toArray();
+        if (list.length > 0) {
+          return list.map(({ _id, ...doc }) => doc as FAQItem);
+        }
+      } catch {}
+    }
+    return this.state.faqs;
+  }
+
+  async addFaq(faq: Omit<FAQItem, 'id'>): Promise<FAQItem> {
+    const newFaq: FAQItem = {
+      ...faq,
+      id: `faq-${Date.now()}`
+    };
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection('faqs').insertOne({ ...newFaq });
+      } catch {}
+    }
+    this.state.faqs.push(newFaq);
+    this.saveLocal();
+    return newFaq;
+  }
+
+  async updateFaq(id: string, updates: Partial<FAQItem>): Promise<FAQItem | null> {
+    const db = getDb();
+    if (db) {
+      try {
+        const { _id, ...safe } = updates as any;
+        await db.collection('faqs').updateOne({ id }, { $set: safe });
+      } catch {}
+    }
+    const idx = this.state.faqs.findIndex(f => f.id === id);
+    if (idx === -1) return null;
+    this.state.faqs[idx] = { ...this.state.faqs[idx], ...updates };
+    this.saveLocal();
+    return this.state.faqs[idx];
+  }
+
+  async deleteFaq(id: string): Promise<boolean> {
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection('faqs').deleteOne({ id });
+      } catch {}
+    }
+    const len = this.state.faqs.length;
+    this.state.faqs = this.state.faqs.filter(f => f.id !== id);
+    this.saveLocal();
+    return this.state.faqs.length !== len;
+  }
+
+  async getTestimonials(): Promise<Testimonial[]> {
+    const db = getDb();
+    if (db) {
+      try {
+        const list = await db.collection('testimonials').find({}).toArray();
+        if (list.length > 0) {
+          return list.map(({ _id, ...doc }) => doc as Testimonial);
+        }
+      } catch {}
+    }
+    return this.state.testimonials;
+  }
+
+  async addTestimonial(testimonial: Omit<Testimonial, 'id' | 'date'>): Promise<Testimonial> {
     const newTest: Testimonial = {
       ...testimonial,
       id: `test-${Date.now()}`,
       date: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     };
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection('testimonials').insertOne({ ...newTest });
+      } catch {}
+    }
     this.state.testimonials.unshift(newTest);
-    this.save();
+    this.saveLocal();
     return newTest;
   }
 
-  updateTestimonial(id: string, updates: Partial<Testimonial>): Testimonial | null {
+  async updateTestimonial(id: string, updates: Partial<Testimonial>): Promise<Testimonial | null> {
+    const db = getDb();
+    if (db) {
+      try {
+        const { _id, ...safe } = updates as any;
+        await db.collection('testimonials').updateOne({ id }, { $set: safe });
+      } catch {}
+    }
     const idx = this.state.testimonials.findIndex(t => t.id === id);
     if (idx === -1) return null;
     this.state.testimonials[idx] = { ...this.state.testimonials[idx], ...updates };
-    this.save();
+    this.saveLocal();
     return this.state.testimonials[idx];
   }
 
-  deleteTestimonial(id: string): boolean {
+  async deleteTestimonial(id: string): Promise<boolean> {
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection('testimonials').deleteOne({ id });
+      } catch {}
+    }
     const len = this.state.testimonials.length;
     this.state.testimonials = this.state.testimonials.filter(t => t.id !== id);
-    if (this.state.testimonials.length !== len) {
-      this.save();
-      return true;
-    }
-    return false;
-  }
-
-  // FAQs
-  addFaq(faq: Omit<FAQItem, 'id'>): FAQItem {
-    const newFaq: FAQItem = {
-      ...faq,
-      id: `faq-${Date.now()}`
-    };
-    this.state.faqs.push(newFaq);
-    this.save();
-    return newFaq;
-  }
-
-  updateFaq(id: string, updates: Partial<FAQItem>): FAQItem | null {
-    const idx = this.state.faqs.findIndex(f => f.id === id);
-    if (idx === -1) return null;
-    this.state.faqs[idx] = { ...this.state.faqs[idx], ...updates };
-    this.save();
-    return this.state.faqs[idx];
-  }
-
-  deleteFaq(id: string): boolean {
-    const len = this.state.faqs.length;
-    this.state.faqs = this.state.faqs.filter(f => f.id !== id);
-    if (this.state.faqs.length !== len) {
-      this.save();
-      return true;
-    }
-    return false;
-  }
-
-  // Contact messages
-  addContact(contact: Omit<ContactMessage, 'id' | 'createdAt' | 'isRead'>): ContactMessage {
-    const newMsg: ContactMessage = {
-      ...contact,
-      id: `cnt-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      isRead: false
-    };
-    this.state.contacts.unshift(newMsg);
-    this.save();
-    return newMsg;
-  }
-
-  markContactRead(id: string): boolean {
-    const msg = this.state.contacts.find(c => c.id === id);
-    if (msg) {
-      msg.isRead = true;
-      this.save();
-      return true;
-    }
-    return false;
-  }
-
-  deleteContact(id: string): boolean {
-    const len = this.state.contacts.length;
-    this.state.contacts = this.state.contacts.filter(c => c.id !== id);
-    if (this.state.contacts.length !== len) {
-      this.save();
-      return true;
-    }
-    return false;
-  }
-
-  // Settings
-  updateSettings(updates: Partial<CompanySettings>): CompanySettings {
-    this.state.settings = { ...this.state.settings, ...updates };
-    this.save();
-    return this.state.settings;
+    this.saveLocal();
+    return this.state.testimonials.length !== len;
   }
 }
 

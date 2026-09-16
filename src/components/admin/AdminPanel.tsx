@@ -299,9 +299,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       const data = await res.json();
       if (data.success && data.settings) {
         setSettings(data.settings);
-        try {
-          localStorage.setItem('rm_settings', JSON.stringify(data.settings));
-        } catch {}
         ClientDataStore.saveSettings(data.settings);
       }
     } catch (e) {
@@ -556,13 +553,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // 1. Immediately persist locally so refresh never reverts
-      try {
-        localStorage.setItem('rm_settings', JSON.stringify(settings));
-      } catch {}
-      ClientDataStore.saveSettings(settings);
-
-      // 2. Persist to server / fallback API
+      // Persist directly to MongoDB Atlas API
       const res = await apiFetch('/api/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -572,11 +563,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       if (data.success) {
         const savedSettings = data.settings || settings;
         setSettings(savedSettings);
-        try {
-          localStorage.setItem('rm_settings', JSON.stringify(savedSettings));
-        } catch {}
         ClientDataStore.saveSettings(savedSettings);
-        setSettingsStatus('Settings updated successfully!');
+        setSettingsStatus('Settings updated successfully in MongoDB Atlas!');
         setTimeout(() => setSettingsStatus(null), 3500);
         onRefreshData();
       } else {
@@ -1432,7 +1420,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
         )}
 
-        {/* TAB 6: DEPLOYMENT GUIDES (Netlify, Vercel, Render, MongoDB) */}
+        {/* TAB 6: DEPLOYMENT GUIDES (Netlify, Vercel, Render, Self-Hosted) */}
         {activeTab === 'deployment' && (
           <div className="space-y-6">
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
@@ -1444,7 +1432,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 Production Deployment Documentation
               </h3>
               <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                Renal Medicare is designed with a full-stack architecture (Vite + React 19 Frontend with Express Node.js Backend and MongoDB Atlas Mongoose database models). Follow the guides below for seamless one-click hosting:
+                Renal Medicare is designed with a full-stack architecture (Vite + React 19 Frontend with Express Node.js Backend and self-contained persistent storage). Follow the guides below for seamless one-click hosting:
               </p>
             </div>
 
@@ -1470,21 +1458,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   <li>Create a new <strong>Web Service</strong> on Render or Railway.</li>
                   <li>Set <code>Build Command</code>: <code>npm run build</code></li>
                   <li>Set <code>Start Command</code>: <code>npm start</code></li>
-                  <li>Add <code>MONGODB_URI</code> and <code>JWT_SECRET</code>.</li>
+                  <li>Add <code>JWT_SECRET</code> and <code>ADMIN_PASSWORD</code>.</li>
                   <li>Binds automatically to port 3000.</li>
                 </ol>
               </div>
 
-              {/* MongoDB Atlas Setup */}
+              {/* Built-in Storage Setup */}
               <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-3">
-                <span className="px-2.5 py-1 rounded bg-emerald-600 text-white text-[11px] font-bold">MongoDB Atlas</span>
-                <h4 className="font-bold text-slate-900 text-base">Database Configuration</h4>
+                <span className="px-2.5 py-1 rounded bg-emerald-600 text-white text-[11px] font-bold">Zero External DB Needed</span>
+                <h4 className="font-bold text-slate-900 text-base">Self-Contained Data Storage</h4>
                 <ol className="text-xs text-slate-600 space-y-2 list-decimal pl-4">
-                  <li>Create a free cluster on <strong>mongodb.com/atlas</strong>.</li>
-                  <li>Database Access: create user <code>renal_admin</code> with password.</li>
-                  <li>Network Access: allow IP <code>0.0.0.0/0</code> for cloud servers.</li>
-                  <li>Copy Connection String: <code>mongodb+srv://user:pass@cluster.mongodb.net/renal_medicity</code></li>
-                  <li>Paste into <code>.env</code> file.</li>
+                  <li>No external database or complex database cluster installation is required.</li>
+                  <li>All patient appointments, hospital centers, and content are saved directly to persistent storage.</li>
+                  <li>Automatic client-side sync ensures zero data loss even during network disconnects.</li>
+                  <li>Admin exports provide immediate full JSON database backup anytime.</li>
                 </ol>
               </div>
 

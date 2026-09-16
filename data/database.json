@@ -253,7 +253,8 @@
       "publishedDate": "September 10, 2026",
       "readTime": "6 min read",
       "metaTitle": "Hemodialysis vs Peritoneal Dialysis: Which Is Right For You?",
-      "metaDescription": "A clinical guide comparing Hemodialysis and Peritoneal Dialysis by Renal Medicare nephrologists."
+      "metaDescription": "A clinical guide comparing Hemodialysis and Peritoneal Dialysis by Renal Medicare nephrologists.",
+      "_id": "6aab25316ba29ca6695ab245"
     },
     {
       "id": "blog-2",
@@ -274,7 +275,8 @@
       "publishedDate": "September 04, 2026",
       "readTime": "5 min read",
       "metaTitle": "Renal Diet Guide: Sodium, Potassium & Phosphorus Management",
-      "metaDescription": "Expert nutrition advice for chronic kidney disease and dialysis patients from Renal Medicare."
+      "metaDescription": "Expert nutrition advice for chronic kidney disease and dialysis patients from Renal Medicare.",
+      "_id": "6aab25316ba29ca6695ab246"
     },
     {
       "id": "blog-3",
@@ -294,7 +296,8 @@
       "publishedDate": "August 28, 2026",
       "readTime": "4 min read",
       "metaTitle": "Home Dialysis Benefits: Safety and Freedom for Patients",
-      "metaDescription": "How Renal Medicare delivers hospital-grade home dialysis with certified technicians."
+      "metaDescription": "How Renal Medicare delivers hospital-grade home dialysis with certified technicians.",
+      "_id": "6aab25316ba29ca6695ab247"
     }
   ],
   "faqs": [
@@ -302,37 +305,43 @@
       "id": "faq-1",
       "question": "How often does a patient need hemodialysis?",
       "answer": "Standard maintenance hemodialysis is typically conducted 3 times per week, with each session lasting between 3.5 to 4 hours. The exact frequency and duration are determined by your nephrologist based on your residual kidney function, body surface area, and fluid clearance requirements.",
-      "category": "dialysis"
+      "category": "dialysis",
+      "_id": "6aab25316ba29ca6695ab248"
     },
     {
       "id": "faq-2",
       "question": "Is home dialysis safe compared to hospital dialysis?",
       "answer": "Yes, absolutely. In fact, home dialysis provides superior infection control as it eliminates exposure to hospital-acquired pathogens. At Renal Medicare, every home session is administered in person by a certified, licensed dialysis technician equipped with hospital-grade equipment, ultrapure RO water filtration, and direct real-time telemetry connected to our senior nephrologists.",
-      "category": "home-dialysis"
+      "category": "home-dialysis",
+      "_id": "6aab25316ba29ca6695ab249"
     },
     {
       "id": "faq-3",
       "question": "What is the cost of dialysis at Renal Medicare?",
       "answer": "Our hospital center hemodialysis begins at ₹2,200 per session including consumables. Comprehensive Home Dialysis with a dedicated technician is ₹3,800 per session. We also accept major insurance policies and cashless TPA partnerships.",
-      "category": "general"
+      "category": "general",
+      "_id": "6aab25316ba29ca6695ab24a"
     },
     {
       "id": "faq-4",
       "question": "How do I book and track my dialysis appointment?",
       "answer": "You can book an appointment directly through our online appointment system on this website, or call our 24/7 helpline at 9069645840. Once booked, you will receive a unique tracking ID (e.g. RM-2026-XXXX) which lets you view real-time confirmation status on our Patient Tracking page.",
-      "category": "appointments"
+      "category": "appointments",
+      "_id": "6aab25316ba29ca6695ab24b"
     },
     {
       "id": "faq-5",
       "question": "How do you care for an AV Fistula between dialysis sessions?",
       "answer": "Keep the fistula arm clean, wash with antimicrobial soap before dialysis, avoid wearing tight clothing or wristwatches on the access arm, and never allow blood pressure checks or blood draws on the fistula arm. Always check for the vibration or buzz (called the \"thrill\") daily.",
-      "category": "dialysis"
+      "category": "dialysis",
+      "_id": "6aab25316ba29ca6695ab24c"
     },
     {
       "id": "faq-6",
       "question": "What happens during a sudden dialysis emergency or fluid overload?",
       "answer": "Renal Medicare operates 24x7 emergency dialysis and ICU bedside CRRT across our hospital network. For immediate assistance, dial our emergency numbers 9069645840 or 7522805397 for rapid patient transfer and immediate triage.",
-      "category": "dialysis"
+      "category": "dialysis",
+      "_id": "6aab25316ba29ca6695ab24d"
     }
   ],
   "testimonials": [
@@ -344,7 +353,8 @@
       "rating": 5,
       "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
       "location": "South Delhi",
-      "date": "August 2026"
+      "date": "August 2026",
+      "_id": "6aab25316ba29ca6695ab24e"
     },
     {
       "id": "test-2",
@@ -354,7 +364,8 @@
       "rating": 5,
       "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
       "location": "Gurugram",
-      "date": "July 2026"
+      "date": "July 2026",
+      "_id": "6aab25316ba29ca6695ab24f"
     },
     {
       "id": "test-3",
@@ -364,10 +375,63 @@
       "rating": 5,
       "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
       "location": "Chandigarh",
-      "date": "September 2026"
+      "date": "September 2026",
+      "_id": "6aab25316ba29ca6695ab250"
     }
   ],
   "appointments": [
+    {
+      "fullName": "Amitabh Saxena",
+      "mobileNumber": "9811998877",
+      "email": "amitabh@example.com",
+      "age": 52,
+      "gender": "Male",
+      "hospitalLocation": "Renal medicare (kidney care & dialysis centre)",
+      "serviceType": "Hemodialysis",
+      "preferredDate": "2026-09-30",
+      "preferredTime": "Morning (07:00 AM - 11:00 AM)",
+      "address": "Rohini Sector 16A, Delhi",
+      "additionalNotes": "",
+      "status": "Pending",
+      "reminderPreference": "both",
+      "reminderConsent": true,
+      "reminderStatus": "scheduled",
+      "reminderScheduledFor": "2026-09-29T07:00:00.000Z",
+      "reminderChannels": [
+        "whatsapp",
+        "email"
+      ],
+      "reminderLogs": [],
+      "id": "RM-2026-7784",
+      "createdAt": "2026-09-16T23:24:40.472Z",
+      "updatedAt": "2026-09-16T23:24:40.472Z"
+    },
+    {
+      "fullName": "Pooja Sharma",
+      "mobileNumber": "9876500000",
+      "email": "pooja@example.com",
+      "age": 38,
+      "gender": "Female",
+      "hospitalLocation": "Renal medicare (kidney care & dialysis centre)",
+      "serviceType": "Hemodialysis",
+      "preferredDate": "2026-09-28",
+      "preferredTime": "Morning (07:00 AM - 11:00 AM)",
+      "address": "Sector 16A Rohini",
+      "additionalNotes": "",
+      "status": "Pending",
+      "reminderPreference": "both",
+      "reminderConsent": true,
+      "reminderStatus": "scheduled",
+      "reminderScheduledFor": "2026-09-27T07:00:00.000Z",
+      "reminderChannels": [
+        "whatsapp",
+        "email"
+      ],
+      "reminderLogs": [],
+      "id": "RM-2026-4368",
+      "createdAt": "2026-09-16T23:04:48.902Z",
+      "updatedAt": "2026-09-16T23:04:48.902Z"
+    },
     {
       "fullName": "Test 2",
       "mobileNumber": "1199226633",
@@ -448,5 +512,32 @@
     "secondaryColor": "#4FA9FF",
     "accentColor": "#0EA5E9"
   },
-  "contacts": []
+  "contacts": [
+    {
+      "name": "Sunil Kumar",
+      "email": "not-provided@renalmedicare.com",
+      "phone": "9811223344",
+      "subject": "General Inquiry",
+      "message": "Need information on home hemodialysis equipment setup",
+      "type": "general",
+      "address": "",
+      "preferredDate": "",
+      "id": "inq-1789599894281",
+      "createdAt": "2026-09-16T23:04:54.281Z",
+      "isRead": false
+    },
+    {
+      "name": "Test User",
+      "email": "not-provided@renalmedicare.com",
+      "phone": "9876543210",
+      "subject": "General Inquiry",
+      "message": "Looking for hemodialysis session availability",
+      "type": "general",
+      "address": "",
+      "preferredDate": "",
+      "id": "inq-1789598900027",
+      "createdAt": "2026-09-16T22:48:20.027Z",
+      "isRead": false
+    }
+  ]
 }

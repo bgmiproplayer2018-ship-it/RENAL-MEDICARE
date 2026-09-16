@@ -14,7 +14,6 @@ class NotificationService {
   private totalAutomatedSent: number = 0;
 
   constructor() {
-    // Start automated background scheduler checking every 30 seconds
     this.startAutomatedScheduler(30000);
   }
 
@@ -23,12 +22,11 @@ class NotificationService {
       clearInterval(this.intervalTimer);
     }
 
-    // Run first check after 3 seconds of server boot
     setTimeout(() => {
       this.scanAndDispatchAutomatedReminders().catch(err => {
         console.error('[NotificationService] Initial scan error:', err);
       });
-    }, 3000);
+    }, 4000);
 
     this.intervalTimer = setInterval(() => {
       this.scanAndDispatchAutomatedReminders().catch(err => {
@@ -46,10 +44,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Scans the database for any appointments within the 24-hour window
-   * and automatically dispatches WhatsApp / Email reminders.
-   */
   public async scanAndDispatchAutomatedReminders(): Promise<{
     scannedCount: number;
     dispatchedCount: number;
@@ -77,12 +71,11 @@ class NotificationService {
     let pendingCount = 0;
 
     try {
-      const appointments = db.getAppointments();
-      const settings = db.getSettings();
+      const appointments = await db.getAppointments();
+      const settings = await db.getSettings();
       const supportPhone = settings?.phone || '9069645840';
 
       for (const app of appointments) {
-        // Skip cancelled or completed
         if (app.status === 'Rejected' || app.status === 'Completed') {
           continue;
         }
@@ -95,19 +88,17 @@ class NotificationService {
         const dueCheck = isAppointmentDueForReminder(app, 24);
 
         if (dueCheck.isDue) {
-          // Determine channels
           const channelPref = app.reminderPreference || 'both';
           const targetChannel: ReminderChannel = channelPref === 'none' ? 'both' : (channelPref as ReminderChannel);
 
-          const { updatedAppointment, logs } = processAppointmentReminder(
+          const { updatedAppointment } = processAppointmentReminder(
             app,
             targetChannel,
             'automated_24h',
             supportPhone
           );
 
-          // Update database
-          db.updateAppointment(app.id, updatedAppointment);
+          await db.updateAppointment(app.id, updatedAppointment);
           this.totalAutomatedSent++;
 
           dispatchedAppointments.push({
@@ -121,34 +112,32 @@ class NotificationService {
           pendingCount++;
         }
       }
+
+      return {
+        scannedCount: appointments.length,
+        dispatchedCount: dispatchedAppointments.length,
+        alreadySentCount,
+        pendingCount,
+        dispatchedAppointments,
+        timestamp: this.lastRunAt
+      };
     } finally {
       this.isScanRunning = false;
     }
-
-    return {
-      scannedCount: db.getAppointments().length,
-      dispatchedCount: dispatchedAppointments.length,
-      alreadySentCount,
-      pendingCount,
-      dispatchedAppointments,
-      timestamp: this.lastRunAt
-    };
   }
 
-  /**
-   * Manually trigger or re-send reminder for a single appointment
-   */
-  public sendSingleReminder(
+  public async sendSingleReminder(
     appointmentId: string,
     channel: ReminderChannel = 'both',
     triggerType: 'manual_admin' | 'patient_test' = 'manual_admin'
-  ): { success: boolean; appointment?: Appointment; message?: string; content?: any } {
-    const app = db.getAppointments().find(a => a.id.toLowerCase() === appointmentId.toLowerCase());
+  ): Promise<{ success: boolean; appointment?: Appointment; message?: string; content?: any }> {
+    const all = await db.getAppointments();
+    const app = all.find(a => a.id.toLowerCase() === appointmentId.toLowerCase());
     if (!app) {
       return { success: false, message: 'Appointment not found' };
     }
 
-    const settings = db.getSettings();
+    const settings = await db.getSettings();
     const supportPhone = settings?.phone || '9069645840';
 
     const { updatedAppointment, content } = processAppointmentReminder(
@@ -158,7 +147,7 @@ class NotificationService {
       supportPhone
     );
 
-    db.updateAppointment(app.id, updatedAppointment);
+    await db.updateAppointment(app.id, updatedAppointment);
 
     return {
       success: true,
@@ -168,11 +157,8 @@ class NotificationService {
     };
   }
 
-  /**
-   * Get service status and live metrics
-   */
-  public getStatus() {
-    const all = db.getAppointments();
+  public async getStatus() {
+    const all = await db.getAppointments();
     const active = all.filter(a => a.status !== 'Rejected' && a.status !== 'Completed');
     const sent = all.filter(a => a.reminderStatus === 'sent');
     const dueNow = active.filter(a => isAppointmentDueForReminder(a, 24).isDue);
@@ -190,11 +176,8 @@ class NotificationService {
     };
   }
 
-  /**
-   * Get all reminder logs across appointments
-   */
-  public getRecentLogs(): ReminderLog[] {
-    const all = db.getAppointments();
+  public async getRecentLogs(): Promise<ReminderLog[]> {
+    const all = await db.getAppointments();
     const logs: ReminderLog[] = [];
 
     for (const a of all) {
@@ -203,18 +186,15 @@ class NotificationService {
       }
     }
 
-    // Sort by timestamp desc
     return logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }
 
-  /**
-   * Preview reminder text and email for an appointment
-   */
-  public previewReminder(appointmentId: string) {
-    const app = db.getAppointments().find(a => a.id.toLowerCase() === appointmentId.toLowerCase());
+  public async previewReminder(appointmentId: string) {
+    const all = await db.getAppointments();
+    const app = all.find(a => a.id.toLowerCase() === appointmentId.toLowerCase());
     if (!app) return null;
 
-    const settings = db.getSettings();
+    const settings = await db.getSettings();
     const supportPhone = settings?.phone || '9069645840';
 
     return generate24HourReminderContent(app, supportPhone);

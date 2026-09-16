@@ -58,34 +58,19 @@ export default function App() {
       return [];
     }
   });
-  const [settings, setSettings] = useState<CompanySettings>(() => {
-    try {
-      const cached = localStorage.getItem('rm_settings');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed && parsed.address) {
-          if (parsed.address.includes('South Extension') || parsed.address.includes('Institutional Medical Area')) {
-            parsed.address = 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
-            try { localStorage.setItem('rm_settings', JSON.stringify(parsed)); } catch {}
-          }
-          return parsed;
-        }
-      }
-    } catch {}
-    return {
-      companyName: 'Renal Medicare',
-      tagline: 'Caring For Kidney Health',
-      phone: '9069645840',
-      alternatePhone: '7522805397',
-      email: 'renalhealthcare01@gmail.com',
-      whatsapp: '9069645840',
-      primaryColor: '#005BBD',
-      secondaryColor: '#4FA9FF',
-      accentColor: '#0EA5E9',
-      backgroundColor: '#FFFFFF',
-      address: 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089'
-    };
-  });
+  const [settings, setSettings] = useState<CompanySettings>(() => ({
+    companyName: 'Renal Medicare',
+    tagline: 'Caring For Kidney Health',
+    phone: '9069645840',
+    alternatePhone: '7522805397',
+    email: 'renalhealthcare01@gmail.com',
+    whatsapp: '9069645840',
+    primaryColor: '#005BBD',
+    secondaryColor: '#4FA9FF',
+    accentColor: '#0EA5E9',
+    backgroundColor: '#FFFFFF',
+    address: 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089'
+  }));
 
   // Admin Auth State
   const [adminToken, setAdminToken] = useState<string | null>(() => localStorage.getItem('rm_admin_token'));
@@ -132,9 +117,6 @@ export default function App() {
           fetchedSettings.address = 'Renal medicare (kidney care & dialysis centre) 63,64,65, Pocket 4, Sector 16A, Rohini Delhi 110089';
         }
         setSettings(fetchedSettings);
-        try {
-          localStorage.setItem('rm_settings', JSON.stringify(fetchedSettings));
-        } catch {}
         ClientDataStore.saveSettings(fetchedSettings);
       }
     } catch (err) {

@@ -99,6 +99,20 @@ inquiryRouter.delete('/:id', requireAuth, async (req, res) => {
   }
 });
 
+// POST /api/inquiries/delete-batch (Admin batch delete inquiries)
+inquiryRouter.post('/delete-batch', requireAuth, async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, error: 'ids array required' });
+    }
+    const count = await db.deleteMultipleInquiries(ids);
+    res.json({ success: true, count, message: `${count} inquiries deleted successfully` });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error?.message || 'Failed to delete inquiries' });
+  }
+});
+
 // POST /api/inquiries/sync (Batch sync if needed)
 inquiryRouter.post('/sync', async (req, res) => {
   try {

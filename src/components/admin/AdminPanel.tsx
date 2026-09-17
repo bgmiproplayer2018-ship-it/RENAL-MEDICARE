@@ -21,8 +21,6 @@ import {
   LogOut,
   ChevronRight,
   ShieldCheck,
-  Server,
-  Code,
   Bell,
   Smartphone,
   Mail,
@@ -76,7 +74,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   services: initialServices,
   settings: initialSettings,
 }) => {
-  const [activeTab, setActiveTab] = useState<'appointments' | 'hospitals' | 'services' | 'inquiries' | 'settings' | 'deployment'>('appointments');
+  const [activeTab, setActiveTab] = useState<'appointments' | 'hospitals' | 'services' | 'inquiries' | 'settings'>('appointments');
   
   // Data states - initialized with fallback storage so refreshes never revert or flash empty
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -97,6 +95,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   });
   const [inquiries, setInquiries] = useState<ContactMessage[]>([]);
+  const [selectedInquiryIds, setSelectedInquiryIds] = useState<string[]>([]);
+  const [isDeletingInquiries, setIsDeletingInquiries] = useState(false);
   const [settings, setSettings] = useState<CompanySettings>(() => {
     if (initialSettings && initialSettings.address) return initialSettings;
     try {
@@ -600,7 +600,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   const handleDeleteInquiry = async (id: string) => {
-    if (!confirm('Delete this message?')) return;
+    if (!confirm('Are you sure you want to delete this inquiry?')) return;
     try {
       const res = await apiFetch(`/api/contact/${id}`, {
         method: 'DELETE',
@@ -610,10 +610,83 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       if (data.success) {
         const updated = (inquiries || []).filter(i => i && i.id !== id);
         setInquiries(updated);
+        setSelectedInquiryIds(prev => prev.filter(item => item !== id));
         ClientDataStore.saveContacts(updated);
       }
     } catch {
       alert('Error deleting inquiry');
+    }
+  };
+
+  const handleDeleteSelectedInquiries = async () => {
+    if (selectedInquiryIds.length === 0) return;
+    if (!confirm(`Are you sure you want to delete ${selectedInquiryIds.length} selected inquiry/inquiries?`)) return;
+    setIsDeletingInquiries(true);
+    try {
+      const res = await apiFetch('/api/inquiries/delete-batch', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ ids: selectedInquiryIds })
+      });
+      const data = await res.json().catch(() => ({}));
+      
+      // Fallback: If delete-batch not available or failed, do sequential DELETE
+      if (!data.success) {
+        await Promise.all(selectedInquiryIds.map(id => 
+          apiFetch(`/api/contact/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+          }).catch(() => {})
+        ));
+      }
+
+      const updated = (inquiries || []).filter(i => i && !selectedInquiryIds.includes(i.id));
+      setInquiries(updated);
+      setSelectedInquiryIds([]);
+      ClientDataStore.saveContacts(updated);
+    } catch {
+      alert('Error deleting selected inquiries');
+    } finally {
+      setIsDeletingInquiries(false);
+    }
+  };
+
+  const handleDeleteAllInquiries = async () => {
+    const valid = (inquiries || []).filter(i => Boolean(i && i.id));
+    if (valid.length === 0) return;
+    if (!confirm(`Are you sure you want to permanently delete ALL ${valid.length} inquiries? This action cannot be undone.`)) return;
+    setIsDeletingInquiries(true);
+    try {
+      const allIds = valid.map(i => i.id);
+      const res = await apiFetch('/api/inquiries/delete-batch', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ ids: allIds })
+      });
+      const data = await res.json().catch(() => ({}));
+      
+      if (!data.success) {
+        await Promise.all(allIds.map(id => 
+          apiFetch(`/api/contact/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+          }).catch(() => {})
+        ));
+      }
+
+      setInquiries([]);
+      setSelectedInquiryIds([]);
+      ClientDataStore.saveContacts([]);
+    } catch {
+      alert('Error deleting all inquiries');
+    } finally {
+      setIsDeletingInquiries(false);
     }
   };
 
@@ -682,7 +755,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             { id: 'services', label: `Services (${(services || []).filter(Boolean).length})`, icon: <Briefcase className="w-4 h-4 shrink-0" /> },
             { id: 'inquiries', label: `Inquiries (${(inquiries || []).filter(Boolean).length})`, icon: <MessageSquare className="w-4 h-4 shrink-0" /> },
             { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4 shrink-0" /> },
-            { id: 'deployment', label: 'Deployment Guides', icon: <Server className="w-4 h-4 shrink-0" /> },
           ].map(tab => (
             <button
               key={tab.id}
@@ -1234,90 +1306,156 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         )}
 
         {/* TAB 4: INQUIRIES & MESSAGES */}
-        {activeTab === 'inquiries' && (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-base font-bold text-slate-900">Patient Messages &amp; Home Visit Inquiries</h3>
-              <p className="text-xs text-slate-500">Real-time incoming queries from the website contact and home dialysis assessment forms.</p>
-            </div>
+        {activeTab === 'inquiries' && (() => {
+          const validInquiries = (inquiries || []).filter((inq): inq is ContactMessage => Boolean(inq && inq.id));
+          const allSelected = validInquiries.length > 0 && validInquiries.every(inq => selectedInquiryIds.includes(inq.id));
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-              <table className="w-full text-left text-xs text-slate-600">
-                <thead className="bg-slate-50 text-slate-700 uppercase font-bold text-[11px] border-b border-slate-200">
-                  <tr>
-                    <th className="py-3 px-4">Type</th>
-                    <th className="py-3 px-4">Patient / Contact</th>
-                    <th className="py-3 px-4">Message / Address</th>
-                    <th className="py-3 px-4">Date</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {(!inquiries || inquiries.filter(Boolean).length === 0) ? (
-                    <tr>
-                      <td colSpan={6} className="py-8 text-center text-slate-400">
-                        No inquiries received yet.
-                      </td>
-                    </tr>
-                  ) : (
-                    inquiries.filter((inq): inq is ContactMessage => Boolean(inq && inq.id)).map(inq => {
-                      const isRead = Boolean(inq.isRead);
-                      return (
-                        <tr key={inq.id} className={isRead ? 'bg-white' : 'bg-blue-50/30 font-semibold'}>
-                          <td className="py-3 px-4">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              inq.type === 'home-dialysis-request' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-800'
-                            }`}>
-                              {inq.type === 'home-dialysis-request' ? 'Home Visit' : 'General'}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="font-bold text-slate-900">{inq.name}</div>
-                            <div className="text-[11px] text-slate-500">{inq.phone}</div>
-                            {inq.email && <div className="text-[10px] text-slate-400">{inq.email}</div>}
-                          </td>
-                          <td className="py-3 px-4 max-w-sm">
-                            {inq.subject && <div className="font-bold text-slate-800 text-[11px]">{inq.subject}</div>}
-                            <p className="text-slate-600 text-xs">{inq.message}</p>
-                            {inq.address && <p className="text-emerald-700 text-[11px]">📍 Address: {inq.address}</p>}
-                            {inq.preferredDate && <p className="text-blue-700 text-[11px]">📅 Preferred Date: {inq.preferredDate}</p>}
-                          </td>
-                          <td className="py-3 px-4 text-slate-400 text-[11px]">
-                            {(inq.createdAt || '').slice(0, 10)}
-                          </td>
-                          <td className="py-3 px-4">
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${isRead ? 'bg-slate-100 text-slate-500' : 'bg-amber-100 text-amber-800'}`}>
-                              {isRead ? 'Read' : 'New'}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              {!isRead && (
-                                <button
-                                  onClick={() => handleMarkInquiryRead(inq.id)}
-                                  className="text-[11px] font-bold text-[#005BBD] hover:underline cursor-pointer"
-                                >
-                                  Mark Read
-                                </button>
-                              )}
-                              <button
-                                onClick={() => handleDeleteInquiry(inq.id)}
-                                className="text-slate-400 hover:text-red-600 cursor-pointer"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
+          return (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Patient Messages &amp; Home Visit Inquiries</h3>
+                  <p className="text-xs text-slate-500">Real-time incoming queries from the website contact and home dialysis assessment forms.</p>
+                </div>
+
+                {/* Bulk & Batch Deletion Action Controls */}
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  {selectedInquiryIds.length > 0 && (
+                    <button
+                      onClick={handleDeleteSelectedInquiries}
+                      disabled={isDeletingInquiries}
+                      className="px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors disabled:opacity-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span>Delete Selected ({selectedInquiryIds.length})</span>
+                    </button>
                   )}
-                </tbody>
-              </table>
+
+                  {validInquiries.length > 0 && (
+                    <button
+                      onClick={handleDeleteAllInquiries}
+                      disabled={isDeletingInquiries}
+                      className="px-3.5 py-2 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors disabled:opacity-50"
+                      title="Permanently remove all inquiries"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span>Delete All Inquiries</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <table className="w-full text-left text-xs text-slate-600">
+                  <thead className="bg-slate-50 text-slate-700 uppercase font-bold text-[11px] border-b border-slate-200">
+                    <tr>
+                      <th className="py-3 px-4 w-10">
+                        <input
+                          type="checkbox"
+                          aria-label="Select all inquiries"
+                          className="rounded border-slate-300 text-[#005BBD] focus:ring-blue-500 cursor-pointer w-4 h-4"
+                          checked={allSelected}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedInquiryIds(validInquiries.map(inq => inq.id));
+                            } else {
+                              setSelectedInquiryIds([]);
+                            }
+                          }}
+                        />
+                      </th>
+                      <th className="py-3 px-4">Type</th>
+                      <th className="py-3 px-4">Patient / Contact</th>
+                      <th className="py-3 px-4">Message / Address</th>
+                      <th className="py-3 px-4">Date</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {validInquiries.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="py-8 text-center text-slate-400">
+                          No inquiries received yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      validInquiries.map(inq => {
+                        const isRead = Boolean(inq.isRead);
+                        const isSelected = selectedInquiryIds.includes(inq.id);
+                        return (
+                          <tr key={inq.id} className={isSelected ? 'bg-red-50/30' : isRead ? 'bg-white' : 'bg-blue-50/30 font-semibold'}>
+                            <td className="py-3 px-4">
+                              <input
+                                type="checkbox"
+                                aria-label={`Select inquiry from ${inq.name}`}
+                                className="rounded border-slate-300 text-[#005BBD] focus:ring-blue-500 cursor-pointer w-4 h-4"
+                                checked={isSelected}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedInquiryIds(prev => [...prev, inq.id]);
+                                  } else {
+                                    setSelectedInquiryIds(prev => prev.filter(id => id !== inq.id));
+                                  }
+                                }}
+                              />
+                            </td>
+                            <td className="py-3 px-4">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                inq.type === 'home-dialysis-request' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-800'
+                              }`}>
+                                {inq.type === 'home-dialysis-request' ? 'Home Visit' : 'General'}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="font-bold text-slate-900">{inq.name}</div>
+                              <div className="text-[11px] text-slate-500">{inq.phone}</div>
+                              {inq.email && <div className="text-[10px] text-slate-400">{inq.email}</div>}
+                            </td>
+                            <td className="py-3 px-4 max-w-sm">
+                              {inq.subject && <div className="font-bold text-slate-800 text-[11px]">{inq.subject}</div>}
+                              <p className="text-slate-600 text-xs">{inq.message}</p>
+                              {inq.address && <p className="text-emerald-700 text-[11px]">📍 Address: {inq.address}</p>}
+                              {inq.preferredDate && <p className="text-blue-700 text-[11px]">📅 Preferred Date: {inq.preferredDate}</p>}
+                            </td>
+                            <td className="py-3 px-4 text-slate-400 text-[11px]">
+                              {(inq.createdAt || '').slice(0, 10)}
+                            </td>
+                            <td className="py-3 px-4">
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${isRead ? 'bg-slate-100 text-slate-500' : 'bg-amber-100 text-amber-800'}`}>
+                                {isRead ? 'Read' : 'New'}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                {!isRead && (
+                                  <button
+                                    onClick={() => handleMarkInquiryRead(inq.id)}
+                                    className="px-2.5 py-1 rounded-lg border border-blue-200 bg-blue-50/50 hover:bg-blue-100 text-[#005BBD] font-bold text-[11px] cursor-pointer transition-colors"
+                                  >
+                                    Mark Read
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleDeleteInquiry(inq.id)}
+                                  className="px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-300 font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                                  title="Delete Inquiry"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>Delete</span>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* TAB 5: COMPANY & SITE SETTINGS */}
         {activeTab === 'settings' && (
@@ -1417,84 +1555,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 Save Updated Site Settings
               </button>
             </form>
-          </div>
-        )}
-
-        {/* TAB 6: DEPLOYMENT GUIDES (Netlify, Vercel, Render, Self-Hosted) */}
-        {activeTab === 'deployment' && (
-          <div className="space-y-6">
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider">
-                <Server className="w-4 h-4" />
-                <span>Production Deployment Blueprint</span>
-              </div>
-              <h3 className="text-2xl font-black text-slate-900">
-                Production Deployment Documentation
-              </h3>
-              <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                Renal Medicare is designed with a full-stack architecture (Vite + React 19 Frontend with Express Node.js Backend and self-contained persistent storage). Follow the guides below for seamless one-click hosting:
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Vercel Guide */}
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-3">
-                <span className="px-2.5 py-1 rounded bg-black text-white text-[11px] font-bold">Vercel Deployment</span>
-                <h4 className="font-bold text-slate-900 text-base">Frontend &amp; Serverless APIs</h4>
-                <ol className="text-xs text-slate-600 space-y-2 list-decimal pl-4">
-                  <li>Push your code to a GitHub repository.</li>
-                  <li>Import the project into <strong>vercel.com</strong>.</li>
-                  <li>Set <code>Build Command</code>: <code>npm run build</code></li>
-                  <li>Set <code>Output Directory</code>: <code>dist</code></li>
-                  <li>Add environment variables from <code>.env.example</code>.</li>
-                </ol>
-              </div>
-
-              {/* Render / Railway / Cloud Run Guide */}
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-3">
-                <span className="px-2.5 py-1 rounded bg-[#005BBD] text-white text-[11px] font-bold">Render / Node Container</span>
-                <h4 className="font-bold text-slate-900 text-base">Full-Stack Express + Vite</h4>
-                <ol className="text-xs text-slate-600 space-y-2 list-decimal pl-4">
-                  <li>Create a new <strong>Web Service</strong> on Render or Railway.</li>
-                  <li>Set <code>Build Command</code>: <code>npm run build</code></li>
-                  <li>Set <code>Start Command</code>: <code>npm start</code></li>
-                  <li>Add <code>JWT_SECRET</code> and <code>ADMIN_PASSWORD</code>.</li>
-                  <li>Binds automatically to port 3000.</li>
-                </ol>
-              </div>
-
-              {/* Built-in Storage Setup */}
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-3">
-                <span className="px-2.5 py-1 rounded bg-emerald-600 text-white text-[11px] font-bold">Zero External DB Needed</span>
-                <h4 className="font-bold text-slate-900 text-base">Self-Contained Data Storage</h4>
-                <ol className="text-xs text-slate-600 space-y-2 list-decimal pl-4">
-                  <li>No external database or complex database cluster installation is required.</li>
-                  <li>All patient appointments, hospital centers, and content are saved directly to persistent storage.</li>
-                  <li>Automatic client-side sync ensures zero data loss even during network disconnects.</li>
-                  <li>Admin exports provide immediate full JSON database backup anytime.</li>
-                </ol>
-              </div>
-
-              {/* Netlify Guide */}
-              <div className="bg-white p-6 rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50/40 to-white space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded bg-teal-600 text-white text-[11px] font-bold">Netlify (100% Ready)</span>
-                  <span className="text-[10px] font-bold text-teal-700 bg-teal-100 px-2 py-0.5 rounded-full">Serverless + SPA Preconfigured</span>
-                </div>
-                <h4 className="font-bold text-slate-900 text-base">Netlify One-Click Deployment</h4>
-                <ol className="text-xs text-slate-600 space-y-2 list-decimal pl-4">
-                  <li><strong>Repository:</strong> Push or connect this project to GitHub / GitLab.</li>
-                  <li><strong>Netlify Import:</strong> Click <em>&ldquo;Add new site&rdquo;</em> &rarr; <em>&ldquo;Import an existing project&rdquo;</em>.</li>
-                  <li><strong>Build Command:</strong> <code>npm run build</code> (pre-configured in <code>netlify.toml</code>)</li>
-                  <li><strong>Publish Directory:</strong> <code>dist</code></li>
-                  <li><strong>Functions Directory:</strong> <code>netlify/functions</code> (auto-detected)</li>
-                  <li><strong>Routes &amp; Fallbacks:</strong> <code>netlify.toml</code> and <code>public/_redirects</code> route all SPA links and API calls seamlessly.</li>
-                </ol>
-                <div className="pt-2 text-[11px] text-teal-800 bg-teal-50 p-2.5 rounded-xl border border-teal-100">
-                  ✨ <strong>Zero-Configuration:</strong> Includes auto-resilient client storage fallback, so appointments, inquiries, tracking, and admin logins work whether deployed with Netlify Functions or static Netlify Drop.
-                </div>
-              </div>
-            </div>
           </div>
         )}
       </div>

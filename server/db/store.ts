@@ -913,6 +913,29 @@ class Store {
     return this.deleteInquiry(id);
   }
 
+  async deleteMultipleInquiries(ids: string[]): Promise<number> {
+    if (!ids || ids.length === 0) return 0;
+    const db = getDb();
+    if (db) {
+      try {
+        const result = await db.collection('inquiries').deleteMany({ id: { $in: ids } });
+        logCollectionUpdated('inquiries', `batch deleted ${result.deletedCount} items`);
+        this.state.contacts = this.state.contacts.filter(c => !ids.includes(c.id));
+        this.saveLocal();
+        return result.deletedCount;
+      } catch (err: any) {
+        logSaveFailed('inquiries', err);
+        throw err;
+      }
+    }
+
+    const initialLen = this.state.contacts.length;
+    this.state.contacts = this.state.contacts.filter(c => !ids.includes(c.id));
+    const deleted = initialLen - this.state.contacts.length;
+    this.saveLocal();
+    return deleted;
+  }
+
   async syncContacts(incoming: ContactMessage[]): Promise<ContactMessage[]> {
     const db = getDb();
     for (const item of incoming) {

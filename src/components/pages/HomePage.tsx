@@ -50,10 +50,67 @@ export const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const [openFaqId, setOpenFaqId] = useState<string | null>(faqs[0]?.id || null);
   const [quickContactStatus, setQuickContactStatus] = useState<string | null>(null);
+
+  const getServiceOptionLabel = (s: ServiceItem) => {
+    const title = s.title.trim();
+    const lower = title.toLowerCase();
+    if (lower === 'hemodialysis') return 'Hemodialysis (Center-Based)';
+    if (lower === 'home dialysis') return 'At-Home Dialysis (Personal Technician)';
+    if (lower === 'emergency dialysis') return 'Emergency Acute Dialysis';
+    if (s.price && s.price.trim()) {
+      return `${title} (${s.price})`;
+    }
+    return title;
+  };
+
+  // Dynamically populated from admin services and database
+  const callbackServiceOptions = React.useMemo(() => {
+    if (!services || services.length === 0) {
+      return [
+        { id: 'fb-hemo', value: 'Hemodialysis', label: 'Hemodialysis (Center-Based)' },
+        { id: 'fb-home', value: 'Home Dialysis', label: 'At-Home Dialysis (Personal Technician)' },
+        { id: 'fb-neph', value: 'Nephrologist Consultation', label: 'Nephrologist Consultation' },
+        { id: 'fb-emerg', value: 'Emergency Dialysis', label: 'Emergency Acute Dialysis' },
+      ];
+    }
+
+    const list: { id: string; value: string; label: string }[] = [];
+    const seen = new Set<string>();
+
+    services.forEach(s => {
+      if (s && s.title) {
+        const norm = s.title.trim().toLowerCase();
+        if (!seen.has(norm)) {
+          seen.add(norm);
+          list.push({
+            id: s.id,
+            value: s.title,
+            label: getServiceOptionLabel(s),
+          });
+        }
+      }
+    });
+
+    // Helpful fallback option if not already present
+    if (!seen.has('general kidney consultation') && !seen.has('general consultation')) {
+      list.push({
+        id: 'opt-general-consult',
+        value: 'General Kidney Consultation',
+        label: 'General Kidney Consultation',
+      });
+    }
+
+    return list;
+  }, [services]);
+
+  const defaultService = (services && services.length > 0 && services[0]?.title) 
+    ? services[0].title 
+    : 'Hemodialysis';
+
   const [quickContactForm, setQuickContactForm] = useState({
     name: '',
     phone: '',
-    service: 'Hemodialysis',
+    service: defaultService,
     message: ''
   });
 
@@ -77,7 +134,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       const data = await res.json();
       if (data.success) {
         setQuickContactStatus('success');
-        setQuickContactForm({ name: '', phone: '', service: 'Hemodialysis', message: '' });
+        setQuickContactForm({ name: '', phone: '', service: defaultService, message: '' });
       } else {
         setQuickContactStatus('error');
       }
@@ -228,14 +285,16 @@ export const HomePage: React.FC<HomePageProps> = ({
                       </div>
 
                       <select
+                        id="quick-contact-service-select"
                         value={quickContactForm.service}
                         onChange={e => setQuickContactForm({ ...quickContactForm, service: e.target.value })}
                         className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white focus:ring-2 focus:ring-[#005BBD] focus:outline-none text-slate-700"
                       >
-                        <option value="Hemodialysis">Hemodialysis (Center-Based)</option>
-                        <option value="Home Dialysis">At-Home Dialysis (Personal Technician)</option>
-                        <option value="Nephrologist Consultation">Nephrologist Consultation</option>
-                        <option value="Emergency Dialysis">Emergency Acute Dialysis</option>
+                        {callbackServiceOptions.map(opt => (
+                          <option key={opt.id} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
                       </select>
 
                       <button

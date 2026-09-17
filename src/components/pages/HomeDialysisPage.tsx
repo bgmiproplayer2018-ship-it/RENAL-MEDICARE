@@ -120,8 +120,8 @@ export const HomeDialysisPage: React.FC<HomeDialysisPageProps> = ({ onNavigate, 
             <div className="lg:col-span-5">
               <div className="relative rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl">
                 <ScrollAnimatedImage
-                  src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80"
-                  alt="Home Dialysis Setup"
+                  src="/images/patient-hemodialysis-session.jpg"
+                  alt="Hospital-Grade At-Home Hemodialysis Setup & Patient Care"
                   className="w-full h-64 sm:h-80 object-cover"
                   containerClassName="w-full h-64 sm:h-80"
                   animation="scale-in"

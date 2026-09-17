@@ -269,7 +269,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         <div className="bg-gradient-to-r from-[#003875] via-[#005BBD] to-[#0EA5E9] rounded-2xl sm:rounded-3xl p-5 sm:p-10 text-white shadow-xl relative overflow-hidden">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 text-center">
             <div className="space-y-1 p-2 bg-white/5 rounded-xl sm:bg-transparent">
-              <span className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight block">15,000+</span>
+              <span className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight block">7,000+</span>
               <span className="text-[11px] sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Dialysis Sessions</span>
               <span className="text-[10px] sm:text-xs text-blue-200">Zero cross-infection</span>
             </div>
@@ -279,12 +279,12 @@ export const HomePage: React.FC<HomePageProps> = ({
               <span className="text-[10px] sm:text-xs text-blue-200">AAMI &amp; ISO ultrapure</span>
             </div>
             <div className="space-y-1 p-2 bg-white/5 rounded-xl sm:bg-transparent">
-              <span className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight block">24+</span>
+              <span className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight block">2+</span>
               <span className="text-[11px] sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Partner Hospitals</span>
               <span className="text-[10px] sm:text-xs text-blue-200">Metro healthcare network</span>
             </div>
             <div className="space-y-1 p-2 bg-white/5 rounded-xl sm:bg-transparent">
-              <span className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight block">50+</span>
+              <span className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight block">15+</span>
               <span className="text-[11px] sm:text-sm font-semibold text-blue-100 uppercase tracking-wider block">Specialists</span>
               <span className="text-[10px] sm:text-xs text-blue-200">DM/DNB Nephrologists</span>
             </div>
@@ -312,17 +312,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               NABH-compliant At-Home Hemodialysis service.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 text-[#005BBD] flex items-center justify-center font-bold">
-                  <Award className="w-4 h-4" />
-                </div>
-                <h4 className="font-bold text-slate-900 text-sm">Our Mission</h4>
-                <p className="text-xs text-slate-600 leading-normal">
-                  To deliver zero-compromise dialysis and nephrology care that prolongs life, preserves residual kidney function, and restores independence.
-                </p>
-              </div>
-
+            <div className="pt-2">
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
                 <div className="w-8 h-8 rounded-lg bg-emerald-100 text-[#16A34A] flex items-center justify-center font-bold">
                   <Sparkles className="w-4 h-4" />
@@ -347,15 +337,22 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           <div className="lg:col-span-6 grid grid-cols-2 gap-4">
             <div className="space-y-4">
-              <div className="rounded-2xl overflow-hidden shadow-md h-52">
+              <div className="rounded-2xl overflow-hidden shadow-md h-52 relative group">
                 <ScrollAnimatedImage
-                  src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=600&q=80"
-                  alt="Nephrologist reviewing chart"
+                  src="/images/hemodialysis-center.jpg"
+                  alt="Renal Medicare Advanced Hemodialysis Center & Care Suite"
                   className="w-full h-full object-cover"
                   containerClassName="w-full h-full"
                   animation="slide-right"
                   delay={0.1}
                 />
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 px-2.5 py-1.5 rounded-lg bg-slate-900/80 backdrop-blur-sm border border-white/10 text-white flex items-center justify-between opacity-90 transition-opacity duration-300">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                    <span className="text-[10px] font-bold tracking-wide uppercase">Dialysis Care Suite</span>
+                  </div>
+                  <span className="text-[9px] text-emerald-300 font-medium">Hospital Embedded</span>
+                </div>
               </div>
               <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100 space-y-2">
                 <span className="font-black text-[#005BBD] text-2xl">100%</span>
@@ -370,15 +367,22 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <h5 className="font-bold text-slate-900 text-xs">Nephrologist On-Call</h5>
                 <p className="text-[11px] text-slate-600">Immediate clinical escalation for vascular access issues, fluid overload, or arrhythmias.</p>
               </div>
-              <div className="rounded-2xl overflow-hidden shadow-md h-52">
+              <div className="rounded-2xl overflow-hidden shadow-md h-52 relative group">
                 <ScrollAnimatedImage
-                  src="https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80"
-                  alt="Modern dialysis equipment"
+                  src="/images/dialysis-ro-water-machine.jpg"
+                  alt="DIALYSIS (R.O) Ultra Pure Water Machine - Clinical Grade Water Treatment Plant"
                   className="w-full h-full object-cover"
                   containerClassName="w-full h-full"
                   animation="slide-left"
                   delay={0.2}
                 />
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 px-2.5 py-1.5 rounded-lg bg-slate-900/80 backdrop-blur-sm border border-white/10 text-white flex items-center justify-between opacity-90 transition-opacity duration-300">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span className="text-[10px] font-bold tracking-wide uppercase">Dialysis R.O Plant</span>
+                  </div>
+                  <span className="text-[9px] text-blue-200 font-medium">Ultrapure Water System</span>
+                </div>
               </div>
             </div>
           </div>
@@ -550,8 +554,8 @@ export const HomePage: React.FC<HomePageProps> = ({
             <div className="lg:col-span-5">
               <div className="relative rounded-2xl overflow-hidden border-2 border-emerald-500/30 shadow-2xl">
                 <ScrollAnimatedImage
-                  src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80"
-                  alt="Home Dialysis Patient Care"
+                  src="/images/patient-hemodialysis-session.jpg"
+                  alt="Hospital-Grade At-Home Hemodialysis Patient Care"
                   className="w-full h-80 sm:h-96 object-cover"
                   containerClassName="w-full h-full"
                   animation="scale-in"
@@ -841,22 +845,29 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {blogs.slice(0, 3).map((b, idx) => (
-            <article
-              key={b.id}
-              onClick={() => onNavigate('blog', b.id)}
-              className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col group"
-            >
-              <div className="h-48 overflow-hidden bg-slate-100 relative">
-                <ScrollAnimatedImage
-                  src={b.featuredImage}
-                  alt={b.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  containerClassName="w-full h-full"
-                  animation="scale-in"
-                  delay={(idx % 3) * 0.1}
-                />
-              </div>
+          {blogs.slice(0, 3).map((b, idx) => {
+            const blogImg = b.id === 'blog-1' && (b.featuredImage.includes('1579684385127') || !b.featuredImage || b.featuredImage === '/images/ckd-dialysis-unit.jpg')
+              ? '/images/ckd-dialysis-unit.jpg'
+              : b.id === 'blog-3' && (b.featuredImage.includes('1516549655169') || !b.featuredImage || b.featuredImage === '/images/patient-dialysis-hospital-room.jpg')
+              ? '/images/patient-dialysis-hospital-room.jpg'
+              : b.featuredImage;
+
+            return (
+              <article
+                key={b.id}
+                onClick={() => onNavigate('blog', b.id)}
+                className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col group"
+              >
+                <div className="h-48 overflow-hidden bg-slate-100 relative">
+                  <ScrollAnimatedImage
+                    src={blogImg}
+                    alt={b.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    containerClassName="w-full h-full"
+                    animation="scale-in"
+                    delay={(idx % 3) * 0.1}
+                  />
+                </div>
 
               <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                 <div className="space-y-2">
@@ -880,8 +891,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                   </span>
                 </div>
               </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </section>
 

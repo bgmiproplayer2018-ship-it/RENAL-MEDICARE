@@ -248,7 +248,7 @@ export const initialData = {
         "Hemodialysis",
         "Peritoneal Dialysis"
       ],
-      "featuredImage": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80",
+      "featuredImage": "/images/ckd-dialysis-unit.jpg",
       "author": "Dr. Vivek Sharma, Senior Nephrologist",
       "publishedDate": "September 10, 2026",
       "readTime": "6 min read",
@@ -289,7 +289,7 @@ export const initialData = {
         "Safety",
         "Technology"
       ],
-      "featuredImage": "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80",
+      "featuredImage": "/images/patient-dialysis-hospital-room.jpg",
       "author": "Dr. Ramesh Nair, Director of Clinical Services",
       "publishedDate": "August 28, 2026",
       "readTime": "4 min read",

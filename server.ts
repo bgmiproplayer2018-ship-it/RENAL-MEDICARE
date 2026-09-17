@@ -9,6 +9,10 @@ dotenv.config();
 async function startServer() {
   const app = createApp();
   const PORT = 3000;
+  const publicPath = path.join(process.cwd(), 'public');
+
+  // Serve static assets from public folder directly
+  app.use(express.static(publicPath));
 
   // Vite middleware for development or static serving in production
   if (process.env.NODE_ENV !== 'production') {

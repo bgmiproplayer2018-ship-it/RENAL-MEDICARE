@@ -107,9 +107,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, phone = '90696
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { num: '15,000+', label: 'Successful Dialysis Sessions', desc: 'Conducted across center and at-home modalities with documented outcomes.' },
+              { num: '7,000+', label: 'Successful Dialysis Sessions', desc: 'Conducted across center and at-home modalities with documented outcomes.' },
               { num: '99.4%', label: 'Infection-Free Record', desc: 'Rigorous microbiological water monitoring and single-use dialyzer tubing.' },
-              { num: '24+', label: 'Hospital Network Wings', desc: 'Integrated state-of-the-art dialysis suites across Delhi NCR and major cities.' },
+              { num: '2+', label: 'Hospital Network Wings', desc: 'Integrated state-of-the-art dialysis suites across Delhi NCR and major cities.' },
               { num: '100%', label: 'Senior Doctor Supervision', desc: 'Every treatment protocol is verified and managed by board-certified Nephrologists.' }
             ].map((ach, idx) => (
               <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-2">

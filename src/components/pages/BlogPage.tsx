@@ -100,26 +100,33 @@ export const BlogPage: React.FC<BlogPageProps> = ({
       {/* Blogs Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {filteredBlogs.map((post, idx) => (
-            <article
-              key={post.id}
-              onClick={() => setActiveArticle(post)}
-              className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group"
-            >
-              <div>
-                <div className="h-44 sm:h-52 relative overflow-hidden bg-slate-100">
-                  <ScrollAnimatedImage
-                    src={post.featuredImage}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    containerClassName="w-full h-full"
-                    animation="scale-in"
-                    delay={(idx % 3) * 0.08}
-                  />
-                  <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-[#005BBD] shadow-xs z-10">
-                    {post.category}
+          {filteredBlogs.map((post, idx) => {
+            const postImg = post.id === 'blog-1' && (post.featuredImage.includes('1579684385127') || !post.featuredImage || post.featuredImage === '/images/ckd-dialysis-unit.jpg')
+              ? '/images/ckd-dialysis-unit.jpg'
+              : post.id === 'blog-3' && (post.featuredImage.includes('1516549655169') || !post.featuredImage || post.featuredImage === '/images/patient-dialysis-hospital-room.jpg')
+              ? '/images/patient-dialysis-hospital-room.jpg'
+              : post.featuredImage;
+
+            return (
+              <article
+                key={post.id}
+                onClick={() => setActiveArticle(post)}
+                className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="h-44 sm:h-52 relative overflow-hidden bg-slate-100">
+                    <ScrollAnimatedImage
+                      src={postImg}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      containerClassName="w-full h-full"
+                      animation="scale-in"
+                      delay={(idx % 3) * 0.08}
+                    />
+                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-[#005BBD] shadow-xs z-10">
+                      {post.category}
+                    </div>
                   </div>
-                </div>
 
                 <div className="p-4 sm:p-6 space-y-2.5 sm:space-y-3">
                   <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-slate-400 font-medium">
@@ -152,8 +159,9 @@ export const BlogPage: React.FC<BlogPageProps> = ({
                   Read Article <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -178,7 +186,13 @@ export const BlogPage: React.FC<BlogPageProps> = ({
             {/* Modal Hero Image */}
             <div className="h-48 sm:h-80 w-full relative bg-slate-100 overflow-hidden">
               <ScrollAnimatedImage
-                src={activeArticle.featuredImage}
+                src={
+                  activeArticle.id === 'blog-1' && (activeArticle.featuredImage.includes('1579684385127') || !activeArticle.featuredImage || activeArticle.featuredImage === '/images/ckd-dialysis-unit.jpg')
+                    ? '/images/ckd-dialysis-unit.jpg'
+                    : activeArticle.id === 'blog-3' && (activeArticle.featuredImage.includes('1516549655169') || !activeArticle.featuredImage || activeArticle.featuredImage === '/images/patient-dialysis-hospital-room.jpg')
+                    ? '/images/patient-dialysis-hospital-room.jpg'
+                    : activeArticle.featuredImage
+                }
                 alt={activeArticle.title}
                 className="w-full h-full object-cover"
                 containerClassName="w-full h-full"

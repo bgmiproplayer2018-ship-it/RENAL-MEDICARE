@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { BlogPost, CompanySettings } from '../../types.ts';
 import { ScrollAnimatedImage } from '../common/ScrollAnimatedImage.tsx';
+import { CardGridSkeleton } from '../common/Skeletons.tsx';
 
 interface BlogPageProps {
   blogs: BlogPost[];
@@ -99,20 +100,23 @@ export const BlogPage: React.FC<BlogPageProps> = ({
 
       {/* Blogs Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {filteredBlogs.map((post, idx) => {
-            const postImg = post.id === 'blog-1' && (post.featuredImage.includes('1579684385127') || !post.featuredImage || post.featuredImage === '/images/ckd-dialysis-unit.jpg')
-              ? '/images/ckd-dialysis-unit.jpg'
-              : post.id === 'blog-3' && (post.featuredImage.includes('1516549655169') || !post.featuredImage || post.featuredImage === '/images/patient-dialysis-hospital-room.jpg')
-              ? '/images/patient-dialysis-hospital-room.jpg'
-              : post.featuredImage;
+        {blogs.length === 0 ? (
+          <CardGridSkeleton count={6} columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3" />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {filteredBlogs.map((post, idx) => {
+              const postImg = post.id === 'blog-1' && (post.featuredImage.includes('1579684385127') || !post.featuredImage || post.featuredImage === '/images/ckd-dialysis-unit.jpg')
+                ? '/images/ckd-dialysis-unit.jpg'
+                : post.id === 'blog-3' && (post.featuredImage.includes('1516549655169') || !post.featuredImage || post.featuredImage === '/images/patient-dialysis-hospital-room.jpg')
+                ? '/images/patient-dialysis-hospital-room.jpg'
+                : post.featuredImage;
 
-            return (
-              <article
-                key={post.id}
-                onClick={() => setActiveArticle(post)}
-                className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group"
-              >
+              return (
+                <article
+                  key={post.id}
+                  onClick={() => setActiveArticle(post)}
+                  className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group"
+                >
                 <div>
                   <div className="h-44 sm:h-52 relative overflow-hidden bg-slate-100">
                     <ScrollAnimatedImage
@@ -163,6 +167,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({
             );
           })}
         </div>
+        )}
       </section>
 
       {/* ARTICLE READER MODAL */}

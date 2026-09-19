@@ -28,6 +28,7 @@ import { ServiceItem, Hospital, BlogPost, FAQItem, Testimonial, CompanySettings 
 import { RenalLogo } from '../common/RenalLogo.tsx';
 import { apiFetch } from '../../lib/apiFallback.ts';
 import { ScrollAnimatedImage } from '../common/ScrollAnimatedImage.tsx';
+import { CardGridSkeleton } from '../common/Skeletons.tsx';
 
 interface HomePageProps {
   onNavigate: (tab: string, param?: string) => void;
@@ -474,17 +475,20 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
 
           {/* Service Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.slice(0, 6).map((srv, idx) => {
-              const serviceImg = srv.id === 'srv-1' && (srv.image.includes('1579684385127') || !srv.image || srv.image === '/images/dialysis-hero-suite.jpg')
-                ? '/images/patient-dialysis-hospital-room.jpg'
-                : srv.image;
+          {services.length === 0 ? (
+            <CardGridSkeleton count={3} columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3" />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {services.slice(0, 6).map((srv, idx) => {
+                const serviceImg = srv.id === 'srv-1' && (srv.image.includes('1579684385127') || !srv.image || srv.image === '/images/dialysis-hero-suite.jpg')
+                  ? '/images/patient-dialysis-hospital-room.jpg'
+                  : srv.image;
 
-              return (
-              <div 
-                key={srv.id}
-                className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
-              >
+                return (
+                <div 
+                  key={srv.id}
+                  className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
+                >
                 <div className="relative h-48 overflow-hidden bg-slate-100">
                   <ScrollAnimatedImage
                     src={serviceImg}
@@ -552,6 +556,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               );
             })}
           </div>
+          )}
         </div>
       </section>
 
@@ -657,63 +662,67 @@ export const HomePage: React.FC<HomePageProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {hospitals.slice(0, 3).map((hosp, idx) => (
-            <div
-              key={hosp.id}
-              className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col group"
-            >
-              <div className="h-44 relative bg-slate-100 overflow-hidden">
-                <ScrollAnimatedImage
-                  src={hosp.image}
-                  alt={hosp.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  containerClassName="w-full h-full"
-                  animation="fade-up"
-                  delay={(idx % 3) * 0.1}
-                />
-                <div className="absolute top-3 left-3 bg-white/95 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 shadow-xs z-10">
-                  {hosp.city}, {hosp.state}
+        {hospitals.length === 0 ? (
+          <CardGridSkeleton count={3} columns="grid-cols-1 md:grid-cols-3" />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {hospitals.slice(0, 3).map((hosp, idx) => (
+              <div
+                key={hosp.id}
+                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col group"
+              >
+                <div className="h-44 relative bg-slate-100 overflow-hidden">
+                  <ScrollAnimatedImage
+                    src={hosp.image}
+                    alt={hosp.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    containerClassName="w-full h-full"
+                    animation="fade-up"
+                    delay={(idx % 3) * 0.1}
+                  />
+                  <div className="absolute top-3 left-3 bg-white/95 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 shadow-xs z-10">
+                    {hosp.city}, {hosp.state}
+                  </div>
+                </div>
+
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                  <div className="space-y-1">
+                    <h4 className="font-bold text-slate-900 text-base leading-snug">
+                      {hosp.name}
+                    </h4>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      {hosp.address}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 pt-2">
+                    {hosp.facilities.slice(0, 3).map((fac, idx) => (
+                      <span key={idx} className="px-2 py-0.5 rounded bg-blue-50 text-[#005BBD] text-[10px] font-semibold">
+                        {fac}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <a
+                      href={`tel:${hosp.contactNumber}`}
+                      className="text-xs font-bold text-slate-700 hover:text-[#005BBD] flex items-center gap-1"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{hosp.contactNumber}</span>
+                    </a>
+                    <button
+                      onClick={() => onNavigate('appointment')}
+                      className="px-3 py-1.5 rounded-lg bg-[#005BBD] text-white text-xs font-bold hover:bg-[#004A99] transition-colors cursor-pointer"
+                    >
+                      Select Center
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-                <div className="space-y-1">
-                  <h4 className="font-bold text-slate-900 text-base leading-snug">
-                    {hosp.name}
-                  </h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    {hosp.address}
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 pt-2">
-                  {hosp.facilities.slice(0, 3).map((fac, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded bg-blue-50 text-[#005BBD] text-[10px] font-semibold">
-                      {fac}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <a
-                    href={`tel:${hosp.contactNumber}`}
-                    className="text-xs font-bold text-slate-700 hover:text-[#005BBD] flex items-center gap-1"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>{hosp.contactNumber}</span>
-                  </a>
-                  <button
-                    onClick={() => onNavigate('appointment')}
-                    className="px-3 py-1.5 rounded-lg bg-[#005BBD] text-white text-xs font-bold hover:bg-[#004A99] transition-colors cursor-pointer"
-                  >
-                    Select Center
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 7. WHY CHOOSE US */}

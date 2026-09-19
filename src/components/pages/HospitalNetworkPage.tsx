@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Hospital, CompanySettings } from '../../types.ts';
 import { ScrollAnimatedImage } from '../common/ScrollAnimatedImage.tsx';
+import { CardGridSkeleton } from '../common/Skeletons.tsx';
 
 interface HospitalNetworkPageProps {
   hospitals: Hospital[];
@@ -116,7 +117,9 @@ export const HospitalNetworkPage: React.FC<HospitalNetworkPageProps> = ({
           </p>
         </div>
 
-        {filteredHospitals.length === 0 ? (
+        {hospitals.length === 0 ? (
+          <CardGridSkeleton count={6} columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3" />
+        ) : filteredHospitals.length === 0 ? (
           <div className="bg-white p-8 sm:p-12 rounded-2xl sm:rounded-3xl border border-slate-200 text-center space-y-3">
             <Building className="w-10 sm:w-12 h-10 sm:h-12 text-slate-400 mx-auto" />
             <h4 className="text-sm sm:text-base font-bold text-slate-800">No centers match your search query</h4>

@@ -29,9 +29,25 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Renal Medicare server running on http://0.0.0.0:${PORT}`);
+  });
+
+  server.on('error', (err: any) => {
+    console.error('Server listen error:', err);
   });
 }
 
-startServer();
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception in server process:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+startServer().catch((err) => {
+  console.error('Fatal error starting server:', err);
+  process.exit(1);
+});
+

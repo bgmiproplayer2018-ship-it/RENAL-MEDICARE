@@ -160,7 +160,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ settings }) => {
                   <div>
                     <span className="text-[11px] font-bold text-slate-400 block uppercase">Official WhatsApp</span>
                     <a 
-                      href={`https://wa.me/91${whatsapp}?text=${encodeURIComponent('Hello Renal Healthcare, I would like to know more about dialysis services.')}`}
+                      href={`https://wa.me/91${whatsapp}?text=${encodeURIComponent('Hello Renal Medicare, I would like to know more about dialysis services.')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-bold text-emerald-600 hover:underline block"

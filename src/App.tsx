@@ -350,7 +350,7 @@ export default function App() {
       {/* Floating WhatsApp Action Button */}
       <WhatsAppButton
         phone={settings.whatsapp || '9069645840'}
-        defaultMessage="Hello Renal Healthcare, I would like to know more about dialysis services."
+        defaultMessage="Hello Renal Medicare, I would like to know more about dialysis services."
       />
 
       {/* Global Clinical Footer */}

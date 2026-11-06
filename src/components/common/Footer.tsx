@@ -185,7 +185,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, settings }) => {
               <div>
                 <span className="text-[11px] font-semibold text-blue-300 block">Official WhatsApp</span>
                 <a 
-                  href={`https://wa.me/91${whatsapp}?text=${encodeURIComponent('Hello Renal Healthcare, I would like to know more about dialysis services.')}`}
+                  href={`https://wa.me/91${whatsapp}?text=${encodeURIComponent('Hello Renal Medicare, I would like to know more about dialysis services.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-emerald-400 font-semibold text-xs hover:underline flex items-center gap-1 mt-0.5"
@@ -220,7 +220,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, settings }) => {
 
         {/* Bottom Copyright */}
         <div className="mt-8 pt-6 border-t border-blue-950 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 text-center sm:text-left">
-          <p>© Renal Healthcare. All Rights Reserved.</p>
+          <p>© Renal Medicare. All Rights Reserved.</p>
           <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
             <button onClick={() => onNavigate('about')} className="hover:text-white cursor-pointer">
               Clinical Quality Policy
